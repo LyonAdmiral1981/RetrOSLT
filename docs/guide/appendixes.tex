@@ -1,0 +1,210 @@
+\renewcommand\runningtitle{Appendix A. Files on the Diskettes}
+\chapter{Files on the Diskettes}
+
+The two RetrOS/LT diskettes hold these files, in the order they are on
+the diskettes. Install copies all of them to the RetrOS/LT directory
+except those marked ``Not installed''; the two system files go to the
+start of drive C, and \file{COMMAND.COM} to \file{C:\bs} as well. Each
+diskette also has a hidden file, \file{RETROS.DSK}, by which Install knows
+it. Every file is dated the day of the release.
+
+{\small
+\begin{longtable}{@{}P{1.05in}rP{0.85in}P{2.3in}@{}}
+\toprule
+\textbf{File} & \textbf{Bytes} & \textbf{Diskette} & \textbf{What it is}\\
+\midrule
+\endhead
+\csname @@input\endcsname diskfiles.tex
+\bottomrule
+\end{longtable}}
+
+\mwnewpart
+\renewcommand\runningtitle{Appendix B. Technical Notes}
+\chapter{Technical Notes}
+\sectioncontents
+
+\section{Version Numbers}\ixs{version, DOS}
+
+\typed{VER} shows \shown{RetrOS/LT Version 1.0, DOS 2.10}. To a program
+that asks through interrupt 21h, function 30h, RetrOS/LT reports DOS
+version 2.10, as PC DOS 2.10 does. The commands supplied with RetrOS/LT
+check for DOS 2.
+
+\section{The System Files}\ixs{RETBIO.COM}\ixs{RETDOS.COM}
+
+\file{RETBIO.COM} is RetrOS/LT's interface to the computer's BIOS: its
+drivers for the keyboard and display, the printers, the serial port, the
+clock and the disks. \file{RETDOS.COM} is the kernel, which gives programs
+the DOS functions. Both are hidden. \file{RETBIO.COM} must be the first
+entry in the root directory and be in one piece at the start of the data
+area; \file{RETDOS.COM} must be the second entry. \typed{FORMAT /S} and
+\typed{SYS} see to that.
+
+The startup record of the disk loads \file{RETBIO.COM} at 0070:0000;
+\file{RETBIO.COM} loads \file{RETDOS.COM}. On a fixed disk, the master
+boot record that \typed{FDISK} writes first loads the startup record of
+the active partition.
+
+\section{Disks}\ixs{disks, formats}
+
+\begin{tabularx}{\textwidth}{@{}P{1.0in}P{0.6in}P{0.6in}P{0.7in}P{0.6in}X@{}}
+\toprule
+\textbf{Format} & \textbf{Media byte} & \textbf{Sectors a cluster} & \textbf{Root entries} & \textbf{FAT sectors} & \textbf{Data starts at sector}\\
+\midrule
+360 KB & FD & 2 & 112 & 2 & 12\\
+320 KB & FF & 2 & 112 & 1 & 10\\
+180 KB & FC & 1 & 64 & 2 & 9\\
+160 KB & FE & 1 & 64 & 1 & 7\\
+Fixed disk & F8 & by size & 512 & by size & by size\\
+\bottomrule
+\end{tabularx}
+
+A fixed disk's partition begins on head 1 of cylinder 0 and is described
+by a 12-bit file allocation table. RetrOS/LT works out the layout of a
+DOS partition from its size, as DOS 2 does: the smallest cluster that
+keeps the number of clusters within 4,084, and as many table sectors as
+that needs. Neither the PC nor the XT can tell when a diskette is changed,
+so RetrOS/LT treats a diskette used in the last two seconds as unchanged,
+and otherwise reads its file allocation table again when the disk's
+buffers allow.
+
+\section{Limits}\ixs{limits}
+
+\begin{tabularx}{\textwidth}{@{}P{2.0in}X@{}}
+\toprule
+Fixed disks & The first two the BIOS reports, one DOS partition each.\\
+Volume size & 65,535 sectors, about 32 MB.\\
+File allocation tables & 12-bit.\\
+Open files & 99, set by \typed{FILES=}; 20 for one program.\\
+Path length & 63 characters from the root.\\
+Command line & 127 characters.\\
+Environment & 160 bytes to begin with.\\
+Dates & 1980 to 2099.\\
+\bottomrule
+\end{tabularx}
+
+\section{Building RetrOS/LT}
+
+The kernel, \file{COMMAND.COM} and most commands are built from Microsoft's
+MS-DOS 2 source, with a short series of changes applied in order, using
+Microsoft's assembler and linker. \file{RETBIO.COM}, the startup records,
+\typed{FORMAT}'s part for the IBM Personal Computer, the IBM commands,
+\file{ANSI.SYS} and Install are new. The \textit{RetrOS/LT Guide to
+Engineering} describes them, the changes and the build.
+
+\mwnewpart
+\renewcommand\runningtitle{Appendix C. EDLIN and DEBUG}
+\chapter{EDLIN and DEBUG}
+\sectioncontents
+
+\section{EDLIN Commands}\ixs{EDLIN command}
+
+\typed{EDLIN} works on numbered lines. In its commands a line may be given
+as a number, as a period for the current line, as \typed{\#} for the line
+after the last, or as \typed{+}\var{n} or \typed{-}\var{n} from the current
+line. Type a line number alone to edit that line.
+
+\begin{tabularx}{\textwidth}{@{}P{1.85in}X@{}}
+\toprule
+\textbf{Command} & \textbf{What it does}\\
+\midrule
+{}[\var{line}]\typed{I} & Inserts lines before \var{line}. End with \keys{Ctrl}{Break}.\\
+{}[\var{line}][,\var{line}]\typed{L} & Lists lines.\\
+{}[\var{line}][,\var{line}]\typed{P} & Lists lines a page at a time, and moves to the last.\\
+{}[\var{line}][,\var{line}]\typed{D} & Deletes lines.\\
+\var{line},\var{line},\var{line}\typed{M} & Moves the range to before the third line.\\
+\var{line},\var{line},\var{line}[,\var{n}]\typed{C} & Copies the range, \var{n} times.\\
+{}[\var{line}][,\var{line}][\typed{?}]\typed{S}\var{text} & Searches for \var{text}; \typed{?} asks at each.\\
+{}[\var{line}][,\var{line}][\typed{?}]\typed{R}\var{old}\key{F6}\var{new} & Replaces \var{old} with \var{new}.\\
+{}[\var{line}]\typed{T}\var{file} & Merges another file in before \var{line}.\\
+{}[\var{n}]\typed{W}, [\var{n}]\typed{A} & Writes lines to disk, and appends more from it, for files too large for memory.\\
+\typed{E} & Ends, saving the file; the old one is kept as \file{.BAK}.\\
+\typed{Q} & Quits without saving, after asking.\\
+\bottomrule
+\end{tabularx}
+
+\section{DEBUG Commands}\ixs{DEBUG command}
+
+Numbers in \typed{DEBUG} are hexadecimal. An address is a segment and an
+offset, \typed{1234:0100}, or an offset alone.
+
+\begin{tabularx}{\textwidth}{@{}P{1.85in}X@{}}
+\toprule
+\textbf{Command} & \textbf{What it does}\\
+\midrule
+\typed{A} [\var{address}] & Assembles 8086 instructions as you type them.\\
+\typed{C} \var{range} \var{address} & Compares two areas of memory.\\
+\typed{D} [\var{range}] & Displays memory.\\
+\typed{E} \var{address} [\var{list}] & Enters bytes into memory.\\
+\typed{F} \var{range} \var{list} & Fills memory.\\
+\typed{G} [=\var{address}] [\var{breakpoints}] & Runs the program.\\
+\typed{H} \var{value} \var{value} & Shows the sum and difference.\\
+\typed{I} \var{port} & Reads a port.\\
+\typed{L} [\var{address} [\var{drive} \var{sector} \var{count}]] & Loads the named file, or disk sectors.\\
+\typed{M} \var{range} \var{address} & Moves memory.\\
+\typed{N} \var{file} & Names the file for \typed{L} and \typed{W}.\\
+\typed{O} \var{port} \var{value} & Writes to a port.\\
+\typed{Q} & Quits.\\
+\typed{R} [\var{register}] & Shows or changes the registers.\\
+\typed{S} \var{range} \var{list} & Searches memory.\\
+\typed{T} [=\var{address}] [\var{count}] & Traces one instruction at a time.\\
+\typed{U} [\var{range}] & Unassembles memory into instructions.\\
+\typed{W} [\var{address} [\var{drive} \var{sector} \var{count}]] & Writes the file, or disk sectors.\\
+\bottomrule
+\end{tabularx}
+
+\caution{\typed{W} with a drive and sector numbers writes straight to the
+disk, past the file system. A wrong number destroys the disk's contents.}
+
+\mwnewpart
+\renewcommand\runningtitle{Appendix D. Credits and License}
+\chapter{Credits and License}
+\sectioncontents
+
+\section{Where RetrOS/LT Comes From}\ixs{credits}\ixs{MS-DOS 2, derived from}
+
+RetrOS/LT is a product of The Lyon Mountain Company, Republic Lyon
+Mountain Corporation. It is derived from the source code of MS-DOS 2,
+which was written by Microsoft Corporation and which Microsoft released to
+the public in 2018 under the MIT License. The kernel, \file{COMMAND.COM},
+\typed{SYSINIT}, and the commands \typed{CHKDSK}, \typed{DEBUG},
+\typed{EDLIN}, \typed{EXE2BIN}, \typed{FC}, \typed{FIND}, \typed{MORE},
+\typed{PRINT}, \typed{RECOVER}, \typed{SORT}, \typed{SYS} and most of
+\typed{FORMAT} are that code; \typed{LINK} is Microsoft's program from the
+same release.
+
+RetrOS/LT is not MS-DOS and is not PC DOS, and neither Microsoft nor IBM
+has any part in it. The Lyon Mountain Company added:
+
+\begin{itemize}
+\item \file{RETBIO.COM}, the startup records and \typed{FORMAT}'s part for
+  the IBM Personal Computer, all new, and the kernel's console functions,
+  which the released source lacks and which were reconstructed;
+\item the commands written to behave as IBM's do: \typed{ASSIGN},
+  \typed{BACKUP}, \typed{COMP}, \typed{DISKCOMP}, \typed{DISKCOPY},
+  \typed{FDISK}, \typed{GRAPHICS}, \typed{MODE}, \typed{RESTORE},
+  \typed{TREE} and \file{ANSI.SYS};
+\item the Install program;
+\item the RetrOS/LT name, banners and messages, the diskettes, and these
+  guides.
+\end{itemize}
+
+IBM, IBM Personal Computer, PC DOS and Personal Computer XT are names of
+International Business Machines Corporation; MS-DOS is a name of
+Microsoft Corporation. They are used here only to say what RetrOS/LT runs
+on and is compatible with.
+
+\section{The Microsoft Notice}\ixs{MIT License}
+
+The MIT License requires that this notice accompany the code. It is also
+on the DOS diskette, as \file{NOTICE.TXT}.
+
+\VerbatimInput[fontsize=\footnotesize,baselinestretch=1.0]{../../dist/NOTICE.TXT}
+
+\section{The RetrOS/LT License}\ixs{license}\ixs{Single-Machine License}\ixs{Blanket License}
+
+RetrOS/LT as The Lyon Mountain Company supplies it is licensed, not sold,
+under the license that follows. It is on the DOS diskette as
+\file{LICENSE.TXT}, and Install asks you to accept it.
+
+\VerbatimInput[fontsize=\footnotesize,baselinestretch=1.0]{../../dist/LICENSE.TXT}

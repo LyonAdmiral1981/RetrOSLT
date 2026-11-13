@@ -1,0 +1,225 @@
+% ------------------------------------------------------------------ glossary
+\mwnewpart
+\renewcommand\runningtitle{Glossary}
+\namedpages{Glossary}
+\chapter*{Glossary}
+\setcounter{page}{1}
+\addcontentsline{toc}{chapter}{Glossary}
+
+\newcommand\gl[2]{\par\noindent\hangindent=1.2em\textbf{#1}\quad #2\par}
+
+\gl{8088}{The Intel processor of the IBM Personal Computer and XT. It has
+20 address lines and can address 1 MB of memory, and moves data 8 bits at
+a time.}
+\gl{active partition}{The partition the computer starts from.}
+\gl{allocation unit}{The unit in which disk space is given to files: one or
+more sectors. Also called a cluster.}
+\gl{archive attribute}{A mark on a file that says it has changed since it
+was last backed up.}
+\gl{AUTOEXEC.BAT}{The batch file run each time the computer starts.}
+\gl{batch file}{A file of commands, run by typing its name.}
+\gl{BIOS}{Basic Input/Output System: the programs in the computer's ROM that
+start it and work its hardware.}
+\gl{boot record}{The first sector of a disk or partition, which starts the
+system and describes the volume. Also called the startup record. The
+first sector of a fixed disk is its master boot record, which holds the
+partition table.}
+\gl{buffer}{Memory in which RetrOS/LT keeps what it last read from or will
+write to a disk.}
+\gl{command processor}{\file{COMMAND.COM}: the program that shows the
+prompt and carries out commands.}
+\gl{CONFIG.SYS}{The file RetrOS/LT reads when the computer starts, to set
+itself up and load device drivers.}
+\gl{current directory}{The directory RetrOS/LT uses when you name none.}
+\gl{current drive}{The drive RetrOS/LT uses when you name none.}
+\gl{device driver}{A program loaded by a \typed{DEVICE=} line in
+\file{CONFIG.SYS}, which stays in memory and works a device.}
+\gl{directory}{A list of files and other directories on a disk.}
+\gl{environment}{A set of named values, such as \file{PATH}, that every
+program can read.}
+\gl{external command}{A command that is a program file on the disk.}
+\gl{file allocation table}{The table on a disk that records which
+allocation units belong to which file. Under DOS 2 its entries are 12
+bits long.}
+\gl{fixed disk}{A disk that is not removed from the computer; a hard
+disk.}
+\gl{internal command}{A command that is part of the command processor.}
+\gl{KB}{Kilobyte: 1,024 bytes.}
+\gl{MB}{Megabyte: 1,024 KB.}
+\gl{partition}{A part of a fixed disk set aside for one operating system.}
+\gl{path}{The directories that lead to a file; also, the list of
+directories searched for programs.}
+\gl{pipe}{A bar between two commands, which makes what the first writes
+into what the second reads.}
+\gl{read-only}{A mark on a file that keeps it from being changed or
+erased.}
+\gl{redirection}{Sending what a command writes to a file or device, or
+having it read from one.}
+\gl{root directory}{The first directory of a disk, written as a
+backslash.}
+\gl{sector}{The unit in which a disk is read and written, usually 512
+bytes.}
+\gl{system files}{\file{RETBIO.COM} and \file{RETDOS.COM}: RetrOS/LT
+itself, hidden at the start of the startup disk.}
+\gl{track}{One of the circles on a disk on which data is recorded. A
+5-1/4 inch diskette of the PC has 40 on each side.}
+\gl{volume label}{A name of up to eleven characters given to a disk.}
+\gl{wildcard}{A \typed{?} or \typed{*} in a file name, standing for other
+characters.}
+
+
+% ------------------------------------------------------------------ index
+\mwnewpart
+\renewcommand\runningtitle{Index}
+\namedpages{Index}
+\setcounter{page}{1}
+\indexprologue{}
+\printindex
+
+% ------------------------------------------------------------------ quick reference
+\mwcutpage
+\pagestyle{blank}
+\newgeometry{left=\dimexpr0.6in+\bleed\relax,right=\dimexpr0.6in+\bleed\relax,top=\dimexpr0.55in+\bleed\relax,bottom=\dimexpr0.6in+\bleed\relax}
+\renewcommand\thepage{}
+\begingroup\small\setlength\parskip{3pt}
+\noindent\begin{tikzpicture}\addressband{(0,0)}{\linewidth}{5pt}\end{tikzpicture}\par
+\noindent{\cond\bfseries\fontsize{20}{22}\selectfont\color{disc}RetrOS/LT Quick Reference Card}\hfill{\footnotesize Version 1.0}\par
+\vspace{4pt}
+\begin{minipage}[t]{0.485\linewidth}\setlength\parskip{3pt}
+\textbf{\large Files}\par
+\begin{tabular}{@{}P{1.7in}P{1.6in}@{}}
+\typed{DIR} [\var{file}] [/P] [/W] & list files\\
+\typed{COPY} \var{source} [\var{target}] & copy files\\
+\typed{REN} \var{file} \var{newname} & rename\\
+\typed{DEL} \var{file} & erase\\
+\typed{TYPE} \var{file} & show on the screen\\
+\typed{PRINT} \var{file} & print\\
+\typed{COMP} \var{file1} \var{file2} & compare\\
+\end{tabular}
+
+\textbf{\large Directories}\par
+\begin{tabular}{@{}P{1.7in}P{1.6in}@{}}
+\typed{MD} \var{path} & make\\
+\typed{CD} \var{path}\quad \typed{CD ..}\quad \typed{CD \bs} & change\\
+\typed{RD} \var{path} & remove (must be empty)\\
+\typed{TREE} [\var{d:}] [/F] & show the tree\\
+\typed{PATH} \var{d:path}[;...] & where programs are found\\
+\end{tabular}
+
+\textbf{\large Disks}\par
+\begin{tabular}{@{}P{1.7in}P{1.6in}@{}}
+\typed{FORMAT B:} & format a 360 KB diskette\\
+\typed{FORMAT B:/1} & format a 180 KB diskette\\
+\typed{FORMAT B:/S} & make a startup diskette\\
+\typed{DISKCOPY A: B:} & copy a diskette\\
+\typed{CHKDSK} [\var{d:}] [/F] & check a disk\\
+\typed{VOL} [\var{d:}] & volume label\\
+\typed{SYS} \var{d:} & copy the system files\\
+\typed{FDISK} & partition a fixed disk\\
+\typed{BACKUP C:\bs\ A: /S} & back up drive C\\
+\typed{RESTORE A: C:\bs*.* /S} & restore it\\
+\end{tabular}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.485\linewidth}\setlength\parskip{3pt}
+\textbf{\large Wildcards and redirection}\par
+\begin{tabular}{@{}P{1.2in}P{2.1in}@{}}
+\typed{?}\quad \typed{*} & any one character; any characters\\
+\typed{>} \var{file}\quad \typed{>>} \var{file} & write to a file; add to it\\
+\typed{<} \var{file} & read from a file\\
+\var{a} \typed{|} \var{b} & pipe \var{a} into \var{b}: \typed{DIR | MORE}\\
+\end{tabular}
+
+\textbf{\large Keys}\par
+\begin{tabular}{@{}P{1.45in}P{1.85in}@{}}
+\keys{Ctrl}{Break} & stop a command\\
+\keys{Ctrl}{Num Lock} & stop the screen; any key goes on\\
+\key{F3} & repeat the last command\\
+\key{F1} & repeat one character of it\\
+\key{Esc} & cancel the line\\
+\key{Shift}\,+\,\key{PrtSc} & print the screen\\
+\key{Ctrl}\,+\,\key{PrtSc} & print as you go, on or off\\
+\key{Ctrl}\,+\,\key{Alt}\,+\,\key{Del} & restart the computer\\
+\end{tabular}
+
+\textbf{\large The system}\par
+\begin{tabular}{@{}P{1.45in}P{1.85in}@{}}
+\typed{VER} & the version\\
+\typed{DATE}\quad \typed{TIME} & show or set (year in four digits)\\
+\typed{SET} [\var{name}=\var{value}] & the environment\\
+\typed{PROMPT \$P\$G} & show the directory\\
+\typed{MODE CO80}\quad \typed{MODE MONO} & the display\\
+\typed{CLS} & clear the screen\\
+\end{tabular}
+
+\textbf{\large As installed}\par
+\shown{FILES=20}\quad\shown{BUFFERS=15}\quad(\shown{10} below 384 KB)\par
+\shown{DEVICE=C:\bs{}DOS\bs{}ANSI.SYS}\par
+\shown{DATE}, \shown{TIME}, \shown{PROMPT \$P\$G}, \shown{PATH C:\bs{}DOS}\par
+
+\textbf{If the computer does not start}\par
+Start from the DOS diskette and press \key{Esc}. For a missing system:
+\typed{SYS C:}, then copy \file{COMMAND.COM} to \file{C:\bs}.
+\end{minipage}
+\par\vfill
+\noindent{\footnotesize\color{grey}Cut along the outer edge. The Lyon Mountain Company, Republic Lyon Mountain Corporation, Lyon Mountain, New York 12952.}
+\endgroup
+\mwcutpage
+
+% ------------------------------------------------------------------ reader's comment form
+\begingroup\small\setlength\parskip{5pt}
+\noindent{\cond\bfseries\fontsize{18}{20}\selectfont\color{disc}Reader's Comment Form}\hfill
+{\footnotesize\textbf{RetrOS/LT Guide to Operations}}\par
+\vspace{2pt}\noindent\begin{tikzpicture}\addressband{(0,0)}{\linewidth}{4pt}\end{tikzpicture}\par
+
+Your comments help us improve our publications. Please tell us about any
+errors, about anything that was hard to follow, and about anything you
+looked for and could not find. Comments about RetrOS/LT itself are
+welcome too; if a program does not run under it, please name the program
+and say what happened.
+
+\newcommand\cbox{\tikz\draw (0,0) rectangle (0.11in,0.11in);}
+\begin{tabular}{@{}lll@{}}
+\multicolumn{3}{@{}l}{Did you find the material:}\\
+\cbox\ Easy to read and understand? & \cbox\ Yes & \cbox\ No\\
+\cbox\ Organized for convenient use? & \cbox\ Yes & \cbox\ No\\
+\cbox\ Complete? & \cbox\ Yes & \cbox\ No\\
+\cbox\ Well illustrated? & \cbox\ Yes & \cbox\ No\\
+\end{tabular}
+
+Computer:\quad \cbox\ IBM PC\quad \cbox\ IBM PC XT\quad \cbox\ Other: \rule{1.6in}{0.4pt}\qquad BIOS date: \rule{1.0in}{0.4pt}
+
+Memory and disks: \rule{5.2in}{0.4pt}
+
+Comments (please give page numbers):
+
+\foreach \n in {1,...,11}{\noindent\rule{\linewidth}{0.4pt}\par\vspace{9pt}}
+
+\begin{tabular}{@{}p{0.9in}p{5.6in}@{}}
+Name & \rule{5.4in}{0.4pt}\\[8pt]
+Address & \rule{5.4in}{0.4pt}\\[8pt]
+& \rule{5.4in}{0.4pt}\\
+\end{tabular}
+
+\vfill
+\noindent\makebox[\linewidth]{\footnotesize\color{grey}\rule[2pt]{1.6in}{0.3pt}\ \ Fold here, with this side inside\ \ \rule[2pt]{1.6in}{0.3pt}}
+\endgroup
+\clearpage
+
+\vspace*{\fill}
+\begin{center}
+\begin{tikzpicture}[x=1in,y=1in]
+  \draw[dashed,grey] (-3.3,1.6) -- (3.3,1.6);
+  \node[font=\footnotesize,text=grey] at (0,1.75) {Fold here};
+  \draw (2.35,0.55) rectangle (3.05,1.35);
+  \node[font=\scriptsize,align=center,text=grey] at (2.7,0.95) {Place\\stamp\\here};
+  \node[align=left,anchor=north west,font=\normalsize] at (-1.2,0.2) {%
+    \textbf{RetrOS/LT Comment Form}\\
+    P.O. Box 290\\
+    Lyon Mountain, New York 12952 USA};
+  \node[anchor=north west,font=\footnotesize] at (-3.3,1.35) {From:};
+  \draw[dashed,grey] (-3.3,-1.6) -- (3.3,-1.6);
+  \node[font=\footnotesize,text=grey] at (0,-1.75) {Fold here, and tape closed. Please do not staple.};
+\end{tikzpicture}
+\end{center}
+\vspace*{\fill}
+\restoregeometry

@@ -1,0 +1,240 @@
+\mwnewpart
+\renewcommand\runningtitle{Section 2. Installing RetrOS/LT}
+\chapter{Installing RetrOS/LT}
+\sectioncontents
+
+\section{Two Ways to Use RetrOS/LT}
+
+\begin{itemize}
+\item \textbf{From diskettes.} Start the computer from the DOS diskette, or
+  from a copy of it, and run your programs from the diskettes. Nothing
+  needs installing. To make a startup diskette of your own, see ``Making a
+  Disk Start the Computer'' in Section~4.
+\item \textbf{From the fixed disk.} Install puts RetrOS/LT on the first
+  fixed disk, drive C, so that the computer starts from it. This Section
+  describes Install.
+\end{itemize}
+
+\section{Before You Install}\ixs{Install}\ixs{INSTALL command}
+
+\begin{itemize}
+\item \textbf{Copy the two diskettes}, and install from the copies.
+\item \textbf{Save what is on the fixed disk.} If the disk holds files you
+  want, copy them to diskettes first. Install can keep the files on a disk
+  that is already formatted, but partitioning or formatting a disk erases
+  it.
+\item \textbf{A new fixed disk} must have been low-level formatted, as its
+  maker describes, before Install can use it.
+\end{itemize}
+
+Install asks before it changes the fixed disk. You can leave it at any
+question by pressing \key{Esc}; nothing further is changed.
+
+\section{Starting Install}
+
+\begin{enumerate}
+\item Put the DOS diskette in drive A and close the drive door.
+\item Turn the computer on, or, if it is on, press
+  \key{Ctrl}\,+\,\key{Alt}\,+\,\key{Del}.
+\item Enter the date and the time when RetrOS/LT asks for them.
+\end{enumerate}
+
+Install then starts:
+
+\begin{dialogue}
+\ \ RetrOS/LT Version 1.0 Install
+
+\ \ Welcome to RetrOS/LT.
+
+\ \ Install puts RetrOS/LT on the fixed disk of this computer,
+\ \ drive C:, so that the computer starts from it.
+
+\ \ Before any change is made to the fixed disk you are asked first.
+\ \ You can leave Install at any question by pressing Esc.
+
+\ \ Press Enter to continue, or Esc to leave Install.
+\end{dialogue}
+
+Press \key{Enter}. Install then asks you to accept the RetrOS/LT License,
+which is printed in Appendix~D and is on the diskette as
+\file{LICENSE.TXT}:
+
+\begin{dialogue}
+\ \ Do you accept the terms of the RetrOS/LT License (Y/N)?
+\end{dialogue}
+
+Press \key{Y} to go on. If you press \key{N}, Install ends and nothing is
+changed. To read the license first, press \key{N} and type
+\typed{TYPE LICENSE.TXT | MORE}. To start Install again, type
+\typed{INSTALL}.
+
+If the computer has no fixed disk, Install says so and ends. RetrOS/LT
+runs from the diskettes as they are.
+
+\section{A Disk with No DOS Partition}\ixs{partition}\ixs{FDISK command}
+
+A fixed disk must be divided into partitions before it can be used. If
+yours has no DOS partition, Install says so:
+
+\begin{dialogue}
+\ \ The fixed disk has no DOS partition.
+
+\ \ A fixed disk must be partitioned before it can be used.
+
+\ \ \ \ W\ \ \ Use the whole disk for RetrOS/LT.
+\ \ \ \ \ \ \ \ Anything on the disk now will be lost.
+
+\ \ \ \ F\ \ \ Run FDISK, to set up the partitions yourself.
+
+\ \ \ \ Esc Leave Install without changing the disk.
+
+\ \ Press W, F or Esc.
+\end{dialogue}
+
+\begin{itemize}
+\item Press \key{W} to give the whole disk to one DOS partition, as
+  \typed{FDISK} does when you answer \typed{Y} to ``Do you wish to use the
+  entire fixed disk for DOS''. This is the usual choice.
+\item Press \key{F} to run \typed{FDISK} yourself, if you want to leave
+  part of the disk for another operating system. See ``Partitioning a
+  Fixed Disk'' in Section~4.
+\end{itemize}
+
+A DOS 2 partition holds at most 65,535 sectors, about 32 MB. On a larger
+disk the rest is left unused.
+
+The computer must then restart. Leave the diskette in drive A and press
+any key. RetrOS/LT starts again, asks the date and time, and Install goes
+on from where it stopped. Accept the license once more.
+
+\section{Choosing the Directory}\ixs{directory, install}
+
+Install asks where to put the commands and device drivers:
+
+\begin{dialogue}
+\ \ Where should RetrOS/LT be installed?
+
+\ \ The programs and drivers go in one directory of drive C:.
+\ \ C:\bs{}DOS is the usual place. To use another, type over the name
+\ \ below. The files that start the computer always go in C:\bs.
+
+\ \ C:\bs{}DOS
+
+\ \ Press Enter to accept, or Esc to leave Install.
+\end{dialogue}
+
+Press \key{Enter} to use \file{C:\bs{}DOS}. To use another directory, press
+\key{Backspace} to erase the name, type the new one, and press
+\key{Enter}. Each name in the path may have up to eight letters or digits;
+a path such as \file{C:\bs{}SYS\bs{}DOS} is allowed, and Install makes each
+directory in it.
+
+\section{Formatting Drive C}\ixs{formatting drive C}
+
+If drive C is not formatted, Install says that it will format it and
+waits for \key{Enter}. It then runs \typed{FORMAT C:/S}, which asks you to
+press a key to begin. Formatting checks every sector of the disk and takes
+some minutes.
+
+If drive C is already formatted, Install asks what to do:
+
+\begin{dialogue}
+\ \ Drive C: is already formatted and may hold files.
+
+\ \ \ \ K\ \ \ Keep the files on drive C: and add RetrOS/LT to them.
+\ \ \ \ \ \ \ \ An existing CONFIG.SYS and AUTOEXEC.BAT are kept as
+\ \ \ \ \ \ \ \ CONFIG.OLD and AUTOEXEC.OLD.
+
+\ \ \ \ F\ \ \ Format drive C:. Everything on it will be lost.
+
+\ \ \ \ Esc Leave Install without changing the disk.
+
+\ \ Press K, F or Esc.
+\end{dialogue}
+
+\begin{itemize}
+\item Press \key{K} to keep your files. Install runs \typed{SYS C:}, which
+  puts the RetrOS/LT system files in place of those of the system that was
+  there.
+\item Press \key{F} to format the disk. Install asks once more,
+  \shown{Format drive C: (Y/N)?}, before it does.
+\end{itemize}
+
+\caution{\typed{SYS} can put the system files on a disk only if the first
+two entries of its root directory are free or already hold system files,
+and the start of the disk has room for them. A disk formatted by DOS 2 or
+by RetrOS/LT has that room; a disk formatted by a later version of DOS may
+not. If \typed{SYS} cannot do it, Install says so and stops. Copy your
+files to diskettes, run Install again, and choose to format drive C.}
+
+\section{Copying the Files}
+
+Install copies the files of the DOS diskette to the directory you chose,
+showing each name, and puts \file{COMMAND.COM} in \file{C:\bs} as well.
+It then asks for the second diskette:
+
+\begin{dialogue}
+\ \ Insert the RetrOS/LT Supplemental Programs diskette in
+\ \ drive A:.
+
+\ \ Press Enter to continue, or Esc to leave Install.
+\end{dialogue}
+
+Change the diskettes and press \key{Enter}. Install checks that it is the
+right diskette before it copies anything from it.
+
+\section{The Startup Files}\ixs{CONFIG.SYS}\ixs{AUTOEXEC.BAT}
+
+Last, Install writes \file{C:\bs{}CONFIG.SYS} and
+\file{C:\bs{}AUTOEXEC.BAT}. If they were there already, the old ones are
+kept as \file{CONFIG.OLD} and \file{AUTOEXEC.OLD}. With the usual
+directory, they are:
+
+\begin{dialogue}
+FILES=20
+BUFFERS=15
+DEVICE=C:\bs{}DOS\bs{}ANSI.SYS
+\end{dialogue}
+
+\begin{dialogue}
+DATE
+TIME
+PROMPT \$P\$G
+PATH C:\bs{}DOS
+\end{dialogue}
+
+On a computer with less than 384 KB, \typed{BUFFERS=10} is written
+instead, to leave more memory for programs. The Personal Computer and the
+XT keep no time while they are off, so \file{AUTOEXEC.BAT} asks the date
+and time each time the computer starts. The prompt shows the current
+directory, and the commands can be used from any directory. Section~5
+describes these files.
+
+When Install is done, it says so:
+
+\begin{dialogue}
+\ \ RetrOS/LT is installed on drive C:.
+
+\ \ Remove the diskette from drive A:, then press Enter to restart
+\ \ the computer from the fixed disk.
+\end{dialogue}
+
+Open the drive door and press \key{Enter}. The computer starts from the
+fixed disk.
+
+\section{If Install Stops}
+
+If something goes wrong, Install says what it was, and that nothing
+further was changed. The usual causes:
+
+\begin{itemize}
+\item \shown{The fixed disk could not be read}: the adapter or its cable
+  is not seated, or the disk has not been low-level formatted.
+\item \shown{Drive C: could not be formatted}: run \typed{FORMAT C:/S}
+  from the DOS diskette to see the message.
+\item \shown{A file could not be copied to drive C:}: the disk is full, or
+  the diskette is damaged. Try another copy of the diskette.
+\end{itemize}
+
+Install works out where it stopped from the state of the disk, so you can
+simply run it again.

@@ -1,0 +1,40 @@
+% RetrOS/LT Guide to Operations
+% Build with:  sh docs/guide/build.sh   (XeLaTeX and makeindex)
+% \mwmode: single (default), duplex or shop; see rosguide.sty and build.sh.
+\providecommand\mwmode{single}
+\def\mwsingle{single}
+\ifx\mwmode\mwsingle \def\mwopts{oneside,openany}\else \def\mwopts{twoside,openright}\fi
+\edef\mwclass{\noexpand\documentclass[11pt,\mwopts]{report}}\mwclass
+\newcommand\booktitle{Guide to Operations}
+\newcommand\subtitleline{The Lite Disk Operating System for the IBM Personal Computer and XT}
+\newcommand\subtitlelines{The Lite Disk Operating System for the\\IBM Personal Computer and XT}
+\usepackage{rosguide}
+\usepackage{imakeidx}
+\usepackage{fancyvrb}
+\makeindex[options=-s rosindex.ist,intoc]
+\input{release}        % \release, written by build.sh from the last program commit
+\newcommand\edition{First Edition (November 2026)}
+\newcommand\editionchanges{}
+
+\begin{document}
+
+\input{front}
+\mwnewpart
+\sectionpages
+\renewcommand\sectionword{Section}
+\input{s1-introduction}
+\input{s2-installing}
+\input{s3-using}
+\input{s4-disks}
+\input{s5-setup}
+\input{s6-commands}
+\input{s7-problems}
+
+\mwnewpart          % before \appendix, which renumbers the pending page
+\appendix
+\renewcommand\sectionword{Appendix}
+\input{appendixes}
+
+\input{back}
+
+\end{document}

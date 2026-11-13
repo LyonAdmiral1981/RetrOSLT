@@ -1,0 +1,232 @@
+\mwnewpart
+\renewcommand\runningtitle{Section 3. Using RetrOS/LT}
+\chapter{Using RetrOS/LT}
+\sectioncontents
+
+\section{The Prompt}\ixs{prompt}
+
+When RetrOS/LT is ready for a command it shows a prompt, such as
+\shown{A>}. The letter is the \term{current drive}, the one RetrOS/LT uses
+when you do not name another. You type a command after the prompt and
+press \key{Enter}.
+
+\begin{dialogue}
+A>\textbf{DIR}
+\end{dialogue}
+
+You may type commands in capitals or in small letters. If you make a
+mistake before you press \key{Enter}, press \key{Backspace} to erase it. To
+stop a command that is running, press \keys{Ctrl}{Break} or \keys{Ctrl}{C}.
+To make the screen stop scrolling, press \keys{Ctrl}{Num Lock}; any key
+starts it again.
+
+To change the current drive, type its letter and a colon:
+
+\begin{dialogue}
+A>\textbf{B:}
+B>
+\end{dialogue}
+
+After Install, the prompt also shows the current directory, as
+\shown{C:\bs>}; the \typed{PROMPT} command sets what it shows.
+
+\section{Drives}\ixs{drives}
+
+Each diskette drive and each fixed disk has a letter. A and B are the
+diskette drives; a computer with one diskette drive uses it as both A and
+B, and asks you to change diskettes. C is the DOS partition of the first
+fixed disk, and D that of the second, if there is one.
+
+\section{Files and Their Names}\ixs{files}\ixs{file names}
+
+Everything kept on a disk is in a \term{file}. A file has a name of one to
+eight characters and, usually, an extension of up to three, with a period
+between: \file{LETTER.TXT}, \file{BUDGET83.CAL}. You may use letters,
+digits and these characters:
+
+\begin{dialogue}
+\$ \&\ \# @ ! \% ' ( ) - \{ \} \_ ` \textasciitilde\ \textasciicircum
+\end{dialogue}
+
+The extension usually tells what kind of file it is:
+
+\begin{tabularx}{\textwidth}{@{}P{1.1in}X@{}}
+\toprule
+\file{.COM}, \file{.EXE} & Programs. Type the name, without the extension, to run one.\\
+\file{.BAT} & Batch files: lists of commands, run the same way.\\
+\file{.SYS} & Device drivers.\\
+\bottomrule
+\end{tabularx}
+
+These names are devices, not files, and cannot be used as file names:
+\file{CON} (the keyboard and screen), \file{PRN} and \file{LPT1} to
+\file{LPT3} (printers), \file{AUX} and \file{COM1} (the serial port), and
+\file{NUL} (nothing).
+
+\subsection{Wildcards}\ixs{wildcards} Two characters stand for others in a
+file name, so that one command can work on many files. A question mark
+\typed{?} stands for any one character; an asterisk \typed{*} stands for
+any characters to the end of the name or of the extension.
+
+\begin{tabularx}{\textwidth}{@{}P{1.3in}X@{}}
+\toprule
+\typed{*.TXT} & every file with the extension \file{.TXT}\\
+\typed{LETTER.*} & every file named \file{LETTER}, whatever its extension\\
+\typed{CHAP?.DOC} & \file{CHAP1.DOC}, \file{CHAP2.DOC} and so on\\
+\typed{*.*} & every file\\
+\bottomrule
+\end{tabularx}
+
+\section{Directories}\ixs{directories}\ixs{path}
+
+A fixed disk holds thousands of files. To keep them in order, a disk is
+divided into \term{directories}, and a directory can hold other
+directories as well as files. Every disk has one directory to begin with,
+the \term{root}, written as a backslash: \file{C:\bs}.
+
+The \term{path} to a file names the drive, then each directory on the way,
+then the file, with backslashes between:
+
+\begin{dialogue}
+C:\bs{}LETTERS\bs{}1983\bs{}SMITH.TXT
+\end{dialogue}
+
+You may leave out what RetrOS/LT already knows. If the current drive is C
+and the current directory is \file{\bs{}LETTERS\bs{}1983}, then
+\file{SMITH.TXT} is enough. Each drive has its own current directory.
+
+\begin{tabularx}{\textwidth}{@{}P{1.6in}X@{}}
+\toprule
+\typed{MD LETTERS} & makes a directory named \file{LETTERS} in the current one\\
+\typed{CD LETTERS} & makes it the current directory\\
+\typed{CD ..} & goes back to the directory above\\
+\typed{CD \bs} & goes to the root\\
+\typed{RD LETTERS} & removes the directory, which must be empty\\
+\typed{DIR} & lists the files in the current directory\\
+\typed{TREE C:} & shows all the directories of drive C\\
+\bottomrule
+\end{tabularx}
+
+In every directory but the root, \typed{DIR} shows two entries named
+\file{.} and \file{..}; they stand for the directory itself and the one
+above it. The root directory of a disk holds a fixed number of entries:
+64 on a single-sided diskette, 112 on a double-sided one, and 512 on a
+fixed disk. Other directories can hold any number.
+
+\section{Working with Files}
+
+\begin{tabularx}{\textwidth}{@{}P{2.2in}X@{}}
+\toprule
+\typed{COPY A:REPORT.TXT C:} & copies a file to another disk\\
+\typed{COPY REPORT.TXT REPORT.BAK} & makes a second copy under another name\\
+\typed{COPY A:*.* C:} & copies every file of a directory\\
+\typed{REN REPORT.TXT FINAL.TXT} & changes a file's name\\
+\typed{DEL REPORT.BAK} & erases a file\\
+\typed{TYPE REPORT.TXT} & shows a file on the screen\\
+\typed{PRINT REPORT.TXT} & prints it while you go on working\\
+\bottomrule
+\end{tabularx}
+
+\caution{\typed{DEL} and \typed{COPY} do not ask before they erase or
+replace a file, and RetrOS/LT has no command to bring an erased file back.
+Only \typed{DEL *.*} asks first.}
+
+\section{Running Programs}\ixs{programs, running}
+
+To run a program, type its name. RetrOS/LT looks for it in the current
+directory, and then in each directory named by the \typed{PATH} command.
+Install sets the path to the directory RetrOS/LT is in, so its commands
+can be used from anywhere:
+
+\begin{dialogue}
+C:\bs>\textbf{PATH C:\bs{}DOS;C:\bs{}WP}
+\end{dialogue}
+
+Some commands, such as \typed{DIR} and \typed{COPY}, are part of
+\file{COMMAND.COM} and are always there; they are called \term{internal}.
+The rest are programs on the disk, and are called \term{external}.
+Section~6 says which is which.
+
+\section{Redirection and Pipes}\ixs{redirection}\ixs{pipes}
+
+Most commands write to the screen and read from the keyboard. You can send
+what a command writes to a file or a device, or have it read from a file:
+
+\begin{tabularx}{\textwidth}{@{}P{2.2in}X@{}}
+\toprule
+\typed{DIR > LIST.TXT} & writes the listing to a file, replacing it\\
+\typed{DIR >> LIST.TXT} & adds the listing to the end of the file\\
+\typed{DIR > PRN} & prints the listing\\
+\typed{SORT < NAMES.TXT} & sorts the lines of a file\\
+\typed{DIR | SORT} & sends the listing through \typed{SORT}\\
+\typed{TYPE BIG.TXT | MORE} & shows a file a screen at a time\\
+\bottomrule
+\end{tabularx}
+
+The bar \typed{|} is a \term{pipe}: it makes what one command writes into
+what the next one reads. RetrOS/LT passes it through a temporary file in
+the root directory of the current drive, so that drive must not be
+write-protected. \typed{SORT}, \typed{FIND} and \typed{MORE} are made to be
+used this way.
+
+\section{The Keyboard}\ixs{editing keys}
+
+RetrOS/LT remembers the last line you typed. These keys bring it back,
+whole or in part:
+
+\begin{tabularx}{\textwidth}{@{}P{1.1in}X@{}}
+\toprule
+\key{F1} or \key{$\rightarrow$} & copies one character from the last line\\
+\key{F2} \var{c} & copies up to the character \var{c}\\
+\key{F3} & copies all the rest of the last line\\
+\key{F4} \var{c} & skips up to the character \var{c}\\
+\key{F5} & keeps the line you have typed for more editing, without running it\\
+\key{Ins} & inserts what you type; \key{Del} skips a character\\
+\key{Esc} & cancels the line\\
+\bottomrule
+\end{tabularx}
+
+Other keys work at any time:
+
+\begin{tabularx}{\textwidth}{@{}P{1.6in}X@{}}
+\toprule
+\keys{Ctrl}{Break}, \keys{Ctrl}{C} & stops the command that is running\\
+\keys{Ctrl}{Num Lock} & stops the screen from scrolling, until any key is pressed\\
+\keys{Shift}{PrtSc} & prints what is on the screen\\
+\keys{Ctrl}{PrtSc} & starts printing everything that appears on the screen; press again to stop\\
+\key{Ctrl}\,+\,\key{Alt}\,+\,\key{Del} & restarts the computer\\
+\bottomrule
+\end{tabularx}
+
+\section{Batch Files}\ixs{batch files}
+
+A batch file is a file of commands, one to a line, with the extension
+\file{.BAT}. Type its name and RetrOS/LT runs the commands in turn. You
+can make one with \typed{EDLIN}, or by copying from the keyboard:
+
+\begin{dialogue}
+A>\textbf{COPY CON SAVE.BAT}
+\textbf{ECHO OFF}
+\textbf{ECHO Put the backup diskette in drive B}
+\textbf{PAUSE}
+\textbf{COPY C:\bs{}WORK\bs{}*.* B:}
+\key{F6} \key{Enter}
+\end{dialogue}
+
+Within a batch file, \typed{\%0} stands for its own name and \typed{\%1} to
+\typed{\%9} for the words typed after it. The commands made for batch
+files are \typed{ECHO}, \typed{FOR}, \typed{GOTO}, \typed{IF},
+\typed{PAUSE}, \typed{REM} and \typed{SHIFT}; Section~6 describes each.
+\typed{ECHO OFF} stops the commands from being shown as they run, but is
+itself shown.
+
+The batch file \file{AUTOEXEC.BAT} in the root of the startup disk is run
+each time the computer starts, in place of the date and time questions.
+See Section~5.
+
+\section{Restarting}
+
+To restart the computer without turning it off, press
+\key{Ctrl}\,+\,\key{Alt}\,+\,\key{Del}. Wait until the drive lights are out
+and the prompt is showing before you do, or before you turn the computer
+off, so that everything has been written to the disk.

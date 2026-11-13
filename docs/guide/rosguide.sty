@@ -1,0 +1,279 @@
+% rosguide.sty: page design for the RetrOS/LT guides.
+% From the same house as the RetrOS/x86, MagicWorks and Extended Magic
+% guides: the structure of IBM's Personal Computer manuals (numbered
+% Sections, section-page numbering, side headings in a wide left margin, a
+% contents list at the head of each Section). The motif is Board G,
+% "Twenty Lines": the 8088's twenty address lines, A19 down to A0, as a
+% band of twenty green cells, and on the cover the 8088 in its 40-pin
+% package.
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{rosguide}
+
+% Three editions from one source; build.sh sets \mwmode before \documentclass.
+%   single  one-sided, US Letter                 (RetrOS-LT-Guide-to-Operations.pdf)
+%   duplex  two-sided, US Letter                 (...-Two-Sided.pdf)
+%   shop    two-sided, with 1/8-inch bleed all round for edge-to-edge printing,
+%           8 3/4 x 11 1/4 inches, trimmed to Letter (...-Print-Shop.pdf)
+\providecommand\mwmode{single}
+\def\mw@single{single}\def\mw@shop{shop}
+\newif\ifmwtwoside \mwtwosidetrue
+\ifx\mwmode\mw@single \mwtwosidefalse \fi
+\newlength\bleed
+\ifx\mwmode\mw@shop \setlength\bleed{0.125in}\fi
+% The side-heading column stays on the left of every page, as in IBM's
+% manuals. On two-sided editions the back pages move 1/4 inch left, so the
+% binding gutter is on the inside of both pages.
+\RequirePackage[paperwidth=\dimexpr8.5in+2\bleed\relax,paperheight=\dimexpr11in+2\bleed\relax,
+                left=\dimexpr2.45in+\bleed\relax,right=\dimexpr0.9in+\bleed\relax,
+                top=\dimexpr0.95in+\bleed\relax,bottom=\dimexpr1.05in+\bleed\relax,asymmetric,
+                headheight=14pt,footskip=0.5in,marginparwidth=1.45in,marginparsep=0.2in]{geometry}
+\ifmwtwoside\AtBeginDocument{\setlength\evensidemargin{\dimexpr\oddsidemargin-0.25in\relax}}\fi
+\RequirePackage{fontspec}
+\setmainfont{TeX Gyre Heros}[Scale=0.95]
+\setsansfont{TeX Gyre Heros}[Scale=0.95]
+\setmonofont{Courier 10 Pitch}[Scale=1.0]
+\newfontfamily\cond{TeX Gyre Heros Cn}
+\RequirePackage{xcolor}
+\RequirePackage{graphicx}
+\RequirePackage{tikz}
+\usetikzlibrary{calc,patterns}
+\RequirePackage{titlesec}
+\RequirePackage{titletoc}
+\RequirePackage{fancyhdr}
+\RequirePackage{enumitem}
+\RequirePackage{array,longtable,booktabs,tabularx}
+\newcolumntype{P}[1]{>{\raggedright\arraybackslash}p{#1}}
+\RequirePackage{caption}
+\RequirePackage{microtype}
+\RequirePackage{needspace}
+\RequirePackage[hyperindex=true]{hyperref}
+\hypersetup{colorlinks=false,pdfborder={0 0 0},
+  pdftitle={RetrOS/LT \booktitle},
+  pdfauthor={The Lyon Mountain Company, Republic Lyon Mountain Corporation},
+  pdfsubject={RetrOS/LT: \subtitleline}}
+
+% ------------------------------------------------------------------ color
+% The house ground (shared with MagicWorks and Extended Magic), the address
+% lines, and the chip carrier's ceramic and gold.
+\definecolor{disc}{HTML}{1D2430}            % house ground and text color
+\definecolor{aLine}{HTML}{25B584}           % A0-A19: the 8088 address lines
+\definecolor{aHot}{HTML}{FFD23F}            % A20-A23: the 80286 only
+\definecolor{aHotEdge}{HTML}{A87A22}
+\definecolor{chipBody}{HTML}{8479A0}        % the carrier's ceramic
+\definecolor{chipGold}{HTML}{D9A441}        % contacts and lid
+\definecolor{chipEdge}{HTML}{A87A22}
+\definecolor{rRed}{HTML}{C00000}            % cautions
+\definecolor{rule}{HTML}{1D2430}
+\definecolor{panel}{HTML}{EEF0F3}
+\definecolor{grey}{HTML}{5A6270}
+
+% The address band: the 8088's 20 address lines, A19 at the left down to
+% A0 at the right, as 20 cells.
+\newcommand\addressband[3]{% lower-left point (calc expression), width, height
+  \foreach \i in {0,...,19}{%
+    \fill[aLine] ($#1+(\i/20*#2,0)$) rectangle ++(0.88/20*#2,#3);}}
+% The band with the lines' names beneath, for the cover.
+\newcommand\addressbandlabels[4]{% lower-left point, width, height, label color
+  \addressband{#1}{#2}{#3}
+  \foreach \i [evaluate=\i as \n using int(19-\i)] in {0,...,19}{%
+    \node[#4,anchor=north,inner sep=0pt,font=\ttfamily\footnotesize]
+      at ($#1+(\i/20*#2+0.44/20*#2,-6pt)$) {A\n};}}
+% A thin address-band rule across the text block and margin.
+\newcommand\addressrule[1][3pt]{%
+  \noindent\hspace*{-\dimexpr\marginparwidth+\marginparsep\relax}%
+  \begin{tikzpicture}\addressband{(0,0)}{\dimexpr\textwidth+\marginparwidth+\marginparsep\relax}{#1}\end{tikzpicture}}
+% The 8088 in its 40-pin dual in-line package, 20 pins a side, seen from
+% above. #1 width in inches.
+\newcommand\dipchip[1]{%
+  \begin{tikzpicture}[x=#1in,y=#1in]
+    \foreach \i in {0,...,19}{%
+      \fill[white!78!disc] (0.035+\i*0.0488,0.505) rectangle ++(0.024,0.06);
+      \fill[white!78!disc] (0.035+\i*0.0488,-0.065) rectangle ++(0.024,0.06);}
+    \fill[white!20!disc,rounded corners=#1*1.2pt] (0,0) rectangle (1,0.5);
+    \fill[disc] (0,0.25) ++(0,-0.045) arc[start angle=-90,end angle=90,radius=0.045] -- cycle;
+    \node[white!90!disc,anchor=center,inner sep=0pt,font=\ttfamily\bfseries\fontsize{\dimexpr#1in*130/1000\relax}{\dimexpr#1in*140/1000\relax}\selectfont] at (0.52,0.29) {8088};
+    \node[white!90!disc,anchor=center,inner sep=0pt,font=\ttfamily\fontsize{\dimexpr#1in*50/1000\relax}{\dimexpr#1in*55/1000\relax}\selectfont] at (0.52,0.14) {40 PINS};
+  \end{tikzpicture}}
+
+\newcommand\RO{RetrOS/LT}
+
+\let\memoryband\addressband
+\let\rainbowrule\addressrule
+
+% ------------------------------------------------------------------ page numbers
+% Sections number their pages 1-1, 1-2...; appendixes A-1; glossary and index
+% by name, as IBM did.
+\newcommand\pageprefix{}
+\renewcommand\thepage{\pageprefix\arabic{page}}
+\newcommand\frontpages{\renewcommand\thepage{\roman{page}}}
+\newcommand\sectionpages{\renewcommand\thepage{\thechapter-\arabic{page}}}
+\newcommand\namedpages[1]{\renewcommand\thepage{#1-\arabic{page}}}
+
+% ------------------------------------------------------------------ running heads
+\newcommand\runningtitle{}
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand\headrulewidth{0pt}
+\renewcommand\footrulewidth{0.4pt}
+\fancyfootoffset[L]{\dimexpr\marginparwidth+\marginparsep\relax}
+% Page number at the outside corner: right on front pages, left on back pages.
+\fancyfoot[LO,RE]{\small\runningtitle}
+\fancyfoot[RO,LE]{\small\bfseries\thepage}
+\fancypagestyle{plain}{\fancyhf{}\renewcommand\footrulewidth{0.4pt}%
+  \fancyfoot[LO,RE]{\small\runningtitle}\fancyfoot[RO,LE]{\small\bfseries\thepage}}
+% Two-sided: every Section starts on a front page; the back page before it,
+% if empty, says so, as IBM's did.
+\renewcommand\cleardoublepage{\clearpage\ifmwtwoside\ifodd\value{page}\else
+  \thispagestyle{plain}\null\vfill\begin{center}\small This page intentionally left blank.\end{center}\vfill\newpage\fi\fi}
+% The cut-out pages at the back (unnumbered): each on a front page, with an
+% empty back so cutting it out loses nothing.
+\newcommand\mwcutpage{\clearpage\ifmwtwoside\ifodd\value{page}\else
+  \thispagestyle{blank}\null\vfill\begin{center}\small This page intentionally left blank.\end{center}\vfill\newpage\fi\fi}
+% Start a new Section, Appendix or back-matter part: a front page when two-sided.
+\newcommand\mwnewpart{\ifmwtwoside\cleardoublepage\else\clearpage\fi}
+\fancypagestyle{blank}{\fancyhf{}\renewcommand\footrulewidth{0pt}}
+
+% ------------------------------------------------------------------ headings
+\setcounter{secnumdepth}{0}
+\setcounter{tocdepth}{1}
+\newcommand\sectionword{Section}
+% Section opening: address band across the top, "SECTION 3", the title, and
+% an address-band rule; the Section's own contents follow (\sectioncontents).
+\newcommand\mwchapterhead[2]{% label line, title
+  \begin{tikzpicture}[remember picture,overlay]
+    \memoryband{(current page.north west)+(0,{-\bleed-0.9in})}{\paperwidth}{0.32in}
+  \end{tikzpicture}%
+  \vspace*{0.25in}%
+  \noindent\hspace*{-\dimexpr\marginparwidth+\marginparsep\relax}%
+  \parbox[t]{\dimexpr\textwidth+\marginparwidth+\marginparsep\relax}{\raggedright
+    #1%
+    {\fontsize{30}{34}\selectfont\color{disc}#2\par}}\par
+  \vspace{6pt}\rainbowrule\par}
+\newcommand\mwnumbered[1]{\mwchapterhead
+  {{\fontsize{13}{15}\selectfont\color{grey}\MakeUppercase{\sectionword}\ \thechapter\par}\vspace{4pt}}{#1}}
+\newcommand\mwunnumbered[1]{\mwchapterhead{}{#1}}
+\titleformat{\chapter}[block]
+  {\cond\bfseries\setcounter{page}{1}\setcounter{figure}{0}\setcounter{table}{0}}
+  {}{0pt}{\mwnumbered}
+\titleformat{name=\chapter,numberless}[block]
+  {\cond\bfseries}
+  {}{0pt}{\mwunnumbered}
+\titlespacing*{\chapter}{0pt}{0pt}{18pt}
+% Side headings in the left margin, with a rule above, as in IBM's manuals.
+\titleformat{\section}[leftmargin]
+  {\needspace{4\baselineskip}\normalfont\bfseries\large\raggedright\color{disc}}
+  {}{0pt}
+  {\vspace*{-3pt}}
+\titlespacing*{\section}{\dimexpr\marginparwidth+\marginparsep\relax}{20pt plus 4pt}{\marginparsep}
+\newcommand\sectionrule{\par\needspace{7\baselineskip}\vspace{14pt}\noindent\hspace*{-\dimexpr\marginparwidth+\marginparsep\relax}%
+  {\color{rule}\rule{\dimexpr\textwidth+\marginparwidth+\marginparsep\relax}{0.6pt}}\par\vspace{-14pt}}
+\let\mw@section\section
+\renewcommand\section{\sectionrule\mw@section}
+\titleformat{\subsection}[runin]{\normalfont\bfseries\color{disc}}{}{0pt}{}[.\enspace]
+\titlespacing*{\subsection}{0pt}{9pt plus 2pt}{0pt}
+\titleformat{\subsubsection}[block]{\normalfont\bfseries\itshape}{}{0pt}{}
+\titlespacing*{\subsubsection}{0pt}{8pt}{2pt}
+
+% Room for page numbers such as "Glossary-1" in the contents.
+\makeatletter\renewcommand\@pnumwidth{5.2em}\makeatother
+% Contents: Section entries bold with their number; side headings beneath.
+\titlecontents{chapter}[0.95in]{\addvspace{9pt}\bfseries}
+  {\contentslabel[\sectionword\ \thecontentslabel]{0.95in}}{\hspace*{-0.95in}}
+  {\titlerule*[0.6pc]{.}\contentspage}
+\titlecontents{section}[0.95in]{}{}{}{\titlerule*[0.6pc]{.}\contentspage}
+% Each Section's own contents, at its head.
+\newcommand\sectioncontents{%
+  \startcontents[sec]%
+  \begingroup\small
+  \noindent{\bfseries Contents}\par\vspace{4pt}
+  \printcontents[sec]{l}{1}[1]{\titlecontents{lsection}[0pt]{}{}{}{\titlerule*[0.6pc]{.}\contentspage}}%
+  \endgroup\par\vspace{6pt}}
+
+% ------------------------------------------------------------------ text
+\setlength\parindent{0pt}
+\setlength\parskip{6pt plus 1pt}
+\linespread{1.08}
+\raggedright
+\setlist{itemsep=2pt,topsep=3pt,parsep=0pt,leftmargin=1.4em}
+\setlist[enumerate]{label=\arabic*.,leftmargin=1.6em}
+\setlist[itemize]{label=\textbullet}
+
+% Keycaps: a key as IBM drew one, a rounded outline with its legend.
+\newcommand\key[1]{\mbox{\tikz[baseline=(k.base)]\node[draw=disc,line width=0.5pt,rounded corners=1.6pt,
+  inner xsep=2.6pt,inner ysep=1.4pt,font=\footnotesize\sffamily] (k) {\strut#1};}}
+\newcommand\keys[2]{\key{#1}\,+\,\key{#2}}
+% What you type, and what the computer shows.
+\newcommand\typed[1]{{\ttfamily\bfseries #1}}
+\newcommand\shown[1]{{\ttfamily #1}}
+\newcommand\file[1]{{\ttfamily #1}}
+\newcommand\term[1]{\emph{#1}}
+
+% A screen as typed: a dialogue at the DOS prompt, in a ruled box.
+\newenvironment{dialogue}
+  {\par\vspace{2pt}\begin{tikzpicture}\node[draw=disc,line width=0.6pt,fill=panel,inner sep=8pt,text width=\dimexpr\linewidth-18pt\relax]\bgroup\ttfamily\small\obeylines\setlength\parskip{0pt}\obeyspaces}
+  {\egroup;\end{tikzpicture}\par\vspace{2pt}}
+
+% A dialogue across the full width, side-heading margin included, for
+% screens with lines up to 80 columns.
+\newenvironment{widedialogue}{\begin{wide}\begin{dialogue}}{\end{dialogue}\end{wide}}
+
+% Notes, cautions, and the IBM-style "Hint" line.
+\newcommand\notebox[2]{\par\vspace{3pt}\noindent
+  \begin{tikzpicture}\node[inner sep=0pt,text width=\textwidth] (n) {%
+    \begin{minipage}{\textwidth}\setlength\parskip{4pt}\textbf{#1}\enspace #2\end{minipage}};
+  \draw[disc,line width=1.6pt] ([xshift=-7pt,yshift=1pt]n.north west) -- ([xshift=-7pt,yshift=-1pt]n.south west);
+  \end{tikzpicture}\par\vspace{2pt}}
+\newcommand\note[1]{\notebox{Note:}{#1}}
+\newcommand\caution[1]{\par\vspace{3pt}\noindent\begin{tikzpicture}
+  \node[draw=rRed,line width=1.2pt,inner sep=7pt,text width=\dimexpr\textwidth-16pt\relax]{%
+    \setlength\parskip{4pt}{\color{rRed}\bfseries CAUTION}\par #1};\end{tikzpicture}\par\vspace{2pt}}
+
+% Figures: a screen, framed, with "Figure 4-2." captions numbered by Section.
+\captionsetup{font=small,labelfont=bf,labelsep=period,justification=raggedright,singlelinecheck=false,skip=5pt}
+\renewcommand\thefigure{\thechapter-\arabic{figure}}
+\renewcommand\thetable{\thechapter-\arabic{table}}
+\newcommand\screen[3][\textwidth]{% width, file, caption
+  \begin{figure}[htbp]\centering
+  \fbox{\includegraphics[width=\dimexpr#1-2\fboxsep-1pt\relax]{figures/#2}}
+  \caption{#3}\end{figure}}
+\newcommand\screenhere[3][\textwidth]{%
+  \par\begin{center}\setlength\fboxrule{0.6pt}%
+  \fbox{\includegraphics[width=\dimexpr#1-2\fboxsep-1pt\relax]{figures/#2}}\par
+  \captionof{figure}{#3}\end{center}}
+\setlength\fboxsep{0pt}
+\setlength\fboxrule{0.6pt}
+
+% A screen across the full width, side-heading margin included.
+\newcommand\widescreen[3][]{% trim, file, caption
+  \par\vspace{4pt}\noindent\hspace*{-\dimexpr\marginparwidth+\marginparsep\relax}%
+  \begin{minipage}{\dimexpr\textwidth+\marginparwidth+\marginparsep\relax}\centering
+  \fbox{\includegraphics[width=\dimexpr\linewidth-1pt\relax,#1]{figures/#2}}\par
+  \captionof{figure}{#3}\end{minipage}\par\vspace{4pt}}
+% Wide material may use the side-heading margin too.
+\newenvironment{wide}
+  {\par\noindent\hspace*{-\dimexpr\marginparwidth+\marginparsep\relax}%
+   \begin{minipage}{\dimexpr\textwidth+\marginparwidth+\marginparsep\relax}\setlength\parskip{6pt}}
+  {\end{minipage}\par}
+
+% Backslash in running text and in what is typed.
+\newcommand\bs{\textbackslash}
+% The command reference: \cmd{NAME}{Internal|External}{purpose} starts an
+% entry; \fmt{...} gives its format; \opt{switch}{meaning} lists a switch.
+\newcommand\cmd[3]{\section{#1}\ixs{#1 command}%
+  {\small\color{grey}#2 command}\par\vspace{-2pt}#3\par}
+\newcommand\fmt[1]{\par\vspace{2pt}\noindent\hangindent=1.6em{\ttfamily #1}\par\vspace{2pt}}
+\newcommand\var[1]{{\normalfont\itshape #1}}
+\newenvironment{opts}{\par\vspace{1pt}\begin{list}{}{\setlength\leftmargin{1.15in}\setlength\labelwidth{1.05in}%
+  \setlength\labelsep{0.1in}\setlength\itemsep{1pt}\setlength\parsep{0pt}\setlength\topsep{2pt}%
+  \renewcommand\makelabel[1]{\ttfamily ##1\hfill}}}{\end{list}}
+\newcommand\opt[2]{\item[{#1}] #2}
+% The same for long labels, which get a line to themselves.
+\newenvironment{longopts}{\par\vspace{1pt}\begin{description}[style=nextline,font=\normalfont\ttfamily,
+  leftmargin=0.3in,itemsep=3pt,topsep=2pt,parsep=0pt]}{\end{description}}
+\newcommand\lopt[2]{\item[{#1}] #2}
+
+% Index entries: \ix{word} prints and indexes; \ixs{entry} only indexes.
+\newcommand\ix[1]{#1\index{#1}}
+\newcommand\ixs[1]{\index{#1}}
+
+\endinput

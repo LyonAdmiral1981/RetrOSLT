@@ -1,0 +1,129 @@
+\mwnewpart
+\renewcommand\runningtitle{Section 1. Introduction}
+\chapter{Introduction}
+\sectioncontents
+
+\section{What RetrOS/LT Is}\ixs{RetrOS/LT}
+
+RetrOS/LT is a disk operating system for the IBM Personal Computer, the
+IBM Personal Computer XT, and compatible computers. It starts the
+computer, keeps your files on diskettes and fixed disks, and runs your
+programs. ``LT'' stands for \emph{lite}: RetrOS/LT is the small member of
+the RetrOS family, built to be what the IBM Personal Computer ran in 1983,
+and nothing more.
+
+RetrOS/LT is derived from the MS-DOS 2 source code that Microsoft
+Corporation released under the MIT License. It is made to behave as IBM
+PC DOS 2.10 does on the same computers: the same commands, with the same
+switches, the same messages and the same results. Programs written for DOS
+2 run under it unchanged. To a program that asks, RetrOS/LT answers that
+it is DOS version 2.10.
+
+When the computer starts from a diskette with no \file{AUTOEXEC.BAT}
+file, RetrOS/LT asks the date and time, shows its name, and then the
+prompt:
+
+\begin{dialogue}
+Current date is Tue  1-01-1980
+Enter new date: 11-13-2026
+Current time is  0:00:12.34
+Enter new time: 9:30
+
+
+RetrOS/LT Version 1.0
+(C) Copyright Republic Lyon Mountain Corporation 2026
+(C) Copyright Microsoft Corp. 1981, 1982, 1983
+
+A>
+\end{dialogue}
+
+Type the year in four digits: RetrOS/LT, like DOS 2, takes a two-digit
+year as 19\var{yy}, and accepts dates from 1980 through 2099.
+
+\section{The Computers It Runs On}\ixs{computers}\ixs{IBM Personal Computer}
+
+\begin{tabularx}{\textwidth}{@{}P{1.25in}>{\raggedright\arraybackslash}X@{}}
+\toprule
+Processor & 8088 or 8086\\
+Computers & IBM Personal Computer, Personal Computer XT, Portable Personal
+Computer, and compatibles\\
+Memory & 64 KB or more. RetrOS/LT has been tested with 256 KB and 640 KB.\\
+Diskette drives & One or two 5-1/4 inch drives, single- or double-sided\\
+Fixed disk & Optional: one or two, through the IBM fixed disk adapter or one
+that follows it\\
+Display & Monochrome or Color/Graphics Monitor Adapter\\
+\bottomrule
+\end{tabularx}
+
+\subsection{The IBM Personal Computer} To start from a fixed disk, the
+Personal Computer needs its second BIOS, of October 1982, which looks for
+the program on a fixed disk adapter. With it, the Personal Computer can
+start from a fixed disk whose adapter is in the system unit, or in the IBM
+Expansion Unit. A Personal Computer with the first BIOS, of April 1981,
+runs RetrOS/LT from diskettes, and can use a fixed disk only after
+starting from a diskette.
+
+\subsection{One diskette drive} On a computer with one diskette drive, the
+drive is both A and B. When a program asks for the drive it is not using
+now, RetrOS/LT asks you to change diskettes:
+
+\begin{dialogue}
+Insert diskette for drive B: and strike
+any key when ready
+\end{dialogue}
+
+\section{What Is on the Diskettes}\ixs{diskettes, RetrOS/LT}
+
+RetrOS/LT comes on two 180 KB single-sided diskettes, which any drive of
+the IBM Personal Computer or XT can read, as PC DOS 2.10 did:
+
+\begin{itemize}
+\item \textbf{The DOS diskette} starts the computer. It holds the system,
+  the command processor \file{COMMAND.COM}, the commands and device
+  drivers, and \typed{INSTALL}, which puts RetrOS/LT on a fixed disk. When
+  you start the computer from it, it asks the date and time and then runs
+  Install; press \key{Esc} to leave Install and use the commands from
+  drive A.
+\item \textbf{The Supplemental Programs diskette} holds the programmer's
+  tools: \typed{DEBUG}, \typed{LINK} and \typed{EXE2BIN}.
+\end{itemize}
+
+The DOS diskette also holds \file{LICENSE.TXT}, the RetrOS/LT License,
+and \file{NOTICE.TXT}, the notice that accompanies Microsoft's code. Both
+are printed in Appendix~D. Appendix~A lists every file on both diskettes.
+
+\caution{Make copies of the RetrOS/LT diskettes before you use them, and
+keep the originals in a safe place. See ``Copying a Diskette'' in
+Section~4.}
+
+\section{How RetrOS/LT Differs from PC DOS 2.10}\ixs{PC DOS 2.10, differences from}
+
+RetrOS/LT has the commands of PC DOS 2.10 and behaves as they do. The
+differences are few, and you can see them:
+
+\begin{itemize}
+\item \textbf{The names.} RetrOS/LT shows its own name, and its two system
+  files are \file{RETBIO.COM} and \file{RETDOS.COM} where PC DOS has
+  \file{IBMBIO.COM} and \file{IBMDOS.COM}. For that reason the
+  \typed{FORMAT} and \typed{SYS} of each system put only their own system
+  files on a disk.
+\item \textbf{Install.} PC DOS 2.10 had no installation program; RetrOS/LT
+  adds one. See Section~2.
+\item \textbf{FC.} RetrOS/LT includes \typed{FC}, Microsoft's file
+  comparison program, beside IBM's \typed{COMP}.
+\item \textbf{Starting up.} RetrOS/LT reads its system files a track at a
+  time, so it starts a little faster from a diskette.
+\end{itemize}
+
+\section{What RetrOS/LT Does Not Include}
+
+\begin{itemize}
+\item \textbf{BASIC.} IBM's \typed{BASIC} and \typed{BASICA} build on the
+  Cassette BASIC in the Personal Computer's read-only memory and are IBM's
+  own programs; RetrOS/LT does not include them, nor IBM's sample BASIC
+  programs.
+\item \textbf{The features of later versions of DOS}, such as volume
+  serial numbers, \typed{ATTRIB}, \typed{LABEL}, \typed{XCOPY} or
+  international support. A program that needs DOS 3 or later says so and
+  stops; see ``Programs That Check the DOS Version'' in Section~7.
+\end{itemize}

@@ -1,0 +1,159 @@
+\mwnewpart
+\renewcommand\runningtitle{Section 5. Setting Up Your System}
+\chapter{Setting Up Your System}
+\sectioncontents
+
+\section{The Two Startup Files}\ixs{CONFIG.SYS}\ixs{AUTOEXEC.BAT}
+
+When the computer starts, RetrOS/LT reads two files from the root
+directory of the startup disk, if they are there:
+
+\begin{itemize}
+\item \file{CONFIG.SYS} sets up RetrOS/LT itself: how many files may be
+  open, how many disk buffers to keep, and which device drivers to load.
+\item \file{AUTOEXEC.BAT} is a batch file of commands to run once
+  RetrOS/LT is ready. If there is none, RetrOS/LT asks the date and the
+  time and shows its name.
+\end{itemize}
+
+Both are plain text. Make or change them with \typed{EDLIN}, or with
+\typed{COPY CON}, and restart the computer for a change to
+\file{CONFIG.SYS} to take effect. Install writes both; see ``The Startup
+Files'' in Section~2.
+
+\section{CONFIG.SYS Commands}\ixs{CONFIG.SYS!commands}
+
+Each line of \file{CONFIG.SYS} is one command:
+
+\begin{longopts}
+\lopt{BREAK=ON | OFF}{With \typed{ON}, RetrOS/LT checks for
+  \keys{Ctrl}{Break} whenever a program asks it to do anything, not only
+  when it reads the keyboard or writes to the screen. \typed{OFF} is the
+  usual setting.}
+\lopt{BUFFERS=\var{n}}{The number of disk buffers, 1 to 99; 2 if not
+  given. Each holds one sector and takes 528 bytes of memory. More
+  buffers make a fixed disk with many directories faster; 10 to 20 is
+  usual.}
+\lopt{DEVICE=\var{path}}{Loads a device driver, such as
+  \typed{DEVICE=C:\bs{}DOS\bs{}ANSI.SYS}.}
+\lopt{FILES=\var{n}}{The number of files that can be open at once, by all
+  programs together, up to 99; 8 if not given. Many programs ask for 20.}
+\lopt{SHELL=\var{path}}{Runs another command processor in place of
+  \file{COMMAND.COM} in the root directory, or \file{COMMAND.COM} from
+  another place: \typed{SHELL=C:\bs{}DOS\bs{}COMMAND.COM /P}. \typed{/P}
+  makes it stay, and run \file{AUTOEXEC.BAT}.}
+\end{longopts}
+
+\section{Memory}\ixs{memory}
+
+RetrOS/LT runs in the first 640 KB of memory, the most the Personal
+Computer and XT can have for programs. With the part of \file{COMMAND.COM} that stays in memory, it takes
+about 28 KB, plus the buffers and files you ask for. \typed{CHKDSK} reports the memory that is left:
+
+\begin{dialogue}
+\ \ \ 655360 bytes total memory
+\ \ \ 626512 bytes free
+\end{dialogue}
+
+These programs stay in memory once they have been run, until the computer
+is restarted, and take memory from other programs while they do:
+\typed{PRINT}, \typed{MODE} (only when it reroutes a printer, retries one,
+or shifts the display), \typed{GRAPHICS} and \typed{ASSIGN}. Each is loaded
+once; running it again changes its settings and takes no more memory.
+
+\section{Device Drivers}\ixs{device drivers}\ixs{ANSI.SYS}
+
+RetrOS/LT has its own drivers for the keyboard and display, the printers,
+the serial port, the clock and the disks. Others are loaded with
+\typed{DEVICE=} lines. RetrOS/LT includes one:
+
+\subsection{ANSI.SYS} \file{ANSI.SYS} takes the place of RetrOS/LT's own
+keyboard and display driver. Programs that use it can move the cursor,
+clear the screen, and set colors by writing \term{escape sequences}, the
+character \typed{Esc} followed by \typed{[} and a command:
+
+\begin{tabularx}{\textwidth}{@{}P{1.45in}X@{}}
+\toprule
+\typed{Esc[\var{r};\var{c}H} & moves the cursor to row \var{r}, column \var{c}\\
+\typed{Esc[\var{n}A} \typed{B} \typed{C} \typed{D} & up, down, right, left \var{n}\\
+\typed{Esc[s}, \typed{Esc[u} & saves the cursor's place, puts it back\\
+\typed{Esc[6n} & reports the cursor's place as if typed: \typed{Esc[\var{rr};\var{cc}R}\\
+\typed{Esc[2J} & clears the screen\\
+\typed{Esc[K} & clears to the end of the line\\
+\typed{Esc[\var{a};\ldots m} & attributes: 0 normal, 1 bright, 4 underlined (monochrome),
+5 blinking, 7 reverse, 8 invisible, 30--37 foreground and 40--47
+background colors\\
+\typed{Esc[=\var{n}h} & screen mode \var{n}, 0 to 6; \typed{Esc[=7h} and
+\typed{Esc[=7l} turn wrapping at the end of a line on and off\\
+\typed{Esc[\var{k};"\var{text}"p} & makes the key \var{k} type \var{text}
+instead; an extended key is \typed{0;\var{n}}\\
+\bottomrule
+\end{tabularx}
+
+The colors are 0 black, 1 red, 2 green, 3 yellow, 4 blue, 5 magenta, 6
+cyan and 7 white. The \typed{PROMPT} command can send escape sequences
+with \typed{\$e}; for example, this prompt shows the directory in bright
+letters:
+
+\begin{dialogue}
+C:\bs>\textbf{PROMPT \$e[1m\$p\$g\$e[0m}
+\end{dialogue}
+
+\section{Printers, Serial Port and Display}\ixs{MODE command}
+
+\typed{MODE} sets up the printers, the serial port and the display; it is
+usually run from \file{AUTOEXEC.BAT}.
+
+\begin{tabularx}{\textwidth}{@{}P{2.0in}X@{}}
+\toprule
+\typed{MODE LPT1:132,8} & 132 characters a line, 8 lines an inch, on an
+IBM printer\\
+\typed{MODE COM1:1200,N,8,1} & the serial port's speed, parity, data bits
+and stop bits\\
+\typed{MODE LPT1:=COM1} & sends what is printed to the serial port, for a
+serial printer; set the port first\\
+\typed{MODE CO80} & the color display, 80 columns\\
+\typed{MODE MONO} & the monochrome display\\
+\typed{MODE ,R,T} & moves the picture right on the color display, with a
+test pattern to line it up\\
+\bottomrule
+\end{tabularx}
+
+\typed{GRAPHICS} lets \keys{Shift}{PrtSc} print a graphics screen on the
+IBM Graphics Printer. Without it, \keys{Shift}{PrtSc} prints only text.
+
+\section{The Environment}\ixs{environment}\ixs{SET command}
+
+The \term{environment} is a set of names and values that
+\file{COMMAND.COM} keeps and gives to every program it runs. \typed{PATH}
+and \typed{PROMPT} set two of them; \typed{SET} sets any other, for the
+programs that read them:
+
+\begin{dialogue}
+C:\bs>\textbf{SET TEMP=C:\bs{}TMP}
+C:\bs>\textbf{SET}
+PATH=C:\bs{}DOS
+PROMPT=\$P\$G
+TEMP=C:\bs{}TMP
+\end{dialogue}
+
+The environment starts with room for 160 bytes. When it is full,
+\file{COMMAND.COM} says \shown{Out of environment space}.
+
+\subsection{The prompt} \typed{PROMPT} sets what the prompt shows. These
+codes stand for things that change:
+
+\begin{tabularx}{\textwidth}{@{}P{0.6in}X@{}P{0.6in}X@{}}
+\toprule
+\typed{\$p} & the current drive and directory & \typed{\$g} & the character \typed{>}\\
+\typed{\$n} & the current drive & \typed{\$l} & the character \typed{<}\\
+\typed{\$d} & the date & \typed{\$b} & the character \typed{|}\\
+\typed{\$t} & the time & \typed{\$q} & the character \typed{=}\\
+\typed{\$v} & the version & \typed{\$\$} & the character \typed{\$}\\
+\typed{\$e} & the Esc character & \typed{\$\_} & a new line\\
+\typed{\$h} & a backspace & & \\
+\bottomrule
+\end{tabularx}
+
+\typed{PROMPT} alone puts back the usual prompt, the drive letter and
+\typed{>}.

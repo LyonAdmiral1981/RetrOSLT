@@ -1,0 +1,227 @@
+\mwnewpart
+\renewcommand\runningtitle{Section 4. Working with Disks}
+\chapter{Working with Disks}
+\sectioncontents
+
+\section{Diskettes}\ixs{diskettes}\ixs{formats, diskette}
+
+The IBM Personal Computer and XT use 5-1/4 inch diskettes, with 40
+tracks on each side. RetrOS/LT reads, writes and formats all four DOS 2
+formats:
+
+\begin{tabularx}{\textwidth}{@{}P{0.75in}P{0.9in}P{1.0in}X@{}}
+\toprule
+\textbf{Capacity} & \textbf{Sides} & \textbf{Sectors a track} & \textbf{FORMAT switches}\\
+\midrule
+360 KB & 2 & 9 & none (the usual one)\\
+180 KB & 1 & 9 & \typed{/1}\\
+320 KB & 2 & 8 & \typed{/8}\\
+160 KB & 1 & 8 & \typed{/1 /8}\\
+\bottomrule
+\end{tabularx}
+
+The 8-sector formats are those of DOS 1, and can be read by computers
+running DOS 1.10. A single-sided drive can use only the single-sided
+formats. RetrOS/LT tells the formats apart by the first byte of each
+diskette's file allocation table, as DOS 2 does, so you never need to tell
+it which kind is in a drive.
+
+\section{Formatting a Diskette}\ixs{formatting}\ixs{FORMAT command}
+
+A new diskette must be formatted before it can hold files.
+
+\begin{dialogue}
+A>\textbf{FORMAT B:}
+Insert new diskette for drive B:
+and strike any key when ready
+
+Formatting...Format complete
+
+\ \ \ 362496 bytes total disk space
+\ \ \ 362496 bytes available on disk
+
+Format another (Y/N)?
+\end{dialogue}
+
+\begin{tabularx}{\textwidth}{@{}P{1.6in}X@{}}
+\toprule
+\typed{FORMAT B:/S} & a diskette that starts the computer: the system
+files and \file{COMMAND.COM} are copied to it\\
+\typed{FORMAT B:/V} & asks for a volume label, a name of up to eleven
+characters for the diskette\\
+\typed{FORMAT B:/1} & single-sided\\
+\typed{FORMAT B:/8} & 8 sectors a track\\
+\typed{FORMAT B:/B} & 8 sectors a track, with room left for the system
+files to be put on later by \typed{SYS}\\
+\bottomrule
+\end{tabularx}
+
+\typed{FORMAT} checks each track and marks bad places so that they are not
+used; it reports them as \shown{bytes in bad sectors}.
+
+\caution{Formatting erases everything on a disk. \typed{FORMAT} does not
+ask before it formats a diskette: check the drive letter before you press
+\key{Enter}.}
+
+\section{Copying a Diskette}\ixs{DISKCOPY command}\ixs{copying a diskette}
+
+\typed{DISKCOPY} makes an exact copy of a whole diskette, formatting the
+new one as it goes if it needs to. Both diskettes must be of the same
+kind.
+
+\begin{dialogue}
+A>\textbf{DISKCOPY A: B:}
+\end{dialogue}
+
+With one drive, type \typed{DISKCOPY A: A:}; \typed{DISKCOPY} tells you when
+to change diskettes. The \term{source} is the diskette you are copying
+from; the \term{target} is the new one. Put a write-protect tab on the
+source first, so that it cannot be erased by mistake. \typed{DISKCOPY} reads
+as many tracks at a time as memory holds, so with more memory there are
+fewer changes. \typed{/1} copies only the first side.
+
+To compare the copy with the original, use \typed{DISKCOMP A: B:}.
+
+\section{Partitioning a Fixed Disk}\ixs{FDISK command}\ixs{partition}
+
+A fixed disk can be shared by up to four operating systems, each in its
+own \term{partition}. RetrOS/LT uses one, the \term{DOS partition}, which
+is drive C on the first fixed disk and drive D on the second. The computer
+starts from whichever partition is marked \term{active}.
+
+\typed{FDISK} sets up the partitions. Install runs it for you if you press
+\key{F}; you can also run it from the DOS diskette:
+
+\begin{dialogue}
+\ \ \ \ \ \ \ \ \ \ \ \ RetrOS/LT Fixed Disk Setup Program Version 1.00
+\ \ \ \ \ \ \ \ (C) Copyright Republic Lyon Mountain Corporation 2026
+
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ FDISK Options
+
+Current Fixed Disk Drive: 1
+
+Choose one of the following:
+
+\ \ \ \ \ 1. Create DOS Partition
+\ \ \ \ \ 2. Change Active Partition
+\ \ \ \ \ 3. Delete DOS Partition
+\ \ \ \ \ 4. Display Partition Information
+
+
+Enter choice: [1]
+\end{dialogue}
+
+With two fixed disks, a fifth choice selects the other. To create the DOS
+partition, choose 1. \typed{FDISK} asks whether to use the entire disk for
+DOS; answer \typed{Y}, or \typed{N} to give its size and its first
+cylinder yourself. A DOS 2 partition holds at most 65,535 sectors, about
+32 MB. After a change, \typed{FDISK} restarts the computer when you leave
+it, so that RetrOS/LT sees the new partition.
+
+\caution{Deleting a partition makes everything in it unusable.}
+
+\section{Formatting a Fixed Disk}
+
+After \typed{FDISK}, format the DOS partition:
+
+\begin{dialogue}
+A>\textbf{FORMAT C:/S/V}
+Press any key to begin formatting C:
+\end{dialogue}
+
+Formatting a fixed disk does not rewrite its sectors; it reads every one
+and marks those that cannot be read, then writes an empty directory and
+file allocation table. On a 10 MB disk it takes a few minutes.
+\typed{FORMAT} chooses the size of the disk's clusters, the units in
+which it gives files space, from the size of the partition: 8 sectors,
+4096 bytes, on a 10 MB disk.
+
+\section{Checking a Disk}\ixs{CHKDSK command}
+
+\typed{CHKDSK} checks a disk's directories and its file allocation table,
+and reports its space and the computer's memory:
+
+\begin{dialogue}
+C:\bs>\textbf{CHKDSK}
+
+\ 10584064 bytes total disk space
+\ \ \ \ 28672 bytes in 2 hidden files
+\ \ \ \ \ 4096 bytes in 1 directories
+\ \ \ 249856 bytes in 29 user files
+\ 10301440 bytes available on disk
+
+\ \ \ 655360 bytes total memory
+\ \ \ 626512 bytes free
+\end{dialogue}
+
+If \typed{CHKDSK} finds lost clusters (space marked as used that no file
+owns), it offers to make files of them; it changes the disk only when you
+type \typed{CHKDSK /F}. \typed{/V} lists every file as it checks it. Run
+\typed{CHKDSK} on each disk from time to time.
+
+\subsection{A file with a bad sector} If a file cannot be read because part
+of the disk has gone bad, \typed{RECOVER} rescues what can be read and
+marks the bad place so that it is not used again. Text in the bad sectors
+is lost.
+
+\section{Backing Up a Fixed Disk}\ixs{BACKUP command}\ixs{RESTORE command}
+
+\typed{BACKUP} copies files from a fixed disk to diskettes, as many
+diskettes as they need, and \typed{RESTORE} puts them back. The diskettes
+must be formatted first.
+
+\begin{tabularx}{\textwidth}{@{}P{2.3in}X@{}}
+\toprule
+\typed{BACKUP C:\bs\ A: /S} & backs up the whole disk\\
+\typed{BACKUP C:\bs{}WORK A:} & the files of one directory\\
+\typed{BACKUP C:\bs\ A: /S /M} & only files changed since they were last backed up\\
+\typed{BACKUP C:\bs\ A: /S /A} & adds to the diskettes of the last backup\\
+\typed{RESTORE A: C:\bs{}*.* /S} & puts back every file\\
+\typed{RESTORE A: C:\bs{}WORK\bs{}*.*} & puts back the files of one directory\\
+\bottomrule
+\end{tabularx}
+
+\typed{BACKUP} erases the files on each diskette before it uses it (unless
+you type \typed{/A}), and asks for the diskettes by number. Write the
+number on each one. A file too big for the space left on a diskette goes
+on in the next. \typed{RESTORE} asks for the diskettes in the same order.
+
+The diskettes are in the format of PC DOS 2: RetrOS/LT can restore
+backups made by PC DOS 2, and PC DOS 2 those made by RetrOS/LT.
+
+\section{Volume Labels}\ixs{volume label}\ixs{VOL command}
+
+A \term{volume label} is a name for a disk, of up to eleven characters.
+\typed{FORMAT /V} asks for one. \typed{VOL} and \typed{DIR} show it. DOS 2
+has no command to change a label afterwards.
+
+\section{Making a Disk Start the Computer}\ixs{SYS command}
+
+A disk starts the computer if it holds the RetrOS/LT system files,
+\file{RETBIO.COM} and \file{RETDOS.COM}, as the first two files of its root
+directory, and \file{COMMAND.COM}. \typed{FORMAT /S} puts them on a disk as
+it formats it. \typed{SYS} puts the system files on a disk that is already
+formatted, if the start of the disk has room for them:
+
+\begin{dialogue}
+A>\textbf{SYS B:}
+System transferred
+
+A>\textbf{COPY COMMAND.COM B:}
+\end{dialogue}
+
+\typed{SYS} does not copy \file{COMMAND.COM}; copy it as shown.
+\typed{FORMAT /B} leaves the room \typed{SYS} needs on a diskette.
+
+\section{Giving One Drive Another's Letter}\ixs{ASSIGN command}
+
+Some programs look for their files only on drive A or B. \typed{ASSIGN}
+sends what is asked of one drive to another, so that such a program can
+work from the fixed disk:
+
+\begin{dialogue}
+C:\bs>\textbf{ASSIGN A=C B=C}
+\end{dialogue}
+
+\typed{ASSIGN} alone puts every drive back. Do not use \typed{FORMAT},
+\typed{DISKCOPY} or \typed{DISKCOMP} while drives are assigned.

@@ -1,0 +1,172 @@
+% ------------------------------------------------------------------ cover
+\thispagestyle{blank}
+\begin{tikzpicture}[remember picture,overlay]
+  \fill[disc] (current page.south west) rectangle (current page.north east);
+  % the 8088's twenty address lines, A19 to A0
+  \addressbandlabels{(current page.north west)+(0,{-3.05in-\bleed})}{\paperwidth}{0.42in}{white!70!disc}
+  \node[anchor=north,text=white!70!disc,inner sep=0pt,font=\sffamily\small] at ($(current page.north)+(0,{-3.47in-\bleed})$) {the 8088's twenty address lines: one megabyte};
+  % The Lyon Mountain Company's lion, alone, small, upper right
+  \node[anchor=north east,inner sep=0pt] at ($(current page.north east)+({-0.8in-\bleed},{-0.55in-\bleed})$)
+    {\includegraphics[height=1.0in]{figures/lmc-lion.png}};
+  \node[anchor=north west,text=white,inner sep=0pt,align=left] at ($(current page.north west)+({0.85in+\bleed},{-3.95in-\bleed})$)
+    {\cond\bfseries\fontsize{68}{68}\selectfont RetrOS/LT};
+  \node[anchor=north west,text=white,inner sep=0pt,align=left,font=\cond\fontsize{18}{22}\selectfont] at ($(current page.north west)+({0.9in+\bleed},{-5.0in-\bleed})$)
+    {\subtitlelines};
+  \node[anchor=north west,text=white,inner sep=0pt,align=left] at ($(current page.north west)+({0.9in+\bleed},{-5.95in-\bleed})$)
+    {\sffamily\bfseries\fontsize{24}{28}\selectfont \booktitle};
+  \node[anchor=north west,text=white!80!disc,inner sep=0pt,align=left,font=\sffamily\fontsize{11.5}{15}\selectfont] at ($(current page.north west)+({0.9in+\bleed},{-6.5in-\bleed})$)
+    {RetrOS/LT Version 1.0, DOS 2.10\\for the IBM Personal Computer, the XT, and compatibles};
+  % the processor
+  \node[anchor=south,inner sep=0pt] at ($(current page.south)+(0,{1.25in+\bleed})$)
+    {\dipchip{3.1}};
+\end{tikzpicture}
+\newpage
+% Two-sided: the inside of the front cover is left empty.
+\ifmwtwoside\thispagestyle{blank}\null\newpage\fi
+
+% ------------------------------------------------------------------ title page
+\frontpages
+\setcounter{page}{1}
+\pagestyle{blank}
+\vspace*{0.4in}
+\hspace*{-\dimexpr\marginparwidth+\marginparsep\relax}%
+\begin{minipage}[t]{\dimexpr\textwidth+\marginparwidth+\marginparsep\relax}
+\raggedright
+{\cond\bfseries\fontsize{40}{44}\selectfont\color{disc} RetrOS/LT\par}
+\vspace{6pt}
+{\cond\fontsize{17}{21}\selectfont\color{disc} \subtitleline\par}
+\vspace{14pt}
+\begin{tikzpicture}\addressband{(0,0)}{\linewidth}{4pt}\end{tikzpicture}\par
+\vspace{14pt}
+{\sffamily\bfseries\fontsize{22}{26}\selectfont \booktitle\par}
+\vspace{8pt}
+{\large RetrOS/LT Version 1.0, for the IBM Personal Computer,\\
+the Personal Computer XT, and compatible computers\par}
+\vspace{0.5in}
+\hspace*{0.3in}\dipchip{2.0}\par
+\vspace{24pt}
+{\small\textbf{The Lyon Mountain Company}\\
+Republic Lyon Mountain Corporation\\
+Lyon Mountain, New York 12952 USA\par}
+\end{minipage}
+\newpage
+
+% ------------------------------------------------------------------ edition notice
+\pagestyle{blank}
+\vspace*{\fill}
+\begin{wide}
+\small
+\textbf{\edition}
+
+This edition applies to Version 1.0 of RetrOS/LT, build \release, and to
+all later releases until otherwise indicated in new editions. Changes are
+made periodically to the information herein. \editionchanges
+
+A form for readers' comments is at the back of this book. If the form has
+been removed, comments may be addressed to P.O. Box 290, Lyon Mountain,
+New York 12952 USA.
+
+\textbf{Where RetrOS/LT comes from.} RetrOS/LT is derived from the MS-DOS 2
+source code that Microsoft Corporation released under the MIT License.
+That code is Copyright \copyright\ Microsoft Corporation; the notice that
+must accompany it is printed in Appendix~D and is on the RetrOS/LT
+diskettes. RetrOS/LT is not MS-DOS and is not PC DOS. It is an independent
+product of The Lyon Mountain Company, and is not affiliated with, endorsed
+by, or supported by Microsoft Corporation or International Business
+Machines Corporation.
+
+\textbf{RetrOS/LT is licensed, not sold}, under the RetrOS/LT License
+printed in Appendix~D: a Single-Machine License, for one computer at a
+time, or a Blanket License, for all the computers one owner owns or
+leases.
+
+\textbf{Trademarks.} IBM, Personal Computer XT and PC DOS are trademarks
+of International Business Machines Corporation. Microsoft and MS-DOS are
+trademarks of Microsoft Corporation. Intel is a trademark of Intel
+Corporation. Other names used in this book may be trademarks of their
+owners.
+
+\copyright\ Copyright The Lyon Mountain Company, Republic Lyon Mountain Corporation 2026
+\end{wide}
+\newpage
+
+% ------------------------------------------------------------------ preface
+\pagestyle{plain}
+\renewcommand\runningtitle{About This Book}
+\chapter*{About This Book}
+
+\addcontentsline{toc}{chapter}{About This Book}
+
+This book tells you how to install and use RetrOS/LT, a disk operating
+system for the IBM Personal Computer, the Personal Computer XT, and
+compatible computers. RetrOS/LT is the small member of the RetrOS family:
+where RetrOS/86 and RetrOS/286 carry DOS 4 to the PC and AT, RetrOS/LT is
+DOS 2.10, as the IBM Personal Computer had it, made again from Microsoft's
+source.
+
+The address band at the head of each Section is the 8088's twenty address
+lines, A19 to A0: the one megabyte RetrOS/LT and every program it runs
+live in.
+
+\section{How This Book Is Organized}
+
+Read Section~1 first. If you are installing RetrOS/LT on a fixed disk,
+read Section~2. If you have used PC DOS 2, you already know RetrOS/LT; go
+straight to Section~6, the command reference, and read the rest when you
+need it.
+
+\begin{tabularx}{\textwidth}{@{}l>{\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{Section} & \textbf{Read it if you}\\
+\midrule
+1 Introduction & are new to RetrOS/LT, or want to know what it runs on\\
+2 Installing RetrOS/LT & are putting RetrOS/LT on a fixed disk\\
+3 Using RetrOS/LT & are new to DOS: the prompt, files, directories and running programs\\
+4 Working with Disks & format, check, copy or back up diskettes and fixed disks\\
+5 Setting Up Your System & want to change \file{CONFIG.SYS} or \file{AUTOEXEC.BAT}, load a device driver, or set up a printer or display\\
+6 Commands & want the format and switches of a command\\
+7 Problem Solving & have a problem, or see a message you do not understand\\
+Appendixes & want the list of files, the technical details, or the license\\
+\bottomrule
+\end{tabularx}
+
+A Glossary and an Index follow the Appendixes. At the very back are a Quick
+Reference Card and a Reader's Comment Form.
+
+\section{Page Numbers}
+
+Pages are numbered within each Section: page 4-7 is the seventh page of
+Section~4, and page B-2 the second page of Appendix~B. Tables are numbered
+the same way.
+
+\section{Conventions}
+
+Keys you press are drawn as keys: \key{Enter}, \key{Y}, \key{N}. When keys
+are pressed together they are joined: \key{Ctrl}\,+\,\key{Alt}\,+\,\key{Del}
+means hold down \key{Ctrl} and \key{Alt}, and press \key{Del}. The key
+the IBM keyboard marks with a bent arrow is called \key{Enter} here.
+
+What you type is printed \typed{like this}. What the computer shows is
+printed \shown{like this}:
+
+\begin{dialogue}
+A>\textbf{VER}
+
+RetrOS/LT Version 1.0, DOS 2.10
+\end{dialogue}
+
+In the format of a command, words in capitals are typed as shown (in
+capitals or small letters, as you like); words in \var{italics} stand for
+something you supply; items in square brackets [\ ] may be left out; and a
+bar | separates choices of which you type one. You do not type the
+brackets or the bar.
+
+\note{A note points out something useful, or something easy to overlook.}
+
+\caution{A caution warns you of something that could lose your files or
+keep your computer from starting.}
+
+\mwnewpart
+\renewcommand\runningtitle{Contents}
+\renewcommand\contentsname{Contents}
+\tableofcontents

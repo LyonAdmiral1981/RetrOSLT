@@ -1,0 +1,391 @@
+\mwnewpart
+\renewcommand\runningtitle{Section 6. Commands}
+\chapter{Commands}
+\startcontents[sec]
+
+This Section describes every RetrOS/LT command, in alphabetical order.
+\term{Internal} commands are part of \file{COMMAND.COM} and are always
+available. \term{External} commands are files on the DOS diskette, or in
+the directory Install put them in; that directory must be the current one
+or be named in the \typed{PATH}.
+
+In the formats, \var{d:} is a drive, \var{path} a directory path,
+\var{file} a file name, which may usually have a drive and path before it
+and wildcards in it. Items in square brackets may be left out.
+
+The commands for batch files are \typed{ECHO}, \typed{FOR}, \typed{GOTO},
+\typed{IF}, \typed{PAUSE}, \typed{REM} and \typed{SHIFT}. \typed{DEBUG},
+\typed{LINK} and \typed{EXE2BIN} are on the Supplemental Programs
+diskette.
+
+\cmd{ASSIGN}{External}{Sends requests for one drive to another.}
+\fmt{ASSIGN [\var{x}=\var{y} [...]]}
+\typed{ASSIGN A=C} sends requests for drive A to drive C, for programs that
+look for their files only on drive A. \typed{ASSIGN} alone puts every drive
+back. Do not use \typed{FORMAT}, \typed{DISKCOPY}, \typed{DISKCOMP} or
+\typed{PRINT} while drives are assigned. \typed{ASSIGN} stays in memory once
+it has been used.
+
+\cmd{BACKUP}{External}{Copies files from a disk to diskettes for
+safekeeping, across as many diskettes as needed.}
+\fmt{BACKUP \var{d:}[\var{path}][\var{file}] \var{d:} [/S] [/M] [/A] [/D:\var{mm-dd-yy}]}
+\begin{opts}
+\opt{/S}{Includes the directories below the source.}
+\opt{/M}{Only files changed since they were last backed up.}
+\opt{/A}{Adds to the files already on the backup diskettes, beginning
+  with the last one, instead of erasing them.}
+\opt{/D:}{Only files changed on or after the date.}
+\end{opts}
+The target diskettes must be formatted. Only \typed{RESTORE} can read what
+\typed{BACKUP} writes. \typed{BACKUP} ends with exit code 0 if it backed up
+the files, 1 if there were none to back up, 3 if it was stopped with
+\keys{Ctrl}{Break}, and 4 after an error; \typed{IF ERRORLEVEL} can test
+it. See Section~4.
+
+\cmd{BREAK}{Internal}{Sets how often RetrOS/LT checks for
+\keys{Ctrl}{Break}.}
+\fmt{BREAK [ON|OFF]}
+\typed{BREAK} alone shows the setting. See \typed{BREAK=} in Section~5.
+
+\cmd{CHDIR (CD)}{Internal}{Shows or changes the current directory.}
+\fmt{CD [\var{d:}][\var{path}]}
+\typed{CD} alone shows the current directory. \typed{CD ..} goes up one
+directory; \typed{CD \bs} goes to the root. Naming a drive changes the
+current directory of that drive without making it the current drive.
+
+\cmd{CHKDSK}{External}{Checks a disk and reports its space and the
+computer's memory.}
+\fmt{CHKDSK [\var{d:}][\var{file}] [/F] [/V]}
+\begin{opts}
+\opt{/F}{Fixes the errors it finds, after asking.}
+\opt{/V}{Shows the name of every file as it is checked.}
+\end{opts}
+With a file name, \typed{CHKDSK} also reports whether those files are in
+one piece. Do not use it on an assigned drive. See Section~4.
+
+\cmd{CLS}{Internal}{Clears the screen.}
+\fmt{CLS}
+
+\cmd{COMMAND}{External}{Starts another copy of the command processor.}
+\fmt{COMMAND [\var{d:}][\var{path}] [/P] [/C \var{command}]}
+\begin{opts}
+\opt{\var{path}}{Where \file{COMMAND.COM} is to be found when it must be
+  read again.}
+\opt{/P}{Makes the new copy permanent, and runs \file{AUTOEXEC.BAT}.}
+\opt{/C \var{command}}{Runs the command and then returns.}
+\end{opts}
+\typed{EXIT} ends a copy that is not permanent.
+
+\cmd{COMP}{External}{Compares two files, or two sets of files, byte for
+byte.}
+\fmt{COMP [\var{file1}] [\var{file2}]}
+If you leave out a name, \typed{COMP} asks for it. The second may be a
+drive or directory only, or have wildcards, and then stands for files of
+the same names. \typed{COMP} reports each difference by its offset in the
+file, in hexadecimal, with the two bytes, and gives up on a pair after ten
+differences. Files of different sizes are not compared. At the end it asks
+\shown{Compare more files (Y/N)?}.
+
+\cmd{COPY}{Internal}{Copies files, or joins them.}
+\fmt{COPY [/A|/B] \var{source}[/A|/B] [\var{target}[/A|/B]] [/V]}
+\fmt{COPY \var{source1}+\var{source2}[+...] [\var{target}] [/V]}
+\begin{opts}
+\opt{/A}{Treats the file as text, ending at the first end-of-file mark
+  (\keys{Ctrl}{Z}).}
+\opt{/B}{Copies the whole file, whatever it holds.}
+\opt{/V}{Verifies that what was written can be read.}
+\end{opts}
+If the target is left out, the copy goes in the current directory under
+the same name. The source or target may be a device: \typed{COPY CON
+NOTE.TXT} copies what you type into a file, until you press \key{F6} and
+\key{Enter}; \typed{COPY NOTE.TXT PRN} prints it. With \typed{+} between
+them, the sources are joined into the target. \typed{COPY} replaces an
+existing target without asking.
+
+\cmd{CTTY}{Internal}{Changes the device RetrOS/LT takes commands from.}
+\fmt{CTTY \var{device}}
+\typed{CTTY COM1} lets a terminal on the serial port run RetrOS/LT;
+\typed{CTTY CON} from that terminal gives the keyboard and screen back.
+
+\cmd{DATE}{Internal}{Shows or sets the date.}
+\fmt{DATE [\var{mm-dd-yyyy}]}
+Without a date, \typed{DATE} shows the date and asks for a new one; press
+\key{Enter} to keep it. Give the year in four digits. RetrOS/LT keeps the
+date only while the computer is on.
+
+\cmd{DEBUG}{External}{A program for examining and changing memory, files
+and disk sectors, and for testing programs.}
+\fmt{DEBUG [\var{file} [\var{parameters}]]}
+Appendix~C lists its commands. \typed{Q} leaves it.
+
+\cmd{DEL (ERASE)}{Internal}{Erases files.}
+\fmt{DEL \var{file}}
+\typed{DEL *.*} asks \shown{Are you sure (Y/N)?} first; otherwise
+\typed{DEL} does not ask.
+
+\cmd{DIR}{Internal}{Lists the files in a directory.}
+\fmt{DIR [\var{d:}][\var{path}][\var{file}] [/P] [/W]}
+\begin{opts}
+\opt{/P}{Stops after each screen.}
+\opt{/W}{Shows the names only, five to a line.}
+\end{opts}
+\typed{DIR} shows each file's name, size, and the date and time it was last
+changed, and the space left on the disk. It does not show the hidden system
+files.
+
+\cmd{DISKCOMP}{External}{Compares two diskettes, track for track.}
+\fmt{DISKCOMP [\var{d:} [\var{d:}]] [/1] [/8]}
+\typed{/1} compares only the first side, and \typed{/8} only 8 sectors of
+each track. \typed{DISKCOMP} reports each track that differs, by side and
+track; \shown{Diskettes compare ok} if none does.
+
+\cmd{DISKCOPY}{External}{Copies a whole diskette to another of the same
+kind.}
+\fmt{DISKCOPY [\var{d:} [\var{d:}]] [/1]}
+\typed{DISKCOPY} formats the target as it copies if it is not formatted
+the same way. \typed{/1} copies only the first side. See Section~4.
+
+\cmd{ECHO}{Internal, batch}{Shows a message, or turns the showing of
+batch commands on or off.}
+\fmt{ECHO [ON|OFF|\var{message}]}
+\typed{ECHO} alone shows the setting.
+
+\cmd{EDLIN}{External}{A line editor for text files.}
+\fmt{EDLIN \var{file} [/B]}
+\typed{/B} reads the whole file, past any \keys{Ctrl}{Z}. Appendix~C lists
+its commands. \typed{E} saves the file and leaves; \typed{Q} leaves without
+saving.
+
+\cmd{EXE2BIN}{External}{Converts a program from \file{.EXE} form to
+\file{.COM} form, or to a memory image.}
+\fmt{EXE2BIN \var{file} [\var{target}]}
+The program must have no stack segment and be no larger than 64 KB.
+
+\cmd{EXIT}{Internal}{Leaves a copy of the command processor started by
+\typed{COMMAND} or by a program.}
+\fmt{EXIT}
+
+\cmd{FC}{External}{Compares two files and shows where they differ.}
+\fmt{FC [/\var{n}] [/B] [/C] [/W] \var{file1} \var{file2}}
+\begin{opts}
+\opt{/B}{Compares byte for byte, as \typed{COMP} does, for programs.}
+\opt{/C}{Ignores the difference between capitals and small letters.}
+\opt{/W}{Treats spaces and tabs as a single space, and ignores them at the
+  ends of lines.}
+\opt{/\var{n}}{The number of lines, 1 to 9, that must match again before
+  a difference is taken to have ended.}
+\end{opts}
+For text, \typed{FC} shows the lines that differ, with a line either side.
+\typed{FC} is not in PC DOS 2.10; it is Microsoft's, from the same
+source.
+
+\cmd{FDISK}{External}{Sets up the partitions of a fixed disk.}
+\fmt{FDISK}
+See ``Partitioning a Fixed Disk'' in Section~4.
+
+\cmd{FIND}{External}{Shows the lines of a file that contain a string of
+characters.}
+\fmt{FIND [/V] [/C] [/N] "\var{string}" [\var{file} ...]}
+\begin{opts}
+\opt{/V}{Shows the lines that do not contain it.}
+\opt{/C}{Shows only how many lines contain it.}
+\opt{/N}{Shows each line's number.}
+\end{opts}
+Capitals and small letters differ. Without a file, \typed{FIND} reads what
+is piped to it: \typed{DIR | FIND "BAT"}.
+
+\cmd{FOR}{Internal, batch}{Runs a command once for each of a set of files
+or words.}
+\fmt{FOR \%\%\var{v} IN (\var{set}) DO \var{command}}
+In a batch file the variable has two percent signs, \typed{\%\%F}; typed at
+the prompt, one: \typed{FOR \%F IN (*.TXT) DO TYPE \%F}.
+
+\cmd{FORMAT}{External}{Prepares a diskette or a fixed disk to hold files.}
+\fmt{FORMAT \var{d:} [/S] [/V] [/1] [/8] [/B]}
+\begin{opts}
+\opt{/S}{Copies the system files and \file{COMMAND.COM} to it, so that
+  it starts the computer.}
+\opt{/V}{Asks for a volume label.}
+\opt{/1}{Formats one side only.}
+\opt{/8}{8 sectors a track.}
+\opt{/B}{8 sectors a track, leaving room for \typed{SYS} to put the system
+  on later.}
+\end{opts}
+See Section~4.
+
+\cmd{GOTO}{Internal, batch}{Jumps to a label in a batch file.}
+\fmt{GOTO \var{label}}
+A label is a line that begins with a colon: \typed{:AGAIN}.
+
+\cmd{GRAPHICS}{External}{Lets \keys{Shift}{PrtSc} print a graphics screen.}
+\fmt{GRAPHICS}
+After \typed{GRAPHICS}, \keys{Shift}{PrtSc} prints the color graphics
+screen on the IBM Graphics Printer, turned on its side: in 640 by 200 mode
+dot for dot, and in 320 by 200 mode with each dot made larger and the four
+colors printed as four shades. Text screens are printed as before.
+\typed{GRAPHICS} stays in memory.
+
+\cmd{IF}{Internal, batch}{Runs a command only if a condition holds.}
+\fmt{IF [NOT] ERRORLEVEL \var{n} \var{command}}
+\fmt{IF [NOT] \var{string1}==\var{string2} \var{command}}
+\fmt{IF [NOT] EXIST \var{file} \var{command}}
+\typed{ERRORLEVEL \var{n}} is true if the last program's exit code was
+\var{n} or more. \typed{BACKUP} and \typed{RESTORE} set one.
+
+\cmd{INSTALL}{External}{Puts RetrOS/LT on the fixed disk.}
+\fmt{INSTALL}
+Run from the DOS diskette. See Section~2.
+
+\cmd{LINK}{External}{Links object modules made by an assembler or a
+compiler into a program.}
+\fmt{LINK [\var{objects}[,\var{program}[,\var{map}[,\var{libraries}]]]][;]}
+\typed{LINK} asks for whatever is left out; a semicolon takes the usual
+answers for the rest. It is Microsoft's linker, version 2.00.
+
+\cmd{MKDIR (MD)}{Internal}{Makes a directory.}
+\fmt{MD [\var{d:}]\var{path}}
+
+\cmd{MODE}{External}{Sets up the printers, the serial port and the
+display.}
+\fmt{MODE LPT\var{n}:[\var{chars}][,[\var{lines}][,P]]}
+\fmt{MODE LPT\var{n}:=COM1}
+\fmt{MODE COM1:\var{baud}[,\var{parity}[,\var{data}[,\var{stop}[,P]]]]}
+\fmt{MODE \var{display}}
+\fmt{MODE [\var{display}],R|L[,T]}
+\begin{longopts}
+\lopt{LPT\var{n}:\var{chars},\var{lines}}{80 or 132 characters a line, and
+  6 or 8 lines an inch, on an IBM printer. \typed{P} keeps trying when the
+  printer is not ready, instead of reporting an error.}
+\lopt{LPT\var{n}:=COM1}{Sends what is printed on that printer to the
+  serial port. \typed{MODE LPT\var{n}:} alone stops it.}
+\lopt{COM1:\var{baud}}{110, 150, 300, 600, 1200, 2400, 4800 or 9600 (the
+  first two digits are enough); parity \typed{N}, \typed{O} or \typed{E}
+  (\typed{E} if not given); 7 or 8 data bits (7); 1 or 2 stop bits (1, or 2
+  at 110 baud). \typed{P} keeps trying when the port is not ready, for a
+  serial printer.}
+\lopt{\var{display}}{\typed{40} or \typed{80} columns; \typed{BW40},
+  \typed{BW80}, \typed{CO40} or \typed{CO80} on the color display; or
+  \typed{MONO} for the monochrome display.}
+\lopt{R, L, T}{Moves the picture on the color display right or left, two
+  characters in 80 columns and one in 40. \typed{T} shows a test pattern
+  and asks whether it is lined up.}
+\end{longopts}
+\typed{MODE} stays in memory when it reroutes or retries a printer or
+shifts the display.
+
+\cmd{MORE}{External}{Shows what is piped to it one screen at a time.}
+\fmt{MORE < \var{file}}
+\fmt{\var{command} | MORE}
+After each screen it shows \shown{-- More --}; press a key for the next.
+
+\cmd{PATH}{Internal}{Sets the directories searched for programs and batch
+files.}
+\fmt{PATH [[\var{d:}]\var{path}[;[\var{d:}]\var{path}...]]}
+\fmt{PATH ;}
+\typed{PATH} alone shows the path; \typed{PATH ;} removes it.
+
+\cmd{PAUSE}{Internal, batch}{Stops a batch file until a key is pressed.}
+\fmt{PAUSE [\var{message}]}
+It shows the message, if echoing is on, and \shown{Strike a key when
+ready . . .}.
+
+\cmd{PRINT}{External}{Prints text files while you go on working.}
+\fmt{PRINT [\var{file} ...] [/T] [/C] [/P]}
+\begin{opts}
+\opt{/T}{Cancels every file in the queue.}
+\opt{/C}{Cancels the files named after it.}
+\opt{/P}{Adds the files named after it (the usual action).}
+\end{opts}
+The first time it is run, \typed{PRINT} asks \shown{Name of list device
+[PRN]:}; press \key{Enter} for the printer, or name another device. It then
+stays in memory. The queue holds ten files. \typed{PRINT} alone shows the
+queue.
+
+\cmd{PROMPT}{Internal}{Sets what the prompt shows.}
+\fmt{PROMPT [\var{text}]}
+See ``The Environment'' in Section~5 for the codes. \typed{PROMPT \$p\$g}
+shows the current directory.
+
+\cmd{RECOVER}{External}{Rescues what can be read of a file that has a bad
+sector, or of every file on a disk whose directory is damaged.}
+\fmt{RECOVER \var{file}}
+\fmt{RECOVER \var{d:}}
+With a file name, \typed{RECOVER} keeps what can be read and marks the bad
+sectors. With a drive alone, it makes every file into one named
+\file{FILE\var{nnnn}.REC} in the root directory; use it only when the
+directory itself cannot be read.
+
+\cmd{REM}{Internal, batch}{A remark, ignored by RetrOS/LT.}
+\fmt{REM [\var{text}]}
+
+\cmd{RENAME (REN)}{Internal}{Changes a file's name.}
+\fmt{REN \var{file} \var{newname}}
+The new name may not have a drive or path; the file stays where it is.
+
+\cmd{RESTORE}{External}{Puts back files saved by \typed{BACKUP}.}
+\fmt{RESTORE \var{d:} [\var{d:}][\var{path}]\var{file} [/S] [/P]}
+\begin{opts}
+\opt{/S}{Includes the directories below.}
+\opt{/P}{Asks before replacing a file that is read-only or that has been
+  changed since it was backed up.}
+\end{opts}
+The first drive is the one with the backup diskettes. Files are restored to
+the directories they came from, which are made if need be. Exit codes are
+as for \typed{BACKUP}.
+
+\cmd{RMDIR (RD)}{Internal}{Removes a directory.}
+\fmt{RD [\var{d:}]\var{path}}
+The directory must be empty, and not the current one.
+
+\cmd{SET}{Internal}{Shows, sets or removes a value in the environment.}
+\fmt{SET [\var{name}=[\var{value}]]}
+\typed{SET} alone shows them all. With nothing after the equal sign, the
+name is removed.
+
+\cmd{SHIFT}{Internal, batch}{Moves each batch parameter down one place,
+so that a batch file can use more than nine.}
+\fmt{SHIFT}
+
+\cmd{SORT}{External}{Sorts lines of text.}
+\fmt{SORT [/R] [/+\var{n}]}
+\begin{opts}
+\opt{/R}{Sorts in reverse order.}
+\opt{/+\var{n}}{Sorts on the characters from column \var{n}.}
+\end{opts}
+\typed{SORT} reads what is piped or redirected to it: \typed{SORT <
+NAMES.TXT > SORTED.TXT}.
+
+\cmd{SYS}{External}{Copies the system files to a formatted disk.}
+\fmt{SYS \var{d:}}
+See ``Making a Disk Start the Computer'' in Section~4.
+
+\cmd{TIME}{Internal}{Shows or sets the time.}
+\fmt{TIME [\var{hh}:\var{mm}[:\var{ss}[.\var{xx}]]]}
+Use the 24-hour clock: \typed{TIME 14:30}.
+
+\cmd{TREE}{External}{Shows the directories of a disk.}
+\fmt{TREE [\var{d:}] [/F]}
+\typed{TREE} lists each directory with the directories in it.
+\typed{/F} lists the files in each as well. Add \typed{| MORE} for a large
+disk.
+
+\cmd{TYPE}{Internal}{Shows a file on the screen.}
+\fmt{TYPE \var{file}}
+
+\cmd{VER}{Internal}{Shows the version of RetrOS/LT.}
+\fmt{VER}
+\begin{dialogue}
+A>\textbf{VER}
+
+RetrOS/LT Version 1.0, DOS 2.10
+\end{dialogue}
+
+\cmd{VERIFY}{Internal}{Sets whether what is written to a disk is read back
+and checked.}
+\fmt{VERIFY [ON|OFF]}
+Verifying makes writing slower. \typed{VERIFY} alone shows the setting.
+
+\cmd{VOL}{Internal}{Shows a disk's volume label.}
+\fmt{VOL [\var{d:}]}
+
+\stopcontents[sec]

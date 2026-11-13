@@ -1,0 +1,114 @@
+\mwnewpart
+\renewcommand\runningtitle{Section 7. Problem Solving}
+\chapter{Problem Solving}
+\sectioncontents
+
+\section{If the Computer Does Not Start}\ixs{startup problems}
+
+\begin{longopts}
+\lopt{\parbox[t]{\linewidth}{\ttfamily Non-System disk or disk error\\Replace and strike any key when ready}}{The
+  diskette in drive A does not hold the RetrOS/LT system files. Put in the
+  DOS diskette, or one made with \typed{FORMAT /S}, and press a key.}
+\lopt{Disk Boot failure}{The startup disk could not be read. Try another
+  copy of the diskette; clean the drive heads.}
+\lopt{\parbox[t]{\linewidth}{\ttfamily Missing RETDOS.COM\\Error loading RETDOS.COM}}{\file{RETDOS.COM} is not
+  the second file of the root directory, or could not be read. Put the
+  system on the disk again with \typed{SYS}, from the DOS diskette.}
+\lopt{Bad or missing Command Interpreter}{\file{COMMAND.COM} is not in the
+  root directory of the startup disk, or is from another version of DOS.
+  Copy it there from the DOS diskette.}
+\lopt{\parbox[t]{\linewidth}{\ttfamily Invalid partition table\\Error loading operating system\\Missing operating system}}{The
+  computer was starting from the fixed disk. The partition table has more
+  than one active partition, the DOS partition could not be read, or it
+  holds no system. Start from the DOS diskette, and use \typed{FDISK} to
+  look at the partitions, or \typed{SYS C:} to put the system back.}
+\lopt{Bad or missing \var{file}}{A \typed{DEVICE=} line in \file{CONFIG.SYS}
+  names a file that is not there. Correct the line.}
+\end{longopts}
+
+If the computer starts ROM BASIC instead, it found no startup diskette in
+drive A and no active partition on the fixed disk.
+
+\section{Device Errors}\ixs{Abort, Retry, Ignore}
+
+When a disk or a printer cannot do what it was asked, RetrOS/LT says what
+happened and asks what to do:
+
+\begin{dialogue}
+Not ready error reading drive A
+Abort, Retry, Ignore?
+\end{dialogue}
+
+\begin{tabularx}{\textwidth}{@{}P{0.5in}X@{}}
+\toprule
+\typed{R} & Retry: put things right first, such as closing the drive door
+or turning the printer on, and try again.\\
+\typed{A} & Abort: end the program that asked.\\
+\typed{I} & Ignore: go on as if it had worked. Data may be lost; use it
+only to rescue what can be read.\\
+\bottomrule
+\end{tabularx}
+
+\begin{tabularx}{\textwidth}{@{}P{1.6in}X@{}}
+\toprule
+Not ready & The drive door is open or there is no diskette; the printer is
+off or off-line.\\
+Write protect & The diskette has a write-protect tab.\\
+Seek, Sector not found, Data & The disk cannot be read there: the diskette
+is damaged, or was written by a drive whose heads are out of line.\\
+Non-DOS disk & The diskette is not formatted, or not for DOS.\\
+No paper & The printer is out of paper.\\
+\bottomrule
+\end{tabularx}
+
+\section{Common Messages}\ixs{messages}
+
+\begin{longopts}
+\lopt{Bad command or file name}{No internal command has that name, and no
+  program or batch file of that name is in the current directory or the
+  path.}
+\lopt{File not found}{No file matches the name. Check the drive and path.}
+\lopt{Invalid drive specification}{There is no such drive.}
+\lopt{Invalid directory}{The directory named does not exist.}
+\lopt{Invalid date}{Give the date as month, day and year, with the year in
+  four digits: \typed{11-13-2026}.}
+\lopt{Insufficient disk space}{The disk is full. Erase files you do not
+  need, or use another disk.}
+\lopt{File creation error}{The root directory is full, or a read-only file
+  of that name is in the way.}
+\lopt{Duplicate file name or File not found}{\typed{RENAME} found no such
+  file, or a file with the new name exists.}
+\lopt{Incorrect DOS version}{The command is from another version of DOS.
+  Use the one from the RetrOS/LT diskette.}
+\lopt{Out of environment space}{See ``The Environment'' in Section~5.}
+\lopt{Insert diskette for drive B: and strike any key when ready}{The
+  computer has one diskette drive, and a program asked for the other
+  letter. Put in the diskette for that drive.}
+\end{longopts}
+
+\section{Programs That Check the DOS Version}\ixs{version, DOS}
+
+RetrOS/LT tells programs it is DOS 2.10, so every program written for DOS
+2.0 or 2.10 runs. A program written for DOS 3 or later that checks the
+version says so and ends; one that does not check may use functions DOS 2
+does not have, and fail. Use a version of the program made for DOS 2.
+
+Some programs look for the system files by name, \file{IBMBIO.COM} and
+\file{IBMDOS.COM}, to tell PC DOS from other systems; they do not find
+them on a RetrOS/LT disk.
+
+\section{Getting Files Back}
+
+RetrOS/LT has no command to bring back an erased file; keep backup copies
+with \typed{BACKUP}, \typed{COPY} or \typed{DISKCOPY}. If part of a file
+cannot be read, \typed{RECOVER} rescues the rest. If \typed{CHKDSK} reports
+lost clusters, \typed{CHKDSK /F} makes files of them, named
+\file{FILE\var{nnnn}.CHK}, which you can look at with \typed{TYPE}.
+
+\section{Reporting a Problem}
+
+If you find that RetrOS/LT does something differently from PC DOS 2.10 on
+the same computer, or wrongly, please write to The Lyon Mountain Company,
+P.O. Box 290, Lyon Mountain, New York 12952 USA, or use the Reader's
+Comment Form at the back of this book. Say what computer, memory and disks
+you have, what you typed, and what appeared.
