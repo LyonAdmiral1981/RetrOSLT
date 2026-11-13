@@ -1335,14 +1335,13 @@ FD_FOUND:
         MOV     DX,[SI+10]
         MOV     [FD_LO],AX
         MOV     [FD_HI],DX
-        PUSH    CS
-        POP     ES
-        MOV     DI,OFFSET SECBUF
-        MOV     CX,1
-        CALL    DISKIO                  ; its boot sector
-        JC      FD_NONE_OK
-        CMP     WORD PTR [SECBUF+11],SECSIZE
-        JNZ     FD_NONE_OK
+        MOV     AX,[SI+12]              ; its length: at most 65535 sectors,
+        CMP     WORD PTR [SI+14],0      ; all a DOS 2 volume can hold
+        JZ      FD_LEN
+        MOV     AX,0FFFFH
+FD_LEN: ; its BPB, worked out from its size as PC DOS 2 does (the BPB in a
+        ; fixed disk's boot sector is not used: FORMAT writes the same one)
+        CALL    CALCBPB
         ; a unit for it
         MOV     BL,[DRVMAX]
         XOR     BH,BH
@@ -1360,7 +1359,7 @@ FD_FOUND:
         MOV     DI,[UNITBPB+BX]         ; HDBPB0 or HDBPB1
         PUSH    CS
         POP     ES
-        MOV     SI,OFFSET SECBUF+11
+        MOV     SI,OFFSET CB_BPB
         MOV     CX,13
         REP     MOVSB
         INC     [DRVMAX]
@@ -1371,6 +1370,72 @@ FD_NONE:
         STC
         RET
 FIXEDDISK ENDP
+
+; CALCBPB: AX = sectors in a fixed disk's DOS partition, to CB_BPB: 512
+; root directory entries, two FATs, and the smallest cluster that keeps the
+; 12-bit FAT within 4,084 clusters. (scripts/mkhd.py does the same.)
+CALCBPB PROC    NEAR
+        MOV     [CB_SECS],AX
+        MOV     [CB_SPC],1
+CB_SPCL:
+        MOV     [CB_FAT],1
+CB_FATL:
+        MOV     AX,[CB_SECS]
+        SUB     AX,1+32                 ; boot sector, root directory
+        SUB     AX,[CB_FAT]
+        SUB     AX,[CB_FAT]
+        XOR     DX,DX
+        DIV     [CB_SPC]
+        MOV     [CB_CLUS],AX
+        ADD     AX,2                    ; bytes the FAT needs: (n+2) * 1.5
+        MOV     CX,3
+        MUL     CX
+        SHR     DX,1
+        RCR     AX,1
+        MOV     CX,[CB_FAT]             ; bytes it has: sectors * 512
+        MOV     BX,CX
+        MOV     CL,7
+        SHR     BX,CL                   ; high word
+        MOV     CX,[CB_FAT]
+        PUSH    AX
+        MOV     AX,CX
+        MOV     CL,9
+        SHL     AX,CL                   ; low word
+        MOV     CX,AX
+        POP     AX
+        CMP     DX,BX
+        JB      CB_FITS
+        JA      CB_MORE
+        CMP     AX,CX
+        JBE     CB_FITS
+CB_MORE:
+        INC     [CB_FAT]
+        JMP     CB_FATL
+CB_FITS:
+        CMP     [CB_CLUS],4084
+        JBE     CB_DONE
+        SHL     [CB_SPC],1
+        JMP     CB_SPCL
+CB_DONE:
+        MOV     WORD PTR [CB_BPB],SECSIZE
+        MOV     AL,BYTE PTR [CB_SPC]
+        MOV     [CB_BPB+2],AL
+        MOV     WORD PTR [CB_BPB+3],1
+        MOV     [CB_BPB+5],2
+        MOV     WORD PTR [CB_BPB+6],512
+        MOV     AX,[CB_SECS]
+        MOV     WORD PTR [CB_BPB+8],AX
+        MOV     [CB_BPB+10],0F8H
+        MOV     AX,[CB_FAT]
+        MOV     WORD PTR [CB_BPB+11],AX
+        RET
+CALCBPB ENDP
+
+CB_SECS DW      0
+CB_SPC  DW      0
+CB_FAT  DW      0
+CB_CLUS DW      0
+CB_BPB  DB      13 DUP (0)
 
 FD_DRV  DB      0
 FD_SPT  DW      0

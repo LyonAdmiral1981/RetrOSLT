@@ -8,6 +8,20 @@ W="$ROOT/build/work"
 rm -rf "$W"; mkdir -p "$W" "$ROOT/build/OUTPUT"
 python3 "$ROOT/scripts/prep.py" "$W" >/dev/null
 S="$W/SRC"
+# The commands written for NASM (cmd/*.ASM), and the master boot record
+# FDISK writes (the code part of boot/MBR.ASM: MBRCODE.INC)
+nasm -f bin -o "$ROOT/build/MBR.BIN" "$ROOT/boot/MBR.ASM"
+python3 - "$ROOT/build/MBR.BIN" > "$ROOT/build/MBRCODE.INC" <<'PY'
+import sys
+b = open(sys.argv[1], "rb").read()[:0x1BE]
+print("mbrcode:")
+for i in range(0, len(b), 16):
+    print("        db      " + ",".join("0%02Xh" % x for x in b[i:i+16]))
+PY
+for f in "$ROOT"/cmd/*.ASM; do
+  n=$(basename "$f" .ASM)
+  nasm -f bin -i "$ROOT/build/" -o "$ROOT/build/OUTPUT/$n.COM" "$f"
+done
 # The boot sector, for FORMAT and SYS to write: BOOTSECT.INC
 nasm -f bin -o "$ROOT/build/BOOT.BIN" "$ROOT/boot/BOOT.ASM"
 python3 - "$ROOT/build/BOOT.BIN" > "$S/BOOTSECT.INC" <<'PY'

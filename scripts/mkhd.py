@@ -28,7 +28,7 @@ def main():
     secs = total - start
     if secs > 65535:
         sys.exit("a DOS 2 volume is at most 65535 sectors")
-    spc, root = 8, 512
+    spc, root = 1, 512
     while True:                               # 12-bit FAT: at most 4084 clusters
         fat = 1
         while True:
