@@ -29,10 +29,14 @@ class PC:
             cmd += ["-drive", f"file={a},if=floppy,index=0,format=raw"]
         if b:
             cmd += ["-drive", f"file={b},if=floppy,index=1,format=raw"]
-        if hd:
-            cmd += ["-drive", f"file={hd},if=ide,index=0,format=raw"]
-        if hd2:
-            cmd += ["-drive", f"file={hd2},if=ide,index=1,format=raw"]
+        for i, h in enumerate((hd, hd2)):
+            if not h:
+                continue
+            # FILE or FILE:CYLS:HEADS:SECTORS (default: the XT's 306:4:17)
+            f, *g = h.split(":")
+            c, hh, ss = (g + ["306", "4", "17"][len(g):]) if g else ("306", "4", "17")
+            cmd += ["-drive", f"file={f},if=none,id=hd{i},format=raw",
+                    "-device", f"ide-hd,drive=hd{i},bus=ide.0,unit={i},cyls={c},heads={hh},secs={ss},bios-chs-trans=none"]
         self.p = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                                   stderr=subprocess.STDOUT)
         os.set_blocking(self.p.stdout.fileno(), False)
