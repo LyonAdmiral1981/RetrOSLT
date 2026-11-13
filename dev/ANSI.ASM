@@ -131,7 +131,10 @@ fill:   mov     ax,[qhead]
 .r:     ret
 
 ; A key, AX from INT 16h: its reassignment, or itself
-keyin:  mov     dx,ax                   ; DX = the key code to look for
+keyin:  cmp     ax,7200h                ; Ctrl-PrtSc: Ctrl-P, which DOS
+        jne     .k                      ; takes as printer echo on or off
+        mov     ax,0010h
+.k:     mov     dx,ax                   ; DX = the key code to look for
         or      al,al
         jz      .ext
         xor     dh,dh                   ; an ASCII key: its character alone
