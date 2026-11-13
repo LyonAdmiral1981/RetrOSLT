@@ -162,6 +162,10 @@ IN_BAD1:
 ; disk is not formatted (its maker's low-level format stands); its sectors
 ; are checked by BADSECTOR.
 DISKFORMAT:
+        MOV     DX,OFFSET MSG_FMTING    ; as PC DOS 2's FORMAT says, then
+        MOV     AH,9                    ; "Format complete" after the FATs
+        INT     21H
+        MOV     [SAIDDONE],0
         MOV     [NEXTSEC],0
         MOV     [NBAD],0
         CMP     [HARDFLAG],0
@@ -395,7 +399,13 @@ WF_LP:  MOV     AX,[COUNT]
         ADD     [COUNT],AX
         DEC     [CURCNT]
         JNZ     WF_LP
-        CLC
+        CMP     [SAIDDONE],0            ; the first time for this disk
+        JNZ     WF_OK
+        MOV     [SAIDDONE],1
+        MOV     DX,OFFSET MSG_FMTDONE
+        MOV     AH,9
+        INT     21H
+WF_OK:  CLC
 WF_RET: RET
 
 WRTBOOT:
@@ -614,6 +624,9 @@ NBAD    DW      0
 NEXTBAD DW      0
 BADLIST DW      BADMAX DUP (0)
 
+MSG_FMTING DB   "Formatting...$"
+MSG_FMTDONE DB  "Format complete",13,10,"$"
+SAIDDONE DB     0
 MSG_WP  DB      13,10,"Write protect error",13,10,"$"
 MSG_NR  DB      13,10,"Drive not ready",13,10,"$"
 
