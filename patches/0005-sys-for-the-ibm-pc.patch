@@ -1,0 +1,107 @@
+diff -ru e/SYS.ASM f/SYS.ASM
+--- e/SYS.ASM	2026-11-13 09:42:03.956550098 -0500
++++ f/SYS.ASM	2026-11-13 09:42:03.994311550 -0500
+@@ -17,8 +17,8 @@
+ TRUE    EQU     NOT FALSE
+ 
+ IBMJAPVER EQU   FALSE
+-IBMVER  EQU     FALSE
+-MSVER   EQU     TRUE
++IBMVER  EQU     TRUE    ; RetrOS/LT: the IBM PC SYS
++MSVER   EQU     FALSE
+ 
+ .xlist
+ .xcref
+@@ -57,14 +57,9 @@
+         ENDIF
+ 
+ DEFALT  DB      0
+-        IF MSVER
++; RetrOS/LT: its system files are IO.SYS and MSDOS.SYS in either version
+ BIOSName    DB  "A:\IO.SYS",0
+ DOSName     DB  "A:\MSDOS.SYS",0
+-        ENDIF
+-        IF IBMVER OR IBMJAPVER
+-BIOSName    DB  "A:\IBMBIO.COM",0
+-DOSName     DB  "A:\IBMDOS.COM",0
+-        ENDIF
+ 
+ BIOSInFH    DW  ?                       ; file handle of source BIOS
+ BIOSLenLow  DW  2 DUP (?)               ; 32-bit length of BIOS
+@@ -85,7 +80,8 @@
+ pDOSEnd     DW  ?                       ; offset of end of DOS in buffer
+ 
+         IF      IBMVER OR IBMJAPVER
+-BOOT    DW      256 DUP (0)
++; RetrOS/LT: its own boot sector, with whatever BPB PUTBOOT gives it
++        INCLUDE BOOTSECT.INC
+         IF      IBMJAPVER
+ LLISTBUF DW     256 DUP (0)
+         ENDIF
+@@ -458,6 +454,9 @@
+         ENDIF
+ 
+         IF      IBMVER
++; RetrOS/LT: always write the RetrOS/LT boot sector, which loads IO.SYS, and
++; keep the disk's own BPB. IBM's SYS wrote one only to a DOS 1 diskette
++; (FEh or FFh, which may have no BPB) and left a DOS 2 disk's as it was.
+ PUTBOOT:
+         MOV     AH,GET_DPB
+         MOV     DL,BYTE PTR DS:[5Ch]    ; Target drive
+@@ -467,16 +466,40 @@
+         PUSH    CS
+         POP     DS
+ ASSUME  DS:DG
++        MOV     BX,OFFSET DG:BOOT
+         CMP     AL,0FEH
+-        JB      RET1
++        JB      PB_READ
++        MOV     WORD PTR [BX+11],512    ; DOS 1: 8 sectors a track, 1 FAT sector
++        MOV     WORD PTR [BX+14],1
++        MOV     BYTE PTR [BX+16],2
++        MOV     BYTE PTR [BX+21],AL
++        MOV     WORD PTR [BX+22],1
++        MOV     WORD PTR [BX+24],8
++        MOV     WORD PTR [BX+28],0
++        MOV     BYTE PTR [BX+13],1      ; FEh: one side
++        MOV     WORD PTR [BX+17],64
++        MOV     WORD PTR [BX+19],320
++        MOV     WORD PTR [BX+26],1
+         TEST    AL,1
+         JZ      GOTBOOT
+-        MOV     BX,OFFSET DG:BOOT
+-        MOV     WORD PTR [BX+17],112    ; Set number of dir entries
+-        MOV     WORD PTR [BX+19],2*8*40 ; Set number of sectors
+-        INC     BYTE PTR [BX+21]        ; Media = ff
+-        INC     WORD PTR [BX+26]        ; Number of heads = 2
+-
++        MOV     BYTE PTR [BX+13],2      ; FFh: two sides
++        MOV     WORD PTR [BX+17],112
++        MOV     WORD PTR [BX+19],640
++        MOV     WORD PTR [BX+26],2
++        JMP     SHORT GOTBOOT
++PB_READ:                                ; DOS 2: keep the disk's BPB
++        MOV     AL,BYTE PTR DS:[5Ch]
++        DEC     AL
++        MOV     BX,OFFSET DG:BUF
++        XOR     DX,DX
++        MOV     CX,1
++        INT     25H
++        POP     AX                      ; Flags
++        JC      RET1
++        MOV     SI,OFFSET DG:BUF+11
++        MOV     DI,OFFSET DG:BOOT+11
++        MOV     CX,19
++        REP     MOVSB
+ GOTBOOT:
+         MOV     AL,BYTE PTR DS:[5Ch]
+         DEC     AL
+@@ -484,7 +507,7 @@
+         XOR     DX,DX                   ; Sector 0
+         MOV     CX,DX
+         INC     CX                      ; One sector
+-        INT     26H                     ; Write out 8 sector boot sector
++        INT     26H                     ; Write out the boot sector
+         POP     AX                      ; Flags
+ RET1:   RET
+         ENDIF
