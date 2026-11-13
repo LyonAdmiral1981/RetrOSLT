@@ -1445,8 +1445,9 @@ FD_HI   DW      0
 DOSPARA  DW      0
 
 ; LOADDOS: find RETDOS.COM, the second entry of the root directory of the
-; disk started from, and read it, a cluster at a time along its FAT chain
-; (it need not be contiguous), to the paragraph after RETBIO.COM.
+; disk started from, and read it along its FAT chain (it need not be
+; contiguous), each run of consecutive clusters at once, to the paragraph
+; after RETBIO.COM.
 LOADDOS PROC    NEAR
         MOV     AL,[BOOTDRV]
         MOV     [RW_DRV],AL
@@ -1495,17 +1496,35 @@ LD_LP:  MOV     AX,[LD_CLUS]
         JAE     LD_DONE
         CMP     AX,2
         JB      LD_ERR
-        ; read the cluster
+        ; a run of clusters one after another on the disk, read at once
+        ; (a track at a time) rather than a cluster at a time
+        MOV     [LD_RUN],AX
+        MOV     [LD_LEN],1
+LD_MORE:
+        CALL    NEXTCLUS
+        JC      LD_ERR
+        MOV     AX,[LD_RUN]
+        ADD     AX,[LD_LEN]
+        CMP     AX,[LD_CLUS]
+        JNZ     LD_READ
+        INC     [LD_LEN]
+        JMP     LD_MORE
+LD_READ:
+        MOV     AX,[LD_RUN]
         SUB     AX,2
         MOV     CL,[BS_SPC]
         XOR     CH,CH
         MUL     CX
         ADD     AX,[DATALO]
         ADC     DX,0
-        CALL    DISKIO                  ; CX = sectors per cluster
-        JC      LD_ERR
-        ; the next cluster, from the FAT
-        CALL    NEXTCLUS
+        PUSH    AX
+        PUSH    DX
+        MOV     AX,[LD_LEN]
+        MUL     CX
+        MOV     CX,AX                   ; sectors
+        POP     DX
+        POP     AX
+        CALL    DISKIO
         JC      LD_ERR
         JMP     LD_LP
 LD_DONE:
@@ -1528,6 +1547,8 @@ LD_HALT:
 LOADDOS ENDP
 
 LD_CLUS DW      0
+LD_RUN  DW      0               ; the first cluster of a run
+LD_LEN  DW      0               ; and how many
 FATSEC  DW      -1              ; the FAT sector in FATBUF (two, for a 12-bit
                                 ; entry across a sector boundary)
 

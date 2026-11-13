@@ -1,10 +1,10 @@
 ; RetrOS/LT boot sector, for NASM:  nasm -f bin -o BOOT.BIN BOOT.ASM
 ;
 ; The ROM BIOS loads this sector at 0000:7C00 and jumps to it. It finds
-; RETBIO.COM and RETDOS.COM as the first two entries of the root directory, as
-; DOS 2 requires, loads RETBIO.COM (which must be contiguous, as FORMAT /S and
-; SYS lay it down) at 0070:0000, and jumps to it with the drive in DL. RETBIO.COM
-; loads RETDOS.COM itself.
+; RETBIO.COM and RETDOS.COM as the first two entries of the root directory,
+; as DOS 2 requires, loads RETBIO.COM (which must be contiguous, as FORMAT /S
+; and SYS lay it down) at 0070:0000, a track at a time, and jumps to it with
+; the drive in DL. RETBIO.COM loads RETDOS.COM itself.
 ;
 ; It works on a diskette and on the DOS partition of a fixed disk, whose
 ; master boot record loads it with DL = 80h. The IBM PC's first ROM BIOS
@@ -105,17 +105,38 @@ boot:   cli
         mov     bx,IOSEG
         mov     es,bx
         xor     bx,bx
-.load:  push    cx
+.load:  push    ax                      ; a track at a time: to its end,
+        xor     dx,dx                   ; or as many as are left
+        div     word [spt]
+        mov     di,[spt]
+        sub     di,dx
+        pop     ax
+        cmp     di,cx
+        jbe     .n
+        mov     di,cx
+.n:     xchg    ax,di
+        mov     [count],al
+        xchg    ax,di
+        push    cx
         call    readsec
         pop     cx
         jc      bootfail
-        inc     ax
-        add     bx,512
-        loop    .load
+        add     ax,di
+        sub     cx,di
+        xchg    ax,di
+        mov     dl,9
+        xchg    cx,dx
+        shl     ax,cl
+        xchg    cx,dx
+        add     bx,ax
+        xchg    ax,di
+        or      cx,cx
+        jnz     .load
         mov     dl,[drive]
         jmp     IOSEG:0
 
-; Read sector AX (relative to the start of the disk) to ES:BX. CF on failure.
+; Read COUNT sectors from sector AX (from the start of the disk, and not
+; past the end of its track) to ES:BX. CF on failure.
 readsec:
         push    ax
         push    bx
@@ -134,7 +155,8 @@ readsec:
         and     ah,0C0h
         or      cl,ah
         mov     dl,[drive]
-        mov     ax,0201h
+        mov     ah,2
+        mov     al,[count]
         int     13h
         pop     ax
         jnc     .ok
@@ -170,6 +192,7 @@ print:  lodsb
 .done:  ret
 
 drive:  db      0
+count:  db      1               ; sectors a read
 rootsec: dw     0
 ioname: db      "RETBIO  COM"
 dosname: db     "RETDOS  COM"
