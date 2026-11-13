@@ -1,0 +1,115 @@
+THE RETROS/LT LICENSE
+Version 1.0, November 2026
+
+The Lyon Mountain Company
+Republic Lyon Mountain Corporation
+P.O. Box 290, Lyon Mountain, New York 12952 USA
+
+Please read this license before installing or using RetrOS/LT. By
+installing or using it, you agree to these terms. If you do not agree, do
+not install or use it.
+
+1. LICENSED, NOT SOLD
+
+RetrOS/LT is licensed to you, not sold. The Lyon Mountain Company
+owns RetrOS/LT and all copies of it, and keeps all rights not
+expressly granted to you in this license.
+
+"RetrOS/LT" means the RetrOS/LT operating system for the IBM Personal
+Computer and Personal Computer XT, as The Lyon Mountain Company supplies
+it: the files on its diskettes, the RetrOS/LT guides, and any updates The
+Lyon Mountain Company provides to you.
+"The Lyon Mountain Company" means The Lyon Mountain Company, Republic
+Lyon Mountain Corporation. "You" means the person or organization that
+obtained the license. A "computer" means one computer, with one system
+board.
+
+2. THE MICROSOFT CODE
+
+RetrOS/LT is derived from the MS-DOS 2 source code that Microsoft
+Corporation released under the MIT License, and includes Microsoft's
+LINK program from that release. That code is Copyright (c) Microsoft
+Corporation, and its notice is on the RetrOS/LT diskettes (NOTICE.TXT)
+and in the Guide to Operations. This license covers RetrOS/LT as The Lyon
+Mountain Company supplies it, and the work The Lyon Mountain Company has
+added. It does not limit any right you have to the original MS-DOS 2
+source code under Microsoft's own release of it. Neither Microsoft nor IBM
+is a party to this license, and neither warrants or supports RetrOS/LT.
+
+3. THE TWO LICENSES
+
+Your license is one of the following, as stated on your invoice or license
+certificate. If none is stated, you have a Single-Machine License.
+
+  SINGLE-MACHINE LICENSE. You may install and use RetrOS/LT on one
+  computer at a time. You may move it to another computer, if you remove
+  it from the first.
+
+  BLANKET LICENSE. You may install and use RetrOS/LT on any number of
+  computers that you own or lease, at any of your locations, and may make
+  as many copies as you need for that. Your employees and members may use
+  it on those computers. A Blanket License does not cover computers that
+  you do not own or lease, such as those of your employees at home.
+
+Under either license you may make copies of the diskettes for backup and
+archival purposes, and may print or copy the Guide to Operations for use
+with your licensed computers.
+
+4. RELEASES
+
+Your license covers the release of RetrOS/LT you obtained and any
+later releases The Lyon Mountain Company provides to you under it.
+
+5. WHAT YOU MAY NOT DO
+
+Except as this license expressly allows, you may not:
+
+  a. distribute, sell, rent, lease, lend or sublicense RetrOS/LT, or
+     give copies of it to others; only The Lyon Mountain Company may
+     distribute it;
+  b. distribute modified versions of RetrOS/LT;
+  c. remove or alter any copyright notice, license notice or release
+     number in RetrOS/LT.
+
+6. TRANSFER
+
+You may transfer a Single-Machine License once to another person or
+organization, if you transfer all copies of RetrOS/LT and its Guide
+to Operations, keep no copies, and the recipient agrees to this license.
+A Blanket License may be transferred only with the written consent of The
+Lyon Mountain Company.
+
+7. NO WARRANTY
+
+RETROS/LT IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. YOU ASSUME THE ENTIRE RISK
+AS TO ITS QUALITY AND PERFORMANCE. AN OPERATING SYSTEM CONTROLS YOUR
+DISKS: KEEP BACKUP COPIES OF YOUR DATA.
+
+8. LIMITATION OF LIABILITY
+
+IN NO EVENT SHALL THE LYON MOUNTAIN COMPANY BE LIABLE FOR ANY LOSS OF
+DATA, LOSS OF PROFITS, OR ANY INDIRECT, INCIDENTAL, SPECIAL OR
+CONSEQUENTIAL DAMAGES ARISING FROM THE USE OF, OR INABILITY TO USE,
+RETROS/LT, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. ITS
+TOTAL LIABILITY SHALL NOT EXCEED THE AMOUNT YOU PAID FOR YOUR LICENSE.
+SOME STATES DO NOT ALLOW THESE EXCLUSIONS OR LIMITATIONS, SO THEY MAY NOT
+APPLY TO YOU.
+
+9. TERMINATION
+
+This license ends automatically if you fail to comply with it. When it
+ends, you must stop using RetrOS/LT and destroy all copies of it.
+Sections 1, 2, 7, 8 and 10 continue after it ends.
+
+10. GENERAL
+
+This license is governed by the laws of the State of New York, United
+States of America. It is the entire agreement between you and The Lyon
+Mountain Company about RetrOS/LT, and can be changed only in writing
+signed by The Lyon Mountain Company. If any part of it is held
+unenforceable, the rest remains in effect.
+
+Copyright 2026 The Lyon Mountain Company, Republic Lyon Mountain
+Corporation. All rights reserved.

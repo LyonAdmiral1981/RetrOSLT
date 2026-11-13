@@ -517,5 +517,5 @@ full2   times 80 db 0
 inbuf   times 68 db 0
 dta     times 43 db 0
 dta2    times 43 db 0
-buf1    times BUFSZ db 0
-buf2    times BUFSZ db 0
+buf1    equ     $                       ; the buffers: memory after the
+buf2    equ     buf1+BUFSZ              ; program, not part of the file

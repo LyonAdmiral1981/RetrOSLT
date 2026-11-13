@@ -22,6 +22,8 @@ for f in "$ROOT"/cmd/*.ASM; do
   n=$(basename "$f" .ASM)
   nasm -f bin -i "$ROOT/build/" -i "$ROOT/cmd/" -o "$ROOT/build/OUTPUT/$n.COM" "$f"
 done
+# Install, which writes the master boot record too
+nasm -f bin -i "$ROOT/build/" -o "$ROOT/build/OUTPUT/INSTALL.COM" "$ROOT/install/INSTALL.ASM"
 # The device drivers (dev/*.ASM), to .SYS
 for f in "$ROOT"/dev/*.ASM; do
   n=$(basename "$f" .ASM)

@@ -231,5 +231,5 @@ inbuf   dw      0
 t1seg   dw      0
         times 256 db 0
 stacktop:
-trkbuf2 times 9*512 db 0
-progend:
+trkbuf2 equ     $                       ; (memory after the program)
+progend equ     trkbuf2+9*512

@@ -22,8 +22,14 @@ SORT, SYS, FORMAT); LINK is Microsoft's 2.00 linker as released. The ones
 IBM wrote are written new, to behave as IBM's do: FDISK, DISKCOPY,
 DISKCOMP, COMP, TREE, ASSIGN, MODE, GRAPHICS, BACKUP, RESTORE and ANSI.SYS.
 
-Still to come: the installation diskettes, and the Guide to Operations and
-Guide to Engineering.
+RetrOS/LT comes as PC DOS 2.10 did, on two single-sided 180 KB diskettes
+that any IBM PC or PC XT drive reads: the DOS diskette, which starts the
+computer and holds the system, the commands and Install, and the
+Supplemental Programs diskette (DEBUG, LINK, EXE2BIN). Install, adapted
+from RetrOS/x86's, partitions, formats and fills the fixed disk, asking
+first. FC, which PC DOS does not have, is built but not shipped.
+
+Still to come: the Guide to Operations and Guide to Engineering.
 
 ## Layout
 
@@ -35,15 +41,21 @@ Guide to Engineering.
 - `boot/` the boot sector and master boot record (NASM)
 - `cmd/` the commands written for RetrOS/LT (NASM)
 - `dev/` ANSI.SYS (NASM)
+- `install/INSTALL.ASM` Install (NASM)
+- `dist/` `LICENSE.TXT` (the RetrOS/LT License) and `NOTICE.TXT`
+  (Microsoft's), which go on the DOS diskette
 - `scripts/` `build.sh` (DOSBox-X), `prep.py`, `mkboot.py` (a startup
-  diskette image), `mkhd.py` (a fixed disk image), `dosrun.sh`
+  diskette image), `mkhd.py` (a fixed disk image), `mkinstall.py` (the
+  two distribution diskettes), `dosrun.sh`
 - `tests/` `qpc.py` (QEMU), `hd_test.py` (FDISK, FORMAT and starting from
-  the fixed disk), `mame5150/` (the IBM PC's own BIOS, which you supply)
+  the fixed disk), `install_test.py` (Install onto an empty fixed disk), `mame5150/` (the IBM PC's own BIOS, which you supply)
 
 ## Building
 
     git submodule update --init
     sh scripts/build.sh                 # build/OUTPUT: the system and commands
+    python3 scripts/mkinstall.py        # build/install: the two diskettes
+    python3 tests/install_test.py
     python3 scripts/mkboot.py build/A.IMG
     python3 tests/qpc.py build/A.IMG --type '\n' --type '\n' --type 'DIR\n'
 
