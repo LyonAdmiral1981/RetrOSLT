@@ -27,7 +27,8 @@ that any IBM PC or PC XT drive reads: the DOS diskette, which starts the
 computer and holds the system, the commands and Install, and the
 Supplemental Programs diskette (DEBUG, LINK, EXE2BIN). Install, adapted
 from RetrOS/x86's, partitions, formats and fills the fixed disk, asking
-first. FC, which PC DOS does not have, is built but not shipped.
+first. FC, from Microsoft's source (PC DOS 2.10 does not have it), comes as an
+extra.
 
 Still to come: the Guide to Operations and Guide to Engineering.
 

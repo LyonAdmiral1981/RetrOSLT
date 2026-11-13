@@ -13,7 +13,8 @@ RETROS-LT-SUPPLEMENTAL.IMG
 
 Each holds a hidden RETROS.DSK ("RetrOS/LT 1" or "RetrOS/LT 2") for
 Install to check. Every file carries the release date and time, as IBM's
-diskettes did. FC, which PC DOS does not have, is built but not shipped.
+diskettes did. FC, which PC DOS 2.10 does not have, comes on the DOS
+diskette as an extra.
 """
 import os, shutil, subprocess, sys, time
 from pathlib import Path
@@ -25,7 +26,7 @@ RELEASE = "2026-11-13 12:00"                 # date and time on every file
 
 DOS = ["RETBIO.COM", "RETDOS.COM", "COMMAND.COM", "ANSI.SYS", "FORMAT.COM",
        "CHKDSK.COM", "SYS.COM", "DISKCOPY.COM", "DISKCOMP.COM", "COMP.COM",
-       "EDLIN.COM", "MODE.COM", "FDISK.COM", "BACKUP.COM", "RESTORE.COM",
+       "FC.EXE", "EDLIN.COM", "MODE.COM", "FDISK.COM", "BACKUP.COM", "RESTORE.COM",
        "PRINT.COM", "RECOVER.COM", "ASSIGN.COM", "TREE.COM", "GRAPHICS.COM",
        "SORT.EXE", "FIND.EXE", "MORE.COM", "INSTALL.COM"]
 SUPPLEMENTAL = ["EXE2BIN.EXE", "LINK.EXE", "DEBUG.COM"]
