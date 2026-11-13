@@ -2,3 +2,4 @@ build/
 tests/mame5150/roms
 tests/mame5150/cfg*/
 *.COM
+__pycache__/
