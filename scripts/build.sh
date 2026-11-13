@@ -20,7 +20,7 @@ for i in range(0, len(b), 16):
 PY
 for f in "$ROOT"/cmd/*.ASM; do
   n=$(basename "$f" .ASM)
-  nasm -f bin -i "$ROOT/build/" -o "$ROOT/build/OUTPUT/$n.COM" "$f"
+  nasm -f bin -i "$ROOT/build/" -i "$ROOT/cmd/" -o "$ROOT/build/OUTPUT/$n.COM" "$f"
 done
 # The boot sector, for FORMAT and SYS to write: BOOTSECT.INC
 nasm -f bin -o "$ROOT/build/BOOT.BIN" "$ROOT/boot/BOOT.ASM"
@@ -39,7 +39,6 @@ BIOS="BIOS SYSINIT SYSIMES"
 CMDS="CHKDSK:COM:CHKDSK,CHKPROC,CHKMES
 DEBUG:COM:DEBUG,DEBCOM1,DEBCOM2,DEBUASM,DEBASM,DEBCONST,DEBDATA,DEBMES
 EDLIN:COM:EDLIN,EDLPROC,EDLMES
-DISKCOPY:COM:DISKCOPY,DISKMES
 EXE2BIN:EXE:EXE2BIN,EXEMES
 FC:EXE:FC,FCMES
 FIND:EXE:FIND,FINDMES
