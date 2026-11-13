@@ -8,6 +8,15 @@ W="$ROOT/build/work"
 rm -rf "$W"; mkdir -p "$W" "$ROOT/build/OUTPUT"
 python3 "$ROOT/scripts/prep.py" "$W" >/dev/null
 S="$W/SRC"
+# The boot sector, for FORMAT and SYS to write: BOOTSECT.INC
+nasm -f bin -o "$ROOT/build/BOOT.BIN" "$ROOT/boot/BOOT.ASM"
+python3 - "$ROOT/build/BOOT.BIN" > "$S/BOOTSECT.INC" <<'PY'
+import sys
+b = open(sys.argv[1], "rb").read()
+print("; The RetrOS/LT boot sector (boot/BOOT.ASM), made by build.sh\r")
+for i in range(0, 512, 16):
+    print(("BOOT    DB      " if i == 0 else "        DB      ") + ",".join("0%02XH" % x for x in b[i:i+16]) + "\r")
+PY
 KERNEL="MSDOS MSCODE DOSMES MISC GETSET DIRCALL ALLOC DEV DIR DISK FAT ROM STDBUF STDCALL STDCTRLC STDFCB STDPROC STDIO TIME XENIX XENIX2"
 COMMAND="COMMAND RUCODE RDATA INIT UINIT TCODE TCODE2 TCODE3 TCODE4 TCODE5 TUCODE COPY COPYPROC CPARSE TDATA TSPC"
 BIOS="BIOS SYSINIT SYSIMES"
@@ -24,7 +33,8 @@ MORE:COM:MORE,MOREMES
 PRINT:COM:PRINT
 RECOVER:COM:RECOVER,RECMES
 SORT:EXE:SORT,SORTMES:/CP:1
-SYS:COM:SYS,SYSMES"
+SYS:COM:SYS,SYSMES
+FORMAT:COM:FORMAT,FORMES,IBMFOR"
 CMDMODS=$(echo "$CMDS" | cut -d: -f3 | tr ',\n' '  ' | tr -s ' ' '\n' | sort -u | tr '\n' ' ')
 crlf() { sed 's/$/\r/'; }
 {

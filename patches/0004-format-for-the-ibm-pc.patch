@@ -1,0 +1,53 @@
+diff -ru d/FORMAT.ASM e/FORMAT.ASM
+--- d/FORMAT.ASM	2026-11-13 09:39:04.566404457 -0500
++++ e/FORMAT.ASM	2026-11-13 09:40:21.142698975 -0500
+@@ -27,8 +27,8 @@
+ TRUE    EQU     NOT FALSE
+ 
+ IBMJAPVER EQU   FALSE           ; SET ONLY ONE SWITCH TO TRUE!
+-IBMVER  EQU     FALSE
+-MSVER   EQU     TRUE
++IBMVER  EQU     TRUE    ; RetrOS/LT: the IBM PC FORMAT (/B /8 /1)
++MSVER   EQU     FALSE
+ 
+ KANJI   EQU     FALSE
+ 
+@@ -94,7 +94,7 @@
+ ;       CALL    PRINT
+ ;       POP     AX
+ 
+-DOSVER_HIGH     EQU  020BH   ;2.11 in hex
++DOSVER_HIGH     EQU  020AH   ;2.10 in hex (RetrOS/LT)
+         PUSH    AX              ;Save DRIVE validity info
+         MOV     AH,GET_VERSION
+         INT     21H
+@@ -1535,7 +1535,7 @@
+ BIODRV  LABEL   BYTE
+         DB      "X:\"
+         IF IBMVER OR IBMJAPVER
+-        DB      "IBMBIO.COM"
++        DB      "IO.SYS"                ; RetrOS/LT's name for it
+         ENDIF
+         IF MSVER
+         DB      "IO.SYS"
+@@ -1556,7 +1556,7 @@
+ DOSDRV  LABEL   BYTE
+         DB      "X:\"
+         IF IBMVER OR IBMJAPVER
+-        DB      "IBMDOS.COM"
++        DB      "MSDOS.SYS"             ; RetrOS/LT's name for it
+         ENDIF
+         IF MSVER
+         DB      "MSDOS.SYS"
+diff -ru d/FORMES.ASM e/FORMES.ASM
+--- d/FORMES.ASM	2026-11-13 09:39:04.566971449 -0500
++++ e/FORMES.ASM	2026-11-13 09:39:25.594942410 -0500
+@@ -3,7 +3,7 @@
+ FALSE   EQU     0
+ TRUE    EQU     NOT FALSE
+ 
+-IBMVER  EQU     FALSE
++IBMVER  EQU     TRUE    ; RetrOS/LT
+ 
+ .xlist
+ .xcref
