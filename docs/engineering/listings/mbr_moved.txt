@@ -1,0 +1,40 @@
+moved:  mov     si,table
+        mov     bl,4
+.find:  cmp     byte [si],80h
+        je      .active
+        cmp     byte [si],0
+        jne     invalid
+        add     si,16
+        dec     bl
+        jnz     .find
+        int     18h                     ; nothing active: ROM BASIC
+.active:
+        mov     bp,si                   ; the entry
+.rest:  add     si,16                   ; the others must be inactive
+        dec     bl
+        jz      ldboot
+        cmp     byte [si],0
+        je      .rest
+invalid:
+        mov     si,msginv
+        jmp     stop
+
+ldboot:  mov     di,5                    ; tries
+ldtry:   mov     dx,[bp]                 ; DL = 80h, DH = head
+        mov     cx,[bp+2]               ; cylinder and sector
+        mov     bx,7C00h
+        mov     ax,0201h
+        int     13h
+        jnc     ldread
+        xor     ax,ax
+        int     13h
+        dec     di
+        jnz     ldtry
+        mov     si,msgerr
+        jmp     stop
+ldread:  cmp     word [7DFEh],0AA55h
+        mov     si,msgmiss
+        jne     stop
+        mov     si,bp
+        mov     dl,80h
+        jmp     0:7C00h

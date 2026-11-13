@@ -1,0 +1,123 @@
+% rosengineering.sty: what the RetrOS/LT Guide to Engineering adds to
+% ../guide/rosguide.sty, after the Extended Magic and MagicWorks Guides to
+% Engineering: source listings taken straight from the files they describe
+% (their line ranges found by listings.py at build time, so they always
+% match the code), "In Plain Words" panels for readers who do not program,
+% engineering notes, and diagrams of records and memory.
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{rosengineering}
+\RequirePackage{listings}
+\RequirePackage[most]{tcolorbox}
+\RequirePackage{etoolbox}
+\RequirePackage{float}
+\RequirePackage{amssymb}           % \checkmark
+\usetikzlibrary{arrows.meta,positioning}
+\graphicspath{{../guide/}}        % the Guide to Operations' figures/ folder
+
+% The side-heading column: listings and wide material reach into it.
+\newlength\sidecol
+\setlength\sidecol{\dimexpr\marginparwidth+\marginparsep\relax}
+
+% ------------------------------------------------------------------ numbering
+% Listings are numbered by Section, like figures and tables: Listing 4-3.
+\newcounter{srclisting}
+\renewcommand\thesrclisting{\thechapter-\arabic{srclisting}}
+\titleformat{\chapter}[block]
+  {\cond\bfseries\setcounter{page}{1}\setcounter{figure}{0}\setcounter{table}{0}\setcounter{srclisting}{0}}
+  {}{0pt}{\mwnumbered}
+
+% ------------------------------------------------------------------ listings
+% MASM and NASM assembly: ';' comments, strings in either quote.
+\lstdefinelanguage{Asm}{sensitive=false,morecomment=[l]{;},morestring=[b]',morestring=[b]"}
+\lstdefinelanguage{Shell}{morecomment=[l]{\#},morestring=[b]",morestring=[b]'}
+\lstdefinelanguage{Py}{morecomment=[l]{\#},morestring=[b]",morestring=[b]'}
+\lstdefinelanguage{Lua}{morecomment=[l]{--},morestring=[b]",morestring=[b]'}
+\lstdefinelanguage{Plain}{}
+\lstset{
+  basicstyle=\ttfamily\fontsize{7.7}{9.3}\selectfont,
+  columns=fixed, basewidth=0.6em, keepspaces=true, upquote=true, tabsize=8,
+  numbers=left, numbersep=7pt,
+  numberstyle=\ttfamily\fontsize{6.6}{9.3}\selectfont\color{grey},
+  xleftmargin=\dimexpr-\sidecol+0.36in\relax, xrightmargin=0pt,
+  frame=l, framerule=0.9pt, rulecolor=\color{aLine}, framesep=6pt, framexleftmargin=0pt,
+  breaklines=true, breakatwhitespace=false,
+  postbreak=\mbox{\textcolor{grey}{\fontsize{7}{9}\selectfont$\hookrightarrow$}\space},
+  showstringspaces=false, keywordstyle={}, stringstyle={},
+  commentstyle=\color{grey}\itshape,
+  aboveskip=3pt, belowskip=8pt,
+  extendedchars=true,
+}
+
+% \roslstdef{name}{path}{first}{last}{language}{path as printed}: written
+% into listings.gen.tex by listings.py.
+\newcommand\roslstdef[6]{\expandafter\def\csname roslst@#1\endcsname{{#2}{#3}{#4}{#5}{#6}}}
+\newcommand\ros@lstpath[5]{#1}
+\newcommand\ros@lstfirst[5]{#2}
+\newcommand\ros@lstlast[5]{#3}
+\newcommand\ros@lstlang[5]{#4}
+\newcommand\ros@lstshow[5]{#5}
+\newcommand\ros@lst[2]{% field, name
+  \ifcsname roslst@#2\endcsname
+    \expandafter\expandafter\csname ros@lst#1\expandafter\expandafter\endcsname\csname roslst@#2\endcsname
+  \else\errmessage{No listing called #2 in listings.gen.tex}\fi}
+
+% \srclist{name}{caption}: the numbered caption across the full width, then
+% the lines themselves, numbered as they are in the file.
+\newcommand\srclist[2]{%
+  \par\needspace{7\baselineskip}\vspace{4pt}%
+  \refstepcounter{srclisting}\label{lst:#1}%
+  \noindent\hspace*{-\sidecol}%
+  \parbox{\dimexpr\textwidth+\sidecol\relax}{\small\raggedright
+    \textbf{Listing \thesrclisting.}\enspace #2\enspace
+    {\color{grey}(\file{\ros@lst{show}{#1}}, lines \ros@lst{first}{#1}--\ros@lst{last}{#1})}}\par
+  \nopagebreak\vspace{1pt}%
+  \edef\ros@opts{language=\ros@lst{lang}{#1},firstnumber=\ros@lst{first}{#1}}%
+  \expandafter\lstinputlisting\expandafter[\ros@opts]{listings/#1.txt}}
+\newcommand\lstref[1]{Listing~\ref{lst:#1}}
+\newcommand\srclines[1]{lines \ros@lst{first}{#1}--\ros@lst{last}{#1} of \file{\ros@lst{show}{#1}}}
+
+% Code named in running text.
+\newcommand\code[1]{{\ttfamily #1}}
+\newcommand\routine[1]{{\ttfamily #1}}           % a routine: PlaceKernelCode
+\newcommand\patch[1]{\textbf{#1}}                % a patch of the series: \patch{0002}
+
+% ------------------------------------------------------------------ In Plain Words
+% For readers who do not program: what a part does, without the code. A
+% panel with the address band down its left edge, in the 8088's green.
+\newtcolorbox{plainwords}[1][In Plain Words]{enhanced, breakable,
+  colback=panel, colframe=panel, boxrule=0pt, arc=0pt, outer arc=0pt,
+  left=14pt, right=8pt, top=6pt, bottom=6pt, before skip=8pt, after skip=8pt,
+  fontupper=\normalsize\setlength\parskip{5pt},
+  overlay={\foreach \c [count=\i from 0] in {aLine,aLine,aLine,aLine}{%
+      \fill[\c] ($(frame.north west)+(\i*1.3pt,0)$) rectangle ($(frame.south west)+(\i*1.3pt+1.3pt,0)$);}},
+  title={\MakeUppercase{#1}}, attach title to upper, coltitle=disc,
+  fonttitle=\footnotesize\bfseries\sffamily, after title={\par\vspace{2pt}}}
+
+% For the programmer: a note in the same manner as \note, headed differently.
+\newcommand\engnote[1]{\notebox{Engineering note:}{#1}}
+
+% ------------------------------------------------------------------ diagrams
+% \recordbar{scale}{offset/width/label, ...}: a structure drawn as a strip
+% of fields, each as wide as its bytes (times scale), offsets above.
+\newcommand\recordbar[2]{%
+  \par\noindent\begin{tikzpicture}[x=#1,y=1pt]
+  \foreach \o/\w/\lab in {#2}{%
+    \draw[disc,line width=0.6pt,fill=panel] (\o,0) rectangle ++(\w,18);
+    \node[font=\fontsize{7}{8}\selectfont\sffamily,align=center,text width={\w*#1-2pt},inner sep=0pt] at ($(\o,9)+(\w/2,0)$) {\lab};
+    \node[font=\fontsize{6.2}{7}\selectfont\ttfamily,text=grey,anchor=south west,inner sep=1pt] at (\o,18) {\o};}
+  \end{tikzpicture}\par}
+
+% \memstack{width}{bottom label}{top label}{y0/y1/color/label, ...}: a
+% column of memory, low addresses at the bottom, each region drawn to
+% scale between y0 and y1 (in units of 1pt).
+\newcommand\memstack[4]{%
+  \begin{tikzpicture}[x=1pt,y=1pt]
+  \foreach \a/\b/\c/\lab in {#4}{%
+    \draw[disc,line width=0.5pt,fill=\c] (0,\a) rectangle (#1,\b);
+    \node[font=\fontsize{7.2}{8.4}\selectfont\sffamily,align=center,text width=#1pt-4pt,inner sep=0pt] at ({#1/2},{(\a+\b)/2}) {\lab};}
+  \node[font=\fontsize{6.4}{7}\selectfont\ttfamily,text=grey,anchor=north] at ({#1/2},-2) {#2};
+  \end{tikzpicture}}
+
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+
+\endinput

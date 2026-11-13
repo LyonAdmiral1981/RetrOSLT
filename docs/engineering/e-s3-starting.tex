@@ -1,0 +1,152 @@
+\mwnewpart
+\renewcommand\runningtitle{Section 3. Starting the Computer}
+\chapter{Starting the Computer}
+\sectioncontents
+
+\section{From Power On to the Prompt}\ixs{startup}
+
+\begin{plainwords}
+A computer that has just been turned on knows nothing about DOS. Its BIOS
+reads the first sector of the diskette, or of the fixed disk, and runs it.
+That sector knows just enough to load \file{RETBIO.COM}, the part of
+RetrOS/LT that works the computer's hardware. \file{RETBIO.COM} finds the
+disks, loads the kernel, \file{RETDOS.COM}, and hands over to SYSINIT,
+Microsoft's start-up code, which reads \file{CONFIG.SYS} and starts
+\file{COMMAND.COM}. All of \file{RETBIO.COM} is new: IBM's was never
+published.
+\end{plainwords}
+
+\begin{tabularx}{\textwidth}{@{}P{1.1in}P{1.2in}Y@{}}
+\toprule
+\textbf{Stage} & \textbf{Source} & \textbf{What happens}\\
+\midrule
+Master boot record & \file{boot/MBR.ASM} & On a fixed disk only. Moves
+itself to 0000:0600, finds the active partition, and loads its startup
+record at 0000:7C00.\\
+Startup record & \file{boot/BOOT.ASM} & Checks the first two root
+directory entries, loads \file{RETBIO.COM} at 0070:0000, a track at a
+time.\\
+INIT & \file{src/BIOS.ASM} & Takes the BIOS parameter block from the
+startup record, sets the interrupt vectors and diskette parameters, finds
+the drives, loads \file{RETDOS.COM}, and fills in SYSINIT's variables.\\
+SYSINIT & Microsoft's \file{SYSINIT.ASM} & Moves itself to the top of
+memory and the kernel down, calls the kernel's own initialization, reads
+\file{CONFIG.SYS}, and loads \file{COMMAND.COM}.\\
+\bottomrule
+\end{tabularx}
+
+\section{The Master Boot Record}\ixs{master boot record}
+
+\typed{FDISK} writes \file{boot/MBR.ASM}'s code with the partition table
+after it. It behaves as the IBM PC XT's: one active partition, all others
+inactive; no active partition starts ROM BASIC through interrupt 18h; and
+the three messages are IBM's.
+
+\srclist{mbr_moved}{The master boot record, after it has moved.}
+
+\section{The Startup Record}\ixs{startup record}
+
+The PC's first BIOS does not tell the startup record which drive it was
+loaded from, so \file{boot/BOOT.ASM} decides by the media byte of its own
+BIOS parameter block: F8h, a fixed disk, means drive 80h; anything else,
+drive 0. It copies the diskette parameter table to 0000:0522, where DOS 2
+keeps it, with this disk's sectors per track, reads the first root
+directory sector, and checks that \file{RETBIO.COM} and \file{RETDOS.COM}
+are its first two entries. \file{RETBIO.COM} must be in one piece, as
+\typed{FORMAT /S} and \typed{SYS} lay it down, so the startup record
+reads it without the file allocation table:
+
+\srclist{boot_load}{Loading RETBIO.COM, a track at a time.}
+
+\engnote{The first version read one sector at a time. On a diskette each
+such read waits nearly a full turn, 200 milliseconds, for the next sector
+to come round, and \file{RETBIO.COM} is fourteen sectors. Reading to the
+end of each track at once, and the same change for \file{RETDOS.COM}
+below, took eight seconds off starting from the 180 KB diskette on the
+5150 (Section~7).}
+
+\section{RETBIO.COM's Devices}\ixs{RETBIO.COM}\ixs{device drivers}
+
+\file{RETBIO.COM} is a chain of device drivers in the form the kit's
+\file{DEVDRIV} document gives. \code{CON}, \code{AUX}, \code{PRN} and
+\code{CLOCK\$} must be the first four, in that order:
+
+\srclist{bios_devs}{The device headers.}
+
+\code{CON} has the special attribute (bit 4), so the kernel writes to it
+through interrupt 29h, which \file{RETBIO.COM} sends to the ROM's
+teletype routine. Extended keys come back as 0 and the scan code,
+\keys{Ctrl}{Break} as \keys{Ctrl}{C} (interrupt 1Bh leaves a 3 to be
+read), and \keys{Ctrl}{PrtSc} as \keys{Ctrl}{P}, as MS-DOS 4's
+\file{MSCON.ASM} does them. \code{CLOCK\$} turns the ROM's tick count into
+the time with the arithmetic of \file{MSCLOCK.ASM}, less its AT clock.
+Each driver's interrupt routine ends with \code{RETF}: the kernel calls
+drivers far.
+
+\section{The Disks}\ixs{disks}
+
+The disk driver has two diskette units, A and B, even on a computer with
+one drive, and a unit for each fixed disk with a DOS partition.
+
+\subsection{Has the diskette changed?} The PC's drives cannot say. A
+diskette used in the last two seconds is taken as unchanged; otherwise
+the kernel is told ``don't know'', and reads the file allocation table
+again unless it has changes waiting to be written. On a one-drive
+computer, asking for the other letter means a change, after the prompt
+\shown{Insert diskette for drive B: and strike any key when ready}; the
+letter in the drive is kept at 0000:0504, where PC DOS keeps it.
+
+\srclist{media_chk}{MEDIA CHECK.}
+
+\subsection{What kind of diskette} The first byte of the file allocation
+table, which is the first byte of the sector after the startup record on
+all four formats, names the format: FEh, FCh, FFh or FDh. \routine{GET\_BPB}
+takes the BIOS parameter block, sectors per track and heads from tables
+for each.
+
+\subsection{Reading and writing} \routine{DISKIO} works a track at a time
+through the ROM, with five tries and a reset between, and maps the ROM's
+error codes to the kernel's as \file{MSBDATA.INC} of MS-DOS 4 does. The
+PC's DMA controller cannot transfer across a 64 KB boundary of physical
+memory, and the ROM refuses a transfer that would; \routine{DISKIO}
+shortens a transfer to stop before one, and passes a sector that would
+straddle it through a buffer of its own:
+
+\srclist{diskio_dma}{Never across a 64 KB boundary.}
+
+\section{The Fixed Disk}\ixs{fixed disk}\ixs{CALCBPB}
+
+For each fixed disk the BIOS reports, \routine{FIXEDDISK} asks its
+geometry (interrupt 13h, function 8), reads its master boot record, and
+looks for a partition of type 1. It does not trust the BIOS parameter
+block in the partition's startup record, which does not yet exist on a
+partition \typed{FDISK} has just made; it works the layout out from the
+partition's size, as DOS 2 does, and \typed{FORMAT} then writes the same:
+
+\srclist{calcbpb}{The layout of a fixed disk partition.}
+
+512 root directory entries; two file allocation tables; and the smallest
+cluster that keeps a 12-bit table within 4,084 clusters. A 10 MB XT disk
+gets 8 sectors a cluster, 4,096 bytes, as PC DOS 2.10 gives it.
+
+\section{Loading RETDOS.COM}
+
+\file{RETDOS.COM} is the second root directory entry, and need not be in
+one piece. \routine{LOADDOS} follows its chain through the first file
+allocation table, reading each run of consecutive clusters with one call
+to \routine{DISKIO}, to the paragraph after the whole of
+\file{RETBIO.COM}:
+
+\srclist{loaddos_run}{RETDOS.COM, a run of clusters at a time.}
+
+\section{Handing Over to SYSINIT}\ixs{SYSINIT}
+
+SYSINIT needs to know where the kernel is now, where it is to go, where
+the device chain starts, how much memory there is, and which drive the
+system started from:
+
+\srclist{init_sysinit}{SYSINIT's variables.}
+
+Everything from \routine{INIT} on is given back to the memory pool:
+SYSINIT moves the kernel down to the paragraph after \code{RESEND}, the
+end of the resident drivers.

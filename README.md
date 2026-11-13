@@ -30,7 +30,9 @@ from RetrOS/x86's, partitions, formats and fills the fixed disk, asking
 first. FC, from Microsoft's source (PC DOS 2.10 does not have it), comes as an
 extra.
 
-Still to come: the Guide to Operations and Guide to Engineering.
+The *Guide to Operations* (`docs/guide`) and *Guide to Engineering*
+(`docs/engineering`) are in three editions each: one-sided, two-sided,
+and for a print shop.
 
 ## Layout
 

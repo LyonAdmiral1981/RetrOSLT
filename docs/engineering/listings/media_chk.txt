@@ -1,0 +1,28 @@
+MEDIA_CHK:
+        CALL    GETUNIT
+        MOV     SI,BX
+        SHR     SI,1
+        MOV     AH,1                    ; not changed
+        TEST    [PHYS+SI],80H
+        JNZ     MC_DONE
+        CALL    ONEDRIVE
+        MOV     AH,-1                   ; changed: the other diskette is in
+        JC      MC_DONE
+        MOV     AX,SI
+        CMP     AL,[LASTUNIT]
+        MOV     AH,0                    ; don't know
+        JNZ     MC_DONE
+        CALL    TICKS
+        SUB     AX,[LASTTICK]
+        CMP     AX,37                   ; two seconds
+        MOV     AH,0
+        JAE     MC_DONE
+        MOV     AH,1
+MC_DONE:
+        LDS     BX,[PTRSAV]
+ASSUME  DS:NOTHING
+        MOV     [BX+RQ_CHANGED],AH
+        PUSH    CS
+        POP     DS
+ASSUME  DS:CODE
+        JMP     EXIT

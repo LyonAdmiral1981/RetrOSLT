@@ -1,0 +1,109 @@
+\mwnewpart
+\renewcommand\runningtitle{Section 1. Overview}
+\chapter{Overview}
+\sectioncontents
+
+\section{What RetrOS/LT Is Made Of}\ixs{RetrOS/LT, parts of}
+
+\begin{plainwords}
+PC DOS 2.10, the DOS of the IBM Personal Computer in 1983, was made of
+three kinds of program. Microsoft wrote the heart of it, the kernel and
+the command processor, and most of the commands. IBM wrote the part that
+works the computer's own hardware, and a set of commands of its own:
+\typed{FDISK}, \typed{MODE}, \typed{BACKUP} and others. In 2018 Microsoft
+published its part as source code, under a license that lets anyone build
+on it. IBM's part has never been published. RetrOS/LT builds Microsoft's
+part from that source, and writes IBM's part again, to behave as IBM's
+did.
+\end{plainwords}
+
+\begin{tabularx}{\textwidth}{@{}P{1.6in}P{1.1in}Y@{}}
+\toprule
+\textbf{Part} & \textbf{From} & \textbf{In this repository}\\
+\midrule
+Kernel (\file{RETDOS.COM}) & Microsoft & \file{upstream/msdos}, with the
+patches, and \file{src/IO.ASM}\\
+\file{COMMAND.COM} & Microsoft & \file{upstream/msdos}, with the patches\\
+SYSINIT & Microsoft & linked into \file{RETBIO.COM}\\
+\typed{CHKDSK}, \typed{DEBUG}, \typed{EDLIN}, \typed{EXE2BIN}, \typed{FC},
+\typed{FIND}, \typed{MORE}, \typed{PRINT}, \typed{RECOVER}, \typed{SORT},
+\typed{SYS} & Microsoft & \file{upstream/msdos}, some with patches\\
+\typed{FORMAT} & both & Microsoft's \file{FORMAT.ASM} and
+\file{FORMES.ASM} with \file{src/IBMFOR.ASM}\\
+\typed{LINK} & Microsoft & the program as released\\
+\file{RETBIO.COM} & new & \file{src/BIOS.ASM}\\
+Startup records & new & \file{boot/BOOT.ASM}, \file{boot/MBR.ASM}\\
+\typed{ASSIGN}, \typed{BACKUP}, \typed{COMP}, \typed{DISKCOMP},
+\typed{DISKCOPY}, \typed{FDISK}, \typed{GRAPHICS}, \typed{MODE},
+\typed{RESTORE}, \typed{TREE} & new & \file{cmd/}\\
+\file{ANSI.SYS} & new & \file{dev/ANSI.ASM}\\
+Install & new, after RetrOS/x86's & \file{install/INSTALL.ASM}\\
+\bottomrule
+\end{tabularx}
+
+\section{The Source It Starts From}\ixs{MS-DOS 2 source}
+
+Microsoft's repository holds MS-DOS 1.25 and 2.0, and later 4.0; RetrOS/LT
+pins it as the submodule \file{upstream/msdos}. Its \file{v2.0/source}
+directory is not exactly 2.0: it is the kit Microsoft sent to computer
+makers, and several files are of version 2.11, the release of March 1984
+that joined PC DOS 2.10's corrections to MS-DOS 2.01. The kit has two
+versions of some files (\file{DOSMAC.ASM} and \file{DOSMAC\_V211.ASM},
+for one), and its \file{bin} directory holds programs built from it as
+2.00. RetrOS/LT builds the 2.11 versions throughout, and reports 2.10.
+
+The kit is incomplete in three ways that matter:
+
+\begin{itemize}
+\item \textbf{There is no BIOS.} Each maker wrote its own; the kit has a
+  skeleton for one other computer, \file{SKELIO.ASM}. IBM's was never
+  published. \file{src/BIOS.ASM} is RetrOS/LT's (Section~3).
+\item \textbf{The kernel's console functions are missing.}
+  \file{STDIO.ASM} includes a file \file{IO.ASM} that is not in the
+  release. \file{src/IO.ASM} is a reconstruction (Section~4).
+\item \textbf{IBM's commands are not there}, nor the part of
+  \typed{FORMAT} for the IBM Personal Computer. They are written new
+  (Section~5).
+\end{itemize}
+
+\section{The Patch Series}\ixs{patches}
+
+RetrOS/LT's changes to Microsoft's files are kept as patches, applied in
+the order of \file{patches/series}:
+
+\srclist{series}{The patch series.}
+
+\begin{tabularx}{\textwidth}{@{}P{0.5in}Y@{}}
+\toprule
+\patch{0001} & Builds with the 2.11 files: \file{DOSMAC} and \file{DOSSYM}
+replaced by their \file{\_V211} versions; names that MASM 5 reserves
+(\code{WAIT}, \code{DOSSEG}) renamed; a typo in \file{MSCODE.ASM}
+corrected; SYSINIT set to IBM's way of starting \file{COMMAND.COM}; and
+messages SYSINIT needs but the kit's \file{SYSIMES.ASM} lacked.\\
+\patch{0002} & The RetrOS/LT identity: the banner, \typed{VER}, and DOS
+version 2.10.\\
+\patch{0003} & \typed{PRINT} from its 2.11 source.\\
+\patch{0004} & \typed{FORMAT} for the IBM Personal Computer: IBM's switches,
+and RetrOS/LT's system file names.\\
+\patch{0005} & \typed{SYS} for the IBM Personal Computer: the names, and
+the RetrOS/LT startup record.\\
+\bottomrule
+\end{tabularx}
+
+Appendix~B lists the files each patch changes.
+
+\section{The Version}\ixs{version, DOS}
+
+PC DOS 2.10 reports major version 2, minor version 10, through interrupt
+21h function 30h, and every program tests that. RetrOS/LT does the same:
+\file{DOSSYM.ASM}'s \code{DOS\_MINOR\_VERSION} is 10 (\patch{0002}).
+Microsoft's commands of the 2.11 kit refuse to run under a DOS older than
+2.11 where they check at all; \typed{FORMAT}'s check is set to 2.10 (\patch{0004}).
+
+\section{The Names}\ixs{RETBIO.COM}\ixs{RETDOS.COM}
+
+PC DOS calls its system files \file{IBMBIO.COM} and \file{IBMDOS.COM};
+MS-DOS calls them \file{IO.SYS} and \file{MSDOS.SYS}. RetrOS/LT's are
+\file{RETBIO.COM} and \file{RETDOS.COM}, in IBM's pattern. Four places
+know them: the startup record, \file{RETBIO.COM}'s loader for
+\file{RETDOS.COM}, \typed{FORMAT} and \typed{SYS}.

@@ -1,0 +1,35 @@
+BOUNCE: MOV     [ORIGBX],0
+        PUSH    AX
+        PUSH    CX
+        MOV     AX,DS
+        MOV     CL,4
+        SHL     AX,CL
+        ADD     AX,BX
+        ADD     AX,511
+        POP     CX
+        JNC     BN_RET                  ; it does not cross
+        MOV     [ORIGBX],BX
+        PUSH    SI
+        PUSH    DI
+        PUSH    CX
+        MOV     AX,DS
+        MOV     CL,4
+        SHL     AX,CL
+        ADD     AX,OFFSET BNC1
+        ADD     AX,511
+        MOV     DI,OFFSET BNC1
+        JNC     BN_1
+        MOV     DI,OFFSET BNC2
+BN_1:   MOV     [BNCBUF],DI
+        CMP     BP,3
+        JNZ     BN_2
+        MOV     SI,BX                   ; a write: the data in first
+        PUSH    DS
+        POP     ES
+        MOV     CX,256
+        REP     MOVSW
+BN_2:   MOV     BX,[BNCBUF]
+        POP     CX
+        POP     DI
+        POP     SI
+BN_RET: POP     AX

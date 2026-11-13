@@ -1,0 +1,160 @@
+% ------------------------------------------------------------------ cover
+\thispagestyle{blank}
+\begin{tikzpicture}[remember picture,overlay]
+  \fill[disc] (current page.south west) rectangle (current page.north east);
+  % the 8088's twenty address lines, A19 to A0
+  \addressbandlabels{(current page.north west)+(0,{-3.05in-\bleed})}{\paperwidth}{0.42in}{white!70!disc}
+  \node[anchor=north,text=white!70!disc,inner sep=0pt,font=\sffamily\small] at ($(current page.north)+(0,{-3.47in-\bleed})$) {the 8088's twenty address lines: one megabyte};
+  % The Lyon Mountain Company's lion, alone, small, upper right
+  \node[anchor=north east,inner sep=0pt] at ($(current page.north east)+({-0.8in-\bleed},{-0.55in-\bleed})$)
+    {\includegraphics[height=1.0in]{figures/lmc-lion.png}};
+  \node[anchor=north west,text=white,inner sep=0pt,align=left] at ($(current page.north west)+({0.85in+\bleed},{-3.95in-\bleed})$)
+    {\cond\bfseries\fontsize{68}{68}\selectfont RetrOS/LT};
+  \node[anchor=north west,text=white,inner sep=0pt,align=left,font=\cond\fontsize{18}{22}\selectfont] at ($(current page.north west)+({0.9in+\bleed},{-5.0in-\bleed})$)
+    {\subtitlelines};
+  \node[anchor=north west,text=white,inner sep=0pt,align=left] at ($(current page.north west)+({0.9in+\bleed},{-5.95in-\bleed})$)
+    {\sffamily\bfseries\fontsize{24}{28}\selectfont \booktitle};
+  \node[anchor=north west,text=white!80!disc,inner sep=0pt,align=left,font=\sffamily\fontsize{11.5}{15}\selectfont] at ($(current page.north west)+({0.9in+\bleed},{-6.5in-\bleed})$)
+    {RetrOS/LT Version 1.0, DOS 2.10\\for the IBM Personal Computer, the XT, and compatibles};
+  % the processor
+  \node[anchor=south,inner sep=0pt] at ($(current page.south)+(0,{1.25in+\bleed})$)
+    {\dipchip{3.1}};
+\end{tikzpicture}
+\newpage
+% Two-sided: the inside of the front cover is left empty.
+\ifmwtwoside\thispagestyle{blank}\null\newpage\fi
+
+% ------------------------------------------------------------------ title page
+\frontpages
+\setcounter{page}{1}
+\pagestyle{blank}
+\vspace*{0.4in}
+\hspace*{-\dimexpr\marginparwidth+\marginparsep\relax}%
+\begin{minipage}[t]{\dimexpr\textwidth+\marginparwidth+\marginparsep\relax}
+\raggedright
+{\cond\bfseries\fontsize{40}{44}\selectfont\color{disc} RetrOS/LT\par}
+\vspace{6pt}
+{\cond\fontsize{17}{21}\selectfont\color{disc} \subtitleline\par}
+\vspace{14pt}
+\begin{tikzpicture}\addressband{(0,0)}{\linewidth}{4pt}\end{tikzpicture}\par
+\vspace{14pt}
+{\sffamily\bfseries\fontsize{22}{26}\selectfont \booktitle\par}
+\vspace{8pt}
+{\large RetrOS/LT Version 1.0, for the IBM Personal Computer,\\
+the Personal Computer XT, and compatible computers\par}
+\vspace{0.5in}
+\hspace*{0.3in}\dipchip{2.0}\par
+\vspace{24pt}
+{\small\textbf{The Lyon Mountain Company}\\
+Republic Lyon Mountain Corporation\\
+Lyon Mountain, New York 12952 USA\par}
+\end{minipage}
+\newpage
+
+% ------------------------------------------------------------------ edition notice
+\pagestyle{blank}
+\vspace*{\fill}
+\begin{wide}
+\small
+\textbf{\edition}
+
+This edition applies to Version 1.0 of RetrOS/LT, build \release, and to
+all later releases until otherwise indicated in new editions. Changes are
+made periodically to the information herein. \editionchanges
+
+A form for readers' comments is at the back of this book. If the form has
+been removed, comments may be addressed to P.O. Box 290, Lyon Mountain,
+New York 12952 USA.
+
+\textbf{Where RetrOS/LT comes from.} RetrOS/LT is derived from the MS-DOS 2
+source code that Microsoft Corporation released under the MIT License.
+That code is Copyright \copyright\ Microsoft Corporation; the notice that
+must accompany it is printed in Appendix~D and is on the RetrOS/LT
+diskettes. RetrOS/LT is not MS-DOS and is not PC DOS. It is an independent
+product of The Lyon Mountain Company, and is not affiliated with, endorsed
+by, or supported by Microsoft Corporation or International Business
+Machines Corporation.
+
+\textbf{RetrOS/LT is licensed, not sold}, under the RetrOS/LT License
+printed in Appendix~D: a Single-Machine License, for one computer at a
+time, or a Blanket License, for all the computers one owner owns or
+leases.
+
+\textbf{Trademarks.} IBM, Personal Computer XT and PC DOS are trademarks
+of International Business Machines Corporation. Microsoft and MS-DOS are
+trademarks of Microsoft Corporation. Intel is a trademark of Intel
+Corporation. Other names used in this book may be trademarks of their
+owners.
+
+\copyright\ Copyright The Lyon Mountain Company, Republic Lyon Mountain Corporation 2026
+\end{wide}
+\newpage
+
+% ------------------------------------------------------------------ preface
+\pagestyle{plain}
+\renewcommand\runningtitle{About This Book}
+\chapter*{About This Book}
+\addcontentsline{toc}{chapter}{About This Book}
+
+This book explains how RetrOS/LT is made: what it takes from Microsoft's
+MS-DOS 2 source and what it adds, how the computer starts, how the
+commands IBM wrote for PC DOS 2.10 were written again, how Install and the
+diskettes work, and how all of it is built and tested. It is the companion
+to the \textit{RetrOS/LT Guide to Operations}, and is written for two
+readers at once.
+
+\begin{plainwords}
+If you do not write programs, read these panels. Each one tells, without
+any code, what the part it opens does, and why it matters to the person
+using the computer.
+\end{plainwords}
+
+If you do write programs, the rest is for you: the source, a listing at a
+time, with the reasons behind it. Most listings are in the assembly
+language of the Intel 8088, as DOS itself is.
+
+\section{How This Book Is Organized}
+
+\begin{tabularx}{\textwidth}{@{}l>{\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{Section} & \textbf{About}\\
+\midrule
+1 Overview & what RetrOS/LT is made of, and where each part comes from\\
+2 Building & the source as published, the 1988 tools in an emulator, the patches, NASM, and what comes out\\
+3 Starting the Computer & from the master boot record to the prompt: the startup record and \file{RETBIO.COM}\\
+4 The Kernel & Microsoft's code as RetrOS/LT builds it, and the console functions the published source lacks\\
+5 The IBM Commands & the commands and driver written again to behave as IBM's\\
+6 Install & \file{INSTALL.COM}, and the two diskettes\\
+7 Testing & QEMU, MAME's IBM PC 5150, and the review that followed\\
+Appendixes & the source files, the patches, and credits\\
+\bottomrule
+\end{tabularx}
+
+\section{Listings}
+
+RetrOS/LT keeps its changes to Microsoft's files as a series of patches,
+not as edited files, so a file such as \file{SYSINIT.ASM} exists in
+RetrOS/LT's form only while it is being built. This book's listings are
+taken the same way: when the book is made, \file{scripts/prep.py} prepares
+the source as the build does, and the lines are taken from the result. A
+listing of Microsoft's code therefore shows the file as RetrOS/LT builds
+it, numbered as the file then is. Listings of RetrOS/LT's own files are
+taken from the repository. If the code a listing points at changes, the
+book will not build until the listing, and the text about it, are
+checked.
+
+\section{Conventions}
+
+Numbers ending in \code{h} are hexadecimal: \code{0FF0h} is 4,080, and
+\code{0070:0000} is a segment and offset. \code{AX}, \code{CS} and the
+like are the processor's registers. Names of routines in the source are
+printed \routine{LIKETHIS}, and the patches by their numbers,
+\patch{0002}. Notes for programmers are headed \textbf{Engineering note}:
+
+\engnote{An engineering note explains a choice that is not obvious from
+the code, often one made after an earlier attempt was wrong.}
+
+\mwnewpart
+\renewcommand\runningtitle{Contents}
+\renewcommand\contentsname{Contents}
+\tableofcontents

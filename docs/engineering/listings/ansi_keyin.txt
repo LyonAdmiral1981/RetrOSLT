@@ -1,0 +1,28 @@
+keyin:  cmp     ax,7200h                ; Ctrl-PrtSc: Ctrl-P, which DOS
+        jne     .k                      ; takes as printer echo on or off
+        mov     ax,0010h
+.k:     mov     dx,ax                   ; DX = the key code to look for
+        or      al,al
+        jz      .ext
+        xor     dh,dh                   ; an ASCII key: its character alone
+.ext:   mov     si,keytab
+.find:  cmp     si,[keyend]
+        jae     .none
+        mov     cl,[si]                 ; entry: length, code (2), string
+        xor     ch,ch
+        cmp     [si+1],dx
+        je      .found
+        add     si,cx
+        add     si,3
+        jmp     .find
+.found: add     si,3
+        jcxz    .r
+.f1:    lodsb
+        call    qput
+        loop    .f1
+.r:     ret
+.none:  or      al,al
+        jnz     .one
+        call    qput                    ; 0, then the scan code
+        mov     al,ah
+.one:   jmp     qput

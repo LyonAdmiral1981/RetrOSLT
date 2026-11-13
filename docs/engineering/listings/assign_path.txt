@@ -1,0 +1,6 @@
+.path:  push    si                      ; the drive letter is changed in the
+        mov     si,dx                   ; caller's string, and DOS given the
+        call    mappath                 ; request as it stands (calling DOS
+        mov     al,[cs:origal]          ; and returning would break EXEC's
+        pop     si                      ; return to its caller)
+        jmp     .pass

@@ -1,0 +1,2 @@
+VERMES_PRE  DB      "RetrOS/LT Version 1.0, DOS"
+        ENDIF

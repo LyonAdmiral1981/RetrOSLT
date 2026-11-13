@@ -1,0 +1,46 @@
+DEVSTART LABEL  WORD
+CONDEV: DW      AUXDEV,BIOSSEG
+        DW      8013H                   ; console in and out, special (INT 29h)
+        DW      STRATEGY,CON_INT
+        DB      "CON     "
+
+AUXDEV: DW      PRNDEV,BIOSSEG
+        DW      8000H
+        DW      STRATEGY,AUX_INT
+        DB      "AUX     "
+
+PRNDEV: DW      TIMDEV,BIOSSEG
+        DW      8000H
+        DW      STRATEGY,PRN_INT
+        DB      "PRN     "
+
+TIMDEV: DW      DSKDEV,BIOSSEG
+        DW      8008H                   ; the clock
+        DW      STRATEGY,TIM_INT
+        DB      "CLOCK$  "
+
+DSKDEV: DW      COM1DEV,BIOSSEG
+        DW      0000H                   ; block device, IBM format
+        DW      STRATEGY,DSK_INT
+DRVMAX  DB      2                       ; number of units, set by INIT
+        DB      7 DUP (0)
+
+COM1DEV: DW     LPT1DEV,BIOSSEG
+        DW      8000H
+        DW      STRATEGY,AUX_INT
+        DB      "COM1    "
+
+LPT1DEV: DW     LPT2DEV,BIOSSEG
+        DW      8000H
+        DW      STRATEGY,PRN_INT
+        DB      "LPT1    "
+
+LPT2DEV: DW     LPT3DEV,BIOSSEG
+        DW      8000H
+        DW      STRATEGY,LPT2_INT
+        DB      "LPT2    "
+
+LPT3DEV: DW     -1,-1
+        DW      8000H
+        DW      STRATEGY,LPT3_INT
+        DB      "LPT3    "

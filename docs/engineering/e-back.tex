@@ -1,0 +1,113 @@
+% ------------------------------------------------------------------ glossary
+\mwnewpart
+\renewcommand\runningtitle{Glossary}
+\namedpages{Glossary}
+\chapter*{Glossary}
+\setcounter{page}{1}
+\addcontentsline{toc}{chapter}{Glossary}
+
+\newcommand\gl[2]{\par\noindent\hangindent=1.2em\textbf{#1}\quad #2\par}
+
+\gl{8088}{The Intel processor of the IBM PC and XT: twenty address lines,
+1 MB, data eight bits at a time.}
+\gl{BPB}{BIOS Parameter Block: the description of a volume in its startup
+record.}
+\gl{cluster}{The unit in which disk space is given to files.}
+\gl{DMA}{Direct memory access: the PC's 8237 controller moves disk data to
+and from memory, within one 64 KB page at a time.}
+\gl{EXEC}{DOS function 4Bh, which loads and runs a program; in PC DOS 2
+part of \file{COMMAND.COM}.}
+\gl{FAT}{File allocation table: the map of which clusters belong to which
+file; 12-bit entries under DOS 2.}
+\gl{FCB}{File control block: DOS 1's way of naming a file to the kernel,
+kept in DOS 2; a program's first two are in its PSP.}
+\gl{kernel}{\file{RETDOS.COM}: the part of DOS that provides the interrupt
+21h functions.}
+\gl{kit}{The source Microsoft sent to computer makers, from which each
+built its own DOS.}
+\gl{listing}{In this book, an excerpt of the source, numbered as in its
+file.}
+\gl{OEM}{Original equipment manufacturer: in the kit, the maker who adds
+the parts for its own computer.}
+\gl{patch}{A file of the lines a change adds to and removes from the
+source.}
+\gl{PSP}{Program Segment Prefix: the 256 bytes DOS puts before every
+program.}
+\gl{release number}{\code{R} and the date and time of the last change to
+RetrOS/LT's own files, such as \release.}
+\gl{series}{The list of patches, in order.}
+\gl{startup record}{The first sector of a diskette or partition, which
+loads \file{RETBIO.COM}; also called the boot sector.}
+\gl{SYSINIT}{Microsoft's start-up code, linked into \file{RETBIO.COM},
+which reads \file{CONFIG.SYS} and starts \file{COMMAND.COM}.}
+
+% ------------------------------------------------------------------ index
+\mwnewpart
+\renewcommand\runningtitle{Index}
+\namedpages{Index}
+\setcounter{page}{1}
+\indexprologue{}
+\printindex
+
+\mwcutpage
+\pagestyle{blank}
+\newgeometry{left=\dimexpr0.6in+\bleed\relax,right=\dimexpr0.6in+\bleed\relax,top=\dimexpr0.55in+\bleed\relax,bottom=\dimexpr0.6in+\bleed\relax}
+\renewcommand\thepage{}
+% ------------------------------------------------------------------ reader's comment form
+\begingroup\small\setlength\parskip{5pt}
+\noindent{\cond\bfseries\fontsize{18}{20}\selectfont\color{disc}Reader's Comment Form}\hfill
+{\footnotesize\textbf{RetrOS/LT Guide to Engineering}}\par
+\vspace{2pt}\noindent\begin{tikzpicture}\addressband{(0,0)}{\linewidth}{4pt}\end{tikzpicture}\par
+
+Your comments help us improve our publications. Please tell us about any
+errors, about anything that was hard to follow, and about anything you
+looked for and could not find. Comments about RetrOS/LT itself are
+welcome too; if a program does not run under it, please name the program
+and say what happened.
+
+\newcommand\cbox{\tikz\draw (0,0) rectangle (0.11in,0.11in);}
+\begin{tabular}{@{}lll@{}}
+\multicolumn{3}{@{}l}{Did you find the material:}\\
+\cbox\ Easy to read and understand? & \cbox\ Yes & \cbox\ No\\
+\cbox\ Organized for convenient use? & \cbox\ Yes & \cbox\ No\\
+\cbox\ Complete? & \cbox\ Yes & \cbox\ No\\
+\cbox\ Well illustrated? & \cbox\ Yes & \cbox\ No\\
+\end{tabular}
+
+Computer:\quad \cbox\ IBM PC\quad \cbox\ IBM PC XT\quad \cbox\ Other: \rule{1.6in}{0.4pt}\qquad BIOS date: \rule{1.0in}{0.4pt}
+
+Memory and disks: \rule{5.2in}{0.4pt}
+
+Comments (please give page numbers):
+
+\foreach \n in {1,...,11}{\noindent\rule{\linewidth}{0.4pt}\par\vspace{9pt}}
+
+\begin{tabular}{@{}p{0.9in}p{5.6in}@{}}
+Name & \rule{5.4in}{0.4pt}\\[8pt]
+Address & \rule{5.4in}{0.4pt}\\[8pt]
+& \rule{5.4in}{0.4pt}\\
+\end{tabular}
+
+\vfill
+\noindent\makebox[\linewidth]{\footnotesize\color{grey}\rule[2pt]{1.6in}{0.3pt}\ \ Fold here, with this side inside\ \ \rule[2pt]{1.6in}{0.3pt}}
+\endgroup
+\clearpage
+
+\vspace*{\fill}
+\begin{center}
+\begin{tikzpicture}[x=1in,y=1in]
+  \draw[dashed,grey] (-3.3,1.6) -- (3.3,1.6);
+  \node[font=\footnotesize,text=grey] at (0,1.75) {Fold here};
+  \draw (2.35,0.55) rectangle (3.05,1.35);
+  \node[font=\scriptsize,align=center,text=grey] at (2.7,0.95) {Place\\stamp\\here};
+  \node[align=left,anchor=north west,font=\normalsize] at (-1.2,0.2) {%
+    \textbf{RetrOS/LT Comment Form}\\
+    P.O. Box 290\\
+    Lyon Mountain, New York 12952 USA};
+  \node[anchor=north west,font=\footnotesize] at (-3.3,1.35) {From:};
+  \draw[dashed,grey] (-3.3,-1.6) -- (3.3,-1.6);
+  \node[font=\footnotesize,text=grey] at (0,-1.75) {Fold here, and tape closed. Please do not staple.};
+\end{tikzpicture}
+\end{center}
+\vspace*{\fill}
+\restoregeometry

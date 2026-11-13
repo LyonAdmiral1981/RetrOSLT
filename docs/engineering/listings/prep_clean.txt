@@ -1,0 +1,10 @@
+def clean(b):
+    """LF lines, nothing after the first ^Z, no NUL padding."""
+    i = b.find(b"\x1a")
+    if i >= 0:
+        b = b[:i]
+    b = b.replace(b"\x00", b"")
+    # A few files were edited in WordStar, which marks a line it reflowed
+    # with the high bit of its line feed: CR 8Ah.
+    b = b.replace(b"\r\x8a", b"\n").replace(b"\r\n", b"\n")
+    return b

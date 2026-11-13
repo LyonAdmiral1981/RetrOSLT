@@ -1,0 +1,13 @@
+        ; and not across a 64K boundary of memory
+        MOV     AX,ES
+        MOV     CL,4
+        SHL     AX,CL
+        ADD     AX,DI
+        NEG     AX                      ; bytes to the boundary (0 = 64K)
+        JZ      DIO_N2
+        MOV     CL,9
+        SHR     AX,CL                   ; whole sectors before it
+        CMP     AX,[RW_N]
+        JAE     DIO_N2
+        MOV     [RW_N],AX
+DIO_N2: ; the ROM's CH CL DH DL

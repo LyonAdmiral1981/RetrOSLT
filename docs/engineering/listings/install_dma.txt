@@ -1,0 +1,11 @@
+dma_buf:
+        push cx
+        mov ax,ds
+        mov cl,4
+        shl ax,cl
+        add ax,buffer
+        add ax,511
+        mov bx,buffer
+        jnc .r
+        add bx,512
+.r:     pop cx

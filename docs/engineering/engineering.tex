@@ -1,0 +1,42 @@
+% RetrOS/LT Guide to Engineering
+% Build with:  sh docs/engineering/build.sh   (XeLaTeX, makeindex, Python 3, patch)
+% \mwmode: single (default), duplex or shop; see rosguide.sty and build.sh.
+\providecommand\mwmode{single}
+\def\mwsingle{single}
+\ifx\mwmode\mwsingle \def\mwopts{oneside,openany}\else \def\mwopts{twoside,openright}\fi
+\edef\mwclass{\noexpand\documentclass[11pt,\mwopts]{report}}\mwclass
+\newcommand\booktitle{Guide to Engineering}
+\newcommand\subtitleline{The Lite Disk Operating System for the IBM Personal Computer and XT}
+\newcommand\subtitlelines{The Lite Disk Operating System for the\\IBM Personal Computer and XT}
+\usepackage{rosguide}
+\usepackage{rosengineering}
+\usepackage{imakeidx}
+\usepackage{fancyvrb}
+\makeindex[options=-s ../guide/rosindex.ist,intoc]
+\input{release}        % \release, written by build.sh from the last program commit
+\input{listings.gen}   % the listings, extracted by listings.py
+\newcommand\edition{First Edition (November 2026)}
+\newcommand\editionchanges{}
+
+\begin{document}
+
+\input{e-front}
+\mwnewpart
+\sectionpages
+\renewcommand\sectionword{Section}
+\input{e-s1-overview}
+\input{e-s2-building}
+\input{e-s3-starting}
+\input{e-s4-kernel}
+\input{e-s5-commands}
+\input{e-s6-install}
+\input{e-s7-testing}
+
+\mwnewpart          % before \appendix, which renumbers the pending page
+\appendix
+\renewcommand\sectionword{Appendix}
+\input{e-appendixes}
+
+\input{e-back}
+
+\end{document}

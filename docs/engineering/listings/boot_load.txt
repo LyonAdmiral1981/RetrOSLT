@@ -1,0 +1,27 @@
+.load:  push    ax                      ; a track at a time: to its end,
+        xor     dx,dx                   ; or as many as are left
+        div     word [spt]
+        mov     di,[spt]
+        sub     di,dx
+        pop     ax
+        cmp     di,cx
+        jbe     .n
+        mov     di,cx
+.n:     xchg    ax,di
+        mov     [count],al
+        xchg    ax,di
+        push    cx
+        call    readsec
+        pop     cx
+        jc      bootfail
+        add     ax,di
+        sub     cx,di
+        xchg    ax,di
+        mov     dl,9
+        xchg    cx,dx
+        shl     ax,cl
+        xchg    cx,dx
+        add     bx,ax
+        xchg    ax,di
+        or      cx,cx
+        jnz     .load

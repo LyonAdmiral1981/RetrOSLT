@@ -1,0 +1,25 @@
+sig     db      "MODE"
+int17:  cmp     dx,3
+        jae     .old
+        push    bx
+        mov     bx,dx
+        mov     bl,[cs:lptcom+bx]       ; rerouted to COM n (1-based), or 0
+        or      bl,bl
+        jnz     .serial
+        mov     bl,dl
+        cmp     ah,0
+        jne     .oldbx
+        cmp     byte [cs:lptretry+bx],0
+        je      .oldbx
+        pop     bx
+.retry: push    ax                      ; print, until it is not a time-out
+        pushf
+        call    far [cs:old17]
+        test    ah,1
+        jz      .done
+        pop     ax
+        jmp     .retry
+.done:  add     sp,2
+        iret
+.oldbx: pop     bx
+.old:   jmp     far [cs:old17]

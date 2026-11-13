@@ -1,0 +1,85 @@
+\mwnewpart
+\renewcommand\runningtitle{Section 6. Install}
+\chapter{Install}
+\sectioncontents
+
+\section{What Install Does}\ixs{Install}
+
+\begin{plainwords}
+PC DOS 2.10 had no installation program: the owner of an XT partitioned
+the disk, formatted it and copied the files by hand, following the
+manual. RetrOS/LT adds Install, as every RetrOS edition has. It asks
+before each change, works out what has already been done from the state
+of the disk, and so can simply be run again after the restart a new
+partition needs.
+\end{plainwords}
+
+\file{install/INSTALL.ASM} is the RetrOS/x86 Install adapted to DOS 2.
+The steps (Section~2 of the \textit{Guide to Operations} shows the
+screens):
+
+\begin{enumerate}
+\item The license, \file{LICENSE.TXT}, must be accepted.
+\item The first fixed disk's master boot record is read; with no type~1
+  partition, Install writes one over the whole disk, or runs
+  \typed{FDISK}, and restarts the computer.
+\item The directory is asked for, \file{C:\bs{}DOS} unless changed.
+\item An unformatted partition gets \typed{FORMAT C:/S}; a formatted one
+  \typed{FORMAT} or \typed{SYS C:}, as the user chooses. Either way
+  Install then checks that \file{C:\bs{}RETBIO.COM} is there.
+\item The DOS diskette's files are copied, then the Supplemental Programs
+  diskette's, each checked by its \file{RETROS.DSK}.
+\item \file{CONFIG.SYS} and \file{AUTOEXEC.BAT} are written, the old ones
+  kept as \file{.OLD}.
+\end{enumerate}
+
+\section{What Changed for DOS 2}
+
+\subsection{Running a program} DOS 2 programs take their drives from the
+two file control blocks in the program segment prefix, which
+\file{COMMAND.COM} fills from the command line; the RetrOS/x86 Install,
+for DOS 4, left them empty, and \typed{FORMAT} took drive A. Install now
+fills them itself before EXEC, as \file{COMMAND.COM} does:
+
+\srclist{install_fcb}{The file control blocks, from the command tail.}
+
+\engnote{The first install test caught this: \typed{FORMAT} asked for a
+diskette in drive A. Nothing was harmed, since \typed{FORMAT} waits for a
+key before formatting a diskette; but it is why Install now checks for
+\file{RETBIO.COM} after \typed{FORMAT} and \typed{SYS}, whose exit codes
+in DOS 2 say nothing.}
+
+\subsection{The partition} RetrOS/x86's Install ran \typed{FDISK} with
+switches; IBM's \typed{FDISK} for DOS 2, and RetrOS/LT's, has none. Install
+writes the whole-disk partition itself, \routine{whole\_disk}, exactly as
+\typed{FDISK} makes it: active, type~1, from head~1 of cylinder~0, at most
+65,535 sectors, with RetrOS/LT's master boot record code.
+
+\subsection{Errors} DOS 2's critical error handler has no ``Fail'' answer,
+so Install leaves DOS's own handler in place.
+
+\subsection{Disk transfers} Install reads the master boot record and the
+partition's startup record through the ROM, into its 16 KB buffer, and
+writes the master boot record from it. A sector there could cross a 64 KB
+boundary, so the transfer uses whichever half of the buffer's first 1,024
+bytes does not:
+
+\srclist{install_dma}{A buffer the DMA controller can use.}
+
+\subsection{The startup files} \file{CONFIG.SYS} has no \code{SHELL=}
+(\file{COMMAND.COM} is in the root, where DOS 2 looks), \code{FILES=20},
+\code{BUFFERS} by memory, and \file{ANSI.SYS}. \file{AUTOEXEC.BAT} asks
+the date and time, since neither the PC nor the XT keeps them, sets
+\code{PROMPT \$P\$G} and the path.
+
+\section{The Diskettes}\ixs{diskettes}\ixs{mkinstall.py}
+
+\file{scripts/mkinstall.py} makes the two 180 KB images: a blank
+single-sided diskette with RetrOS/LT's startup record and a media byte of
+FCh, then the files in IBM's order. \file{RETBIO.COM} and
+\file{RETDOS.COM} go first, so that they are the first two directory
+entries and \file{RETBIO.COM} is in one piece at the start of the data
+area. Every file is given the release date and time, as IBM's diskettes
+had one date for all; the hidden \file{RETROS.DSK} names the diskette for
+Install. The DOS diskette's \file{AUTOEXEC.BAT} is \typed{DATE},
+\typed{TIME}, \typed{INSTALL}.

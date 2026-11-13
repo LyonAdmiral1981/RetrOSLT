@@ -1,0 +1,118 @@
+\mwnewpart
+\renewcommand\runningtitle{Section 7. Testing}
+\chapter{Testing}
+\sectioncontents
+
+\section{Two Emulated PCs}\ixs{testing}
+
+\begin{plainwords}
+Every part of RetrOS/LT was run before it was kept, on two kinds of
+emulated computer. One is quick and can be driven from a script like a
+person at the keyboard; the other is slow but runs IBM's own BIOS of
+October 1982 on an emulated 8088, as close to the real Personal Computer as
+software gets. Neither is a real Personal Computer, and some things only a
+real one can show.
+\end{plainwords}
+
+\subsection{QEMU} \file{tests/qpc.py} starts QEMU with diskette and fixed
+disk images, types keys through its monitor, and reads the screen from
+video memory at B8000h. It can capture the printer port to a file. Its
+BIOS is SeaBIOS, not IBM's; the differences that showed are below.
+
+\subsection{MAME's IBM PC 5150} \file{tests/mame5150} runs MAME's model
+of the 5150 with IBM's BIOS 1501476 (10/27/82), which the owner supplies;
+it is not in the repository. MAME's keyboard model needs a ROM that is not
+used, so nothing can be typed: tests run from \file{AUTOEXEC.BAT}, and a
+Lua script saves the screen from video memory.
+
+\section{The Tests}
+
+\begin{tabularx}{\textwidth}{@{}P{1.55in}Y@{}}
+\toprule
+\file{tests/hd\_test.py} & An empty XT disk: \typed{FDISK} (whole disk),
+the restart, \typed{FORMAT C:/S/V}, starting from C, and \typed{CHKDSK}.
+Ends \shown{HD-TEST OK}.\\
+\file{tests/install\_test.py} & An empty XT disk and the two diskettes:
+Install from beginning to end, as a person would (the partition, the
+restart, the format, the diskette change), then starting from C and
+running \typed{VER}, \typed{DEBUG} and \typed{CHKDSK}, and reading the
+startup files. Ends \shown{INSTALL-TEST OK}.\\
+On the 5150 & Starting from 360 and 180 KB diskettes at 256 and 640 KB;
+\file{ANSI.SYS}, \typed{MODE}, \typed{GRAPHICS}, \typed{TREE},
+\typed{VER} and \typed{CHKDSK} from \file{AUTOEXEC.BAT}; the time from
+power on to the date prompt.\\
+\bottomrule
+\end{tabularx}
+
+Each command was also run through its cases when it was written: every
+switch of \typed{FORMAT}, \typed{SYS} onto formatted diskettes,
+\typed{DISKCOPY} onto unformatted ones, \typed{DISKCOMP} and \typed{COMP}
+on equal and different ones, \typed{ASSIGN} with \typed{FORMAT}'s check,
+every form of \typed{MODE}, \typed{GRAPHICS}' printer output turned back
+into a picture, \typed{BACKUP} of a 500 KB file and two files of the same
+name across three diskettes and \typed{RESTORE} of them, byte for byte,
+and each escape sequence of \file{ANSI.SYS}.
+
+\section{The Kernel}
+
+The kernel exerciser of the RetrOS/x86 tests (\file{STRESS.ASM}) was run
+on RetrOS/LT on the 5150. Its DOS 2 parts, handles, seeking,
+directories, finding files, duplicate handles, file control blocks, memory
+allocation, absolute disk reads and the CP/M-style call at offset 5 of the
+program segment prefix, all ran. Its later parts call functions of DOS 3,
+and interrupt 2Fh, which DOS 2 does not set up; PC DOS 2.10 would fail
+there the same way.
+
+\engnote{The CP/M-style call jumps to F01D:FEF0, which on an 8088 wraps
+around to 0000:00C0. Under QEMU, whose BIOS leaves the twenty-first
+address line on, it does not wrap, and the call runs off into memory above
+1 MB. On the 5150 it works. Tests that depend on the wrap are run there.}
+
+\section{The Review}\ixs{review}
+
+When the commands were done, the whole of RetrOS/LT's own source was read
+again, line by line, for faults and for things that could be made faster
+or smaller. It found:
+
+\begin{longopts}
+\lopt{Transfers across 64 KB}{Five programs that call the ROM's disk
+  routines directly did not keep their buffers off 64 KB boundaries.
+  Shown on \typed{FORMAT}: a resident program sized to make DOS load
+  \typed{FORMAT} at segment 0E7Dh put its startup record buffer across one,
+  and the old \typed{FORMAT} said \shown{Format failure}; the new one
+  formats. (Section~5.)}
+\lopt{Starting up}{The startup record read \file{RETBIO.COM} a sector at a
+  time, and \file{RETBIO.COM} read \file{RETDOS.COM} a cluster at a time.
+  Reading whole tracks and runs of clusters took the time from power on to
+  the date prompt, on the 5150 at 640 KB from the 180 KB diskette, from 59
+  seconds to 51; most of what remains is the BIOS's memory test.}
+\lopt{MODE}{A mistake such as \typed{MODE 80,X} changed the screen mode,
+  clearing the screen, before reporting the error.}
+\lopt{ANSI.SYS}{\keys{Ctrl}{PrtSc} no longer turned printer echo on and
+  off. QEMU's BIOS does not give 7200h for that key, so the test puts 7200h
+  in the BIOS's keyboard buffer and reads it through DOS.}
+\lopt{FORMAT}{PC DOS 2's \typed{FORMAT} says
+  \shown{Formatting...Format complete}; RetrOS/LT's said nothing while it
+  worked.}
+\lopt{COMP, DISKCOMP}{Their work buffers were part of the file, making
+  them 18 KB and 7 KB where IBM's were about 2 KB.}
+\end{longopts}
+
+It looked at \typed{ASSIGN}'s changing of the caller's string and kept it
+(Section~5). It found nothing wrong in \file{RETBIO.COM}, the
+reconstructed console functions, the startup records, \typed{FDISK},
+\typed{TREE}, \typed{GRAPHICS}, \typed{BACKUP} or \typed{RESTORE}.
+
+\section{What Has Not Been Tested}
+
+\begin{itemize}
+\item \textbf{A real IBM Personal Computer or XT.} Everything here ran in
+  emulators. Disk timing, the DMA controller, real diskette drives and
+  fixed disk adapters, and keyboards are where an emulator and a real
+  machine part.
+\item \textbf{A second fixed disk}, and fixed disks other than the XT's
+  10 MB geometry.
+\item \textbf{PC DOS 2.10 itself, side by side.} RetrOS/LT's behavior was
+  matched to IBM's documentation and to what is known of PC DOS 2.10; no
+  copy of PC DOS was used in making it.
+\end{itemize}

@@ -1,0 +1,90 @@
+\mwnewpart
+\renewcommand\runningtitle{Section 4. The Kernel}
+\chapter{The Kernel}
+\sectioncontents
+
+\section{Microsoft's Code}\ixs{kernel}
+
+\begin{plainwords}
+The kernel is the part of DOS every program talks to: open this file, read
+that many bytes, run that program. RetrOS/LT's is Microsoft's, built from
+the published source with only the changes it needed to build and to call
+itself RetrOS/LT. One piece of it was missing from what Microsoft
+published, the part that reads the keyboard and writes to the screen for
+programs; it was put back together from what the rest of the code and the
+finished 2.00 kernel show it must have been.
+\end{plainwords}
+
+The kernel is twenty-one modules, assembled and linked as Microsoft's
+\file{MSDOS.LNK} names them, into \file{RETDOS.COM}. RetrOS/LT changes it
+only through \patch{0001} and \patch{0002}:
+
+\begin{itemize}
+\item \file{DOSMAC.ASM} and \file{DOSSYM.ASM} are replaced by the kit's
+  \file{\_V211} versions. The older ones do not match the 2.11 modules,
+  and MASM stops at the end of \file{MSCODE.ASM} without them.
+\item \code{WAIT}, the name of function 4Dh in \file{DOSSYM.ASM}, is a
+  reserved word to MASM 5; it becomes \code{WAITPROCESS}, in
+  \file{DOSSYM.ASM} and in \file{COMMAND.ASM}, which uses it.
+\item \file{MSCODE.ASM} has a typo, \code{handlers>>}, in a macro
+  argument; it is corrected.
+\item \file{DEVSYM.ASM} gains \code{ISSPEC}, the name of the special
+  attribute bit that \file{RETBIO.COM} uses.
+\item \code{DOS\_MINOR\_VERSION} is 10.
+\end{itemize}
+
+\section{The Console Functions}\ixs{IO.ASM}\ixs{console functions}
+
+Functions 1 to 12 of interrupt 21h, keyboard input with and without echo,
+display output, the auxiliary and printer devices, string output and
+input, input status and flush, are in a module \file{STDIO.ASM} includes
+as \file{IO.ASM}. The file is not in Microsoft's release. Without it the
+kernel cannot be built, and no program could read a key.
+
+\file{src/IO.ASM} is a reconstruction from two sources, both Microsoft's
+and both released under the same license:
+
+\begin{itemize}
+\item \textbf{Its names and structure} follow \file{CPMIO.ASM} and
+  \file{CPMIO2.ASM} of the MS-DOS 4.0 source, which grew from it, with what
+  4.0 added (double-byte characters, networks, the system file table) taken
+  out.
+\item \textbf{Its code} follows the console functions in the MS-DOS 2.00
+  \file{MSDOS.SYS} of the same release, instruction for instruction.
+\end{itemize}
+
+The buffered input of function 10, with its editing keys, is
+\file{STRIN.ASM}, which is in the release and is included at the end.
+The heart of it is \routine{OUT}, which keeps the column for tabs and
+backspaces, checks for \keys{Ctrl}{S} and \keys{Ctrl}{C} every fourth
+character, and echoes to the printer while \keys{Ctrl}{P} is on:
+
+\srclist{io_out}{OUT: a character to the console.}
+
+\engnote{The \code{AND} with \code{00000011B} is the check every fourth
+character: \routine{STATCHK}, which looks at the keyboard, is slow on an
+8088, and calling it for every character made output visibly slower. The
+mask is the 2.00 kernel's.}
+
+\section{The Identity}\ixs{banner}\ixs{version, DOS}
+
+\patch{0002} changes the banner \file{COMMAND.COM} shows when there is no
+\file{AUTOEXEC.BAT}, to \shown{RetrOS/LT Version 1.0} with the Republic
+Lyon Mountain Corporation's copyright and Microsoft's 1981--83 line, and
+the text of \typed{VER}:
+
+\srclist{vermes}{What VER says.}
+
+\file{COMMAND.COM} adds the version number the kernel reports, so
+\typed{VER} shows \shown{RetrOS/LT Version 1.0, DOS 2.10}.
+
+\section{SYSINIT}\ixs{SYSINIT}\ixs{CONFIG.SYS}
+
+SYSINIT reads \file{CONFIG.SYS}, loads device drivers, sets up the buffers
+and file tables, and loads \file{COMMAND.COM}. The kit's version knows
+\code{BUFFERS}, \code{BREAK}, \code{SHELL}, \code{DEVICE} and \code{FILES},
+which PC DOS 2.10 documents, and three more 2.11 added
+(\code{SWITCHAR}, \code{AVAILDEV} and \code{COUNTRY}), which RetrOS/LT
+leaves in place but does not document. \patch{0001} adds the messages
+\file{SYSIMES.ASM} lacked: SYSINIT refers to them but the kit's file does
+not define them.

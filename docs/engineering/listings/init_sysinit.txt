@@ -1,0 +1,25 @@
+        ; SYSINIT's variables
+        MOV     AX,SEG SYSINIT
+        MOV     ES,AX
+ASSUME  ES:SYSINITSEG
+        MOV     AX,[DOSPARA]
+        MOV     ES:[CURRENT_DOS_LOCATION],AX
+        MOV     AX,OFFSET RESEND+15
+        MOV     CL,4
+        SHR     AX,CL
+        MOV     BX,CS
+        ADD     AX,BX
+        MOV     ES:[FINAL_DOS_LOCATION],AX
+        MOV     WORD PTR ES:[DEVICE_LIST],OFFSET DEVSTART
+        MOV     WORD PTR ES:[DEVICE_LIST+2],CS
+        INT     12H                     ; memory, in KB
+        MOV     CL,6
+        SHL     AX,CL
+        MOV     ES:[MEMORY_SIZE],AX
+        MOV     AL,1                    ; 1 = A:
+        TEST    [BOOTDRV],80H
+        JZ      DEFDRV
+        MOV     AL,3                    ; started from the fixed disk: C:
+DEFDRV: MOV     ES:[DEFAULT_DRIVE],AL
+ASSUME  ES:NOTHING
+        JMP     SYSINIT

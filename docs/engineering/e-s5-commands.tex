@@ -1,0 +1,195 @@
+\mwnewpart
+\renewcommand\runningtitle{Section 5. The IBM Commands}
+\chapter{The IBM Commands}
+\sectioncontents
+
+\section{Writing Them Again}\ixs{IBM commands}
+
+\begin{plainwords}
+IBM wrote a dozen of PC DOS 2.10's commands itself, and never published
+them. RetrOS/LT has its own, written to behave as IBM's do: the same
+switches, the same questions, the same messages, and where it matters to
+other programs, the same layout in memory and on disk. They are small
+programs, most under 5,000 bytes, written for NASM, and they use only
+what an 8088 and the PC's BIOS provide.
+\end{plainwords}
+
+Each was written from IBM's documentation of PC DOS 2.10 and what is
+known of its behavior, and tested against the situations the
+documentation describes. Where IBM's behavior could not be learned, the
+choice made is noted.
+
+\section{FORMAT: the IBM Part}\ixs{FORMAT command}
+
+Microsoft's \typed{FORMAT} leaves everything that depends on the computer
+to an OEM module, through a fixed interface (\file{FORMAT.txt} of the
+kit): \routine{INIT}, \routine{DISKFORMAT}, \routine{BADSECTOR},
+\routine{WRTFAT} and \routine{DONE}, with \code{SWITCHLIST},
+\code{FATID}, \code{STARTSECTOR} and the rest. \file{src/IBMFOR.ASM} is
+RetrOS/LT's, linked after \file{FORMAT.ASM} and \file{FORMES.ASM}.
+
+\begin{itemize}
+\item \textbf{Diskettes} are formatted a track at a time through the ROM
+  (interrupt 13h, function 5) and verified; a bad track is remembered and
+  reported to \routine{BADSECTOR}. \code{SWITCHLIST} is IBM's,
+  \code{"B81OVS"}.
+\item \textbf{A fixed disk} is not low-level formatted. Its layout comes
+  from the drive parameter block \file{RETBIO.COM} built (function 32h),
+  its geometry from the ROM, and where its partition starts from the
+  master boot record; every sector is then verified, a track at a time,
+  and bad ones reported.
+\item \textbf{WRTFAT} writes the startup record and the file allocation
+  tables straight to the disk: until the FAT ID byte is there, the kernel
+  cannot know what the disk is.
+\item \textbf{The messages} \shown{Formatting...} and \shown{Format
+  complete}, which PC DOS 2's \typed{FORMAT} shows and Microsoft's leaves to
+  the OEM part, come from \routine{DISKFORMAT} and the first
+  \routine{WRTFAT}.
+\end{itemize}
+
+\typed{FORMAT} calls the ROM itself, so it must keep its own transfers off
+64 KB boundaries, as \file{RETBIO.COM} does:
+
+\srclist{ibmfor_bounce}{FORMAT's bounce buffer.}
+
+\engnote{The first version did not, and \typed{FORMAT} failed with
+\shown{Format failure} whenever DOS happened to load it where its startup
+record buffer crossed a 64 KB boundary. The review found it; a resident
+program of the right size reproduced it (Section~7). \typed{DISKCOPY},
+\typed{DISKCOMP}, \typed{FDISK} and Install had the same fault in their
+own direct calls, and have the same remedy.}
+
+\section{SYS}\ixs{SYS command}
+
+Microsoft's \typed{SYS} copies the system files and, for the IBM version,
+writes a startup record. \patch{0005} makes it always write RetrOS/LT's:
+it reads the disk's BIOS parameter block (interrupt 25h) and keeps it, or,
+on a diskette with none, builds a DOS 1 one from the FAT ID byte, and
+writes the RetrOS/LT code around it.
+
+\section{FDISK}\ixs{FDISK command}
+
+\typed{FDISK} has PC DOS 2.10's menu: create the DOS partition, change the
+active partition, delete the DOS partition, display the partition table,
+and, with two fixed disks, select the other. Creating offers the whole
+disk, which gives the largest free run of cylinders, to at most 65,535
+sectors; or a size and a first cylinder, checked against the other
+partitions. A partition on cylinder 0 starts on head 1, after the master
+boot record's track. A new disk with no master boot record gets RetrOS/LT's
+(\file{MBRCODE.INC}). On leaving after a change, \typed{FDISK} restarts the
+computer through interrupt 19h, so that \file{RETBIO.COM} finds the new
+partition.
+
+\section{DISKCOPY and DISKCOMP}\ixs{DISKCOPY command}\ixs{DISKCOMP command}
+
+Both work through the ROM, a track at a time, with as many tracks in
+memory at once as fit, each placed so that it does not cross a 64 KB
+boundary; they share \file{cmd/FLOPPY.INC}. The source's format comes from
+its FAT ID byte, and the diskette parameter table is given its sectors per
+track. \typed{DISKCOPY} formats a target track that will not take the data
+as it is, and says \shown{Formatting while copying} the first time.
+\typed{DISKCOMP} reports a difference by side and track. Both take
+\typed{/1}, \typed{DISKCOMP} \typed{/8} too.
+
+\section{COMP and TREE}\ixs{COMP command}\ixs{TREE command}
+
+\typed{COMP} compares files byte for byte, ten differences at most, with
+IBM's prompts when a name is left out, wildcards in the first name and a
+template in the second, and \shown{Compare more files (Y/N)?} at the end.
+\typed{TREE} walks the directories depth first, with a disk transfer area
+for each level, and prints IBM's \shown{Path:}, \shown{Sub-directories:}
+and \shown{Files:} lines.
+
+\section{ASSIGN}\ixs{ASSIGN command}
+
+\typed{ASSIGN} stays resident, catching interrupt 21h (functions that
+name a drive in \code{DL}, in a file control block, or in a path),
+interrupts 25h and 26h. PC DOS 2's \typed{FORMAT} looks for it, to refuse
+to work on an assigned drive, by a fixed layout: the drive table at offset
+103h of its segment and its interrupt 21h handler at 122h. RetrOS/LT's
+\typed{ASSIGN} is laid out the same way:
+
+\srclist{assign_layout}{ASSIGN's layout.}
+
+A path's drive letter is changed where it is, in the caller's string, and
+the request passed on:
+
+\srclist{assign_path}{A path request.}
+
+\engnote{Two other ways were tried. Calling DOS from the handler and
+returning broke EXEC, which in DOS 2 does not come back to its caller in
+the ordinary way. Changing a copy of the name, and giving DOS the copy, kept
+the caller's string unchanged, but \file{COMMAND.COM} works out
+directories from the string it passed: with the copy, \typed{REN} on an
+assigned drive renamed the first file of the directory,
+\file{COMMAND.COM}, instead of the one named. Changing the string where it
+is is what \file{COMMAND.COM} expects.}
+
+\section{MODE}\ixs{MODE command}
+
+\typed{MODE} sets printer width and line spacing by sending the IBM
+printer's control codes, the serial port with interrupt 14h, and the
+display with interrupt 10h and the equipment flags at 0040:0010. For
+rerouting (\typed{LPT1:=COM1}), retry (\typed{P}) and shifting the
+display, a resident part hooks interrupts 17h and 14h, and copies the
+ROM's video parameter table (interrupt 1Dh) so it can change the
+horizontal sync position. A later \typed{MODE} finds the resident part by
+the word \code{MODE} just before its handler:
+
+\srclist{mode_int17}{MODE's printer handler: rerouting and retry.}
+
+Every parameter is read and checked before anything is done, so a mistake
+changes nothing.
+
+\section{GRAPHICS}\ixs{GRAPHICS command}
+
+\typed{GRAPHICS} takes interrupt 5, the print-screen interrupt. In a text
+mode it passes the request to the ROM. In modes 4, 5 and 6 it prints the
+screen from video memory at B800:0000 on the IBM Graphics Printer, turned
+on its side: each printer line is a column of eight screen dots, printed
+from the bottom row up with \code{ESC K} graphics, line spacing 8/72
+inch. A 640 by 200 screen prints each dot twice across; a 320 by 200
+screen prints each dot as two by two printer dots, the four colors as
+none, one, two and four of them. The status byte at 0050:0000 is kept as
+the ROM keeps it.
+
+\section{BACKUP and RESTORE}\ixs{BACKUP command}\ixs{RESTORE command}
+
+The diskettes are in PC DOS 2's format, so that the two systems can read
+each other's backups:
+
+\srclist{br_format}{The backup format.}
+
+\engnote{Whether DOS 2's \typed{BACKUP} kept the files in the root
+directory or in directories mirroring the source could not be settled from
+the documents found. RetrOS/LT keeps them in the root, which the header's
+full path and the 3.x documents' mention of a pack switch that makes
+directories only when the root is full both point to. A file whose name is
+already on the diskette, from another directory, goes on the next
+diskette.}
+
+\typed{BACKUP} erases the target's root directory files (unless
+\typed{/A}), writes \file{BACKUPID.@@@}, copies each file behind its
+header with its date and time, splits a file across diskettes when the
+space runs out, clears the archive bit, and marks the last diskette.
+\typed{RESTORE} reads the diskettes in order, matches each file's path
+against the one asked for, makes directories, follows split files, and
+with \typed{/P} asks before replacing a read-only or changed file. Both
+set the exit codes 0, 1, 3 and 4.
+
+\section{ANSI.SYS}\ixs{ANSI.SYS}
+
+\file{ANSI.SYS} is a character device named \code{CON}, which therefore
+takes \code{CON}'s place. It writes through the ROM with an attribute of
+its own, keeps a parameter list for each escape sequence, and has a queue
+for what it gives programs to read: a reassigned key's text, the second
+byte of an extended key, and the cursor report. It takes interrupt 29h and
+interrupt 1Bh itself. A key is looked up in the reassignment table as it
+is read:
+
+\srclist{ansi_keyin}{A key, and its reassignment.}
+
+\engnote{The first version passed \keys{Ctrl}{PrtSc}, which the ROM gives
+as 7200h, through as an extended key, so that with \file{ANSI.SYS} loaded
+it no longer turned printer echo on and off. The review found it; it is
+now \keys{Ctrl}{P}, as \file{RETBIO.COM}'s \code{CON} gives it.}

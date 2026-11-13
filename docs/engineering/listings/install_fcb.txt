@@ -1,0 +1,11 @@
+        push di                         ; DOS 2 programs take their drives
+        lea si,[di+1]                   ; from the two FCBs: fill ours from
+        push cs                         ; the command tail, as COMMAND does
+        pop es
+        mov di,5Ch
+        mov ax,2901h
+        int 21h
+        mov di,6Ch
+        mov ax,2901h
+        int 21h
+        pop di

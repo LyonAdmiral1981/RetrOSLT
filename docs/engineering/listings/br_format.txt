@@ -1,0 +1,11 @@
+; A backup diskette holds BACKUPID.@@@ in its root directory, 128 bytes:
+;       0       0FFh on the last diskette of the set, 0 before it
+;       1       the diskette's number in the set (a word, from 1)
+;       3       the year it was written (a word), 5 the day, 6 the month
+; and each file backed up, in the root directory under its own name, with
+; the original date and time, behind a 128-byte header:
+;       0       0FFh if this is the file's last (or only) part, 0 if more
+;               follows on the next diskette
+;       1       the number of the diskette this part is on
+;       5       the file's full path, without the drive (ASCIIZ)
+;       53h     the length of the path plus 1

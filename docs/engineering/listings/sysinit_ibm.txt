@@ -1,0 +1,4 @@
+IBMVER     EQU     TRUE                 ; RetrOS/LT: as PC DOS, where EXEC is in COMMAND.COM
+IBM        EQU     IBMVER
+IBMJAPVER  EQU     FALSE                ; If TRUE set KANJI true also
+MSVER      EQU     FALSE

@@ -1,0 +1,65 @@
+        entry   OUT
+        CMP     AL,20H
+        JB      CTRLOUT
+        CMP     AL,c_DEL
+        JZ      OUTCH
+        INC     BYTE PTR [CARPOS]
+OUTCH:
+        PUSH    DS
+        PUSH    SI
+        INC     BYTE PTR [CHARCO]               ;invoke  statchk...
+        AND     BYTE PTR [CHARCO],00000011B     ; every fourth char
+        JNZ     OUTSKIP
+        PUSH    AX
+        invoke  STATCHK
+        POP     AX
+OUTSKIP:
+        invoke  RAWOUT                          ;output the character
+        POP     SI
+        POP     DS
+        TEST    BYTE PTR [PFLAG],-1
+        retz
+        PUSH    BX
+        PUSH    DS
+        PUSH    SI
+        MOV     BX,1
+        invoke  GET_IO_FCB
+        JC      TRIPOPJ
+        TEST    [SI.fcb_DEVID],080H             ; output to file?
+        JZ      TRIPOPJ                         ; if so, no echo
+        MOV     BX,4
+        JMP     SHORT LISSTRT2
+
+TRIPOPJ:
+        JMP     SHORT TRIPOP
+
+CTRLOUT:
+        CMP     AL,c_CR
+        JZ      ZERPOS
+        CMP     AL,c_BS
+        JZ      BACKPOS
+        CMP     AL,c_HT
+        JNZ     OUTCH
+        MOV     AL,[CARPOS]
+        OR      AL,0F8H
+        NEG     AL
+
+        entry   TAB
+        PUSH    CX
+        MOV     CL,AL
+        MOV     CH,0
+        JCXZ    POPTAB
+TABLP:
+        MOV     AL," "
+        invoke  OUT
+        LOOP    TABLP
+POPTAB:
+        POP     CX
+        return
+
+ZERPOS:
+        MOV     BYTE PTR [CARPOS],0
+        JMP     OUTCH
+OUTJ:   JMP     OUT
+
+BACKPOS:

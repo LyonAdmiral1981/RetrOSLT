@@ -1,0 +1,68 @@
+\renewcommand\runningtitle{Appendix A. The Source Files}
+\chapter{The Source Files}
+
+RetrOS/LT's own files, with the number of lines in each when this edition
+was made. Microsoft's files are in \file{upstream/msdos}, unchanged; the
+patches change them as the build prepares them.
+
+{\small
+\begin{longtable}{@{}P{1.85in}rP{2.9in}@{}}
+\toprule
+\textbf{File} & \textbf{Lines} & \textbf{What it is}\\
+\midrule
+\endhead
+\csname @@input\endcsname files.gen.tex
+\bottomrule
+\end{longtable}}
+
+\mwnewpart
+\renewcommand\runningtitle{Appendix B. The Patches}
+\chapter{The Patches}
+
+Each patch of the series, the files it changes, and the lines it adds and
+removes in each. Section~1 says what each is for.
+
+{\small
+\begin{longtable}{@{}P{0.7in}P{2.0in}rr@{}}
+\toprule
+\textbf{Patch} & \textbf{File} & \textbf{Added} & \textbf{Removed}\\
+\midrule
+\endhead
+\csname @@input\endcsname patches.gen.tex
+\bottomrule
+\end{longtable}}
+
+\file{DOSMAC.ASM} and \file{DOSSYM.ASM} in \patch{0001} are the kit's
+\file{\_V211} files in place of the older ones, which is why so many lines
+change.
+
+\mwnewpart
+\renewcommand\runningtitle{Appendix C. Credits and License}
+\chapter{Credits and License}
+\sectioncontents
+
+\section{Where RetrOS/LT Comes From}\ixs{credits}
+
+RetrOS/LT is a product of The Lyon Mountain Company, Republic Lyon
+Mountain Corporation. It is derived from the source code of MS-DOS 2,
+which was written by Microsoft Corporation and which Microsoft released to
+the public in 2018 under the MIT License. The kernel, \file{COMMAND.COM},
+SYSINIT, and the commands \typed{CHKDSK}, \typed{DEBUG}, \typed{EDLIN},
+\typed{EXE2BIN}, \typed{FC}, \typed{FIND}, \typed{MORE}, \typed{PRINT},
+\typed{RECOVER}, \typed{SORT}, \typed{SYS} and most of \typed{FORMAT} are
+that code; \typed{LINK} is Microsoft's program from the same release, and
+the assembler and linker that build RetrOS/LT are Microsoft's, from the
+MS-DOS 4.0 release. A few routines of \file{RETBIO.COM} follow the IBM PC
+BIOS of the MS-DOS 4.0 source, and are marked where they are used.
+
+RetrOS/LT is not MS-DOS and is not PC DOS, and neither Microsoft nor IBM
+has any part in it.
+
+\section{The Microsoft Notice}\ixs{MIT License}
+
+\VerbatimInput[fontsize=\footnotesize,baselinestretch=1.0]{../../dist/NOTICE.TXT}
+
+\section{The RetrOS/LT License}\ixs{license}
+
+The RetrOS/LT License is printed in Appendix~D of the \textit{Guide to
+Operations}, and is on the DOS diskette as \file{LICENSE.TXT}.

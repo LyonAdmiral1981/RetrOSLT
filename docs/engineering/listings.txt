@@ -1,0 +1,40 @@
+# Listings in the RetrOS/LT Guide to Engineering, read by listings.py.
+#   name | file | start pattern | end pattern or +N
+# A file is named from the top of the repository, or as lt:NAME for a file
+# of the MS-DOS 2 source as RetrOS/LT builds it (scripts/prep.py).
+# Patterns are Python regular expressions; the first line matching the start
+# opens the listing, the first line from there matching the end closes it.
+
+# Section 1: overview
+series | patches/series | ^# RetrOS/LT | ^0005
+
+# Section 2: building
+prep_clean | scripts/prep.py | ^def clean | ^    return b
+build_nasm | scripts/build.sh | ^# The commands written for NASM | ^nasm -f bin -o "\$ROOT/build/BOOT.BIN"
+sysinit_ibm | lt:SYSINIT.ASM | ^IBMVER | ^MSVER
+
+# Section 3: starting the computer
+mbr_moved | boot/MBR.ASM | ^moved: | jmp     0:7C00h
+boot_load | boot/BOOT.ASM | ^\.load: | jnz     \.load
+bios_devs | src/BIOS.ASM | ^DEVSTART | "LPT3    "
+media_chk | src/BIOS.ASM | ^MEDIA_CHK: | ^        JMP     EXIT
+diskio_dma | src/BIOS.ASM | and not across a 64K boundary of memory | ^DIO_N2:
+calcbpb | src/BIOS.ASM | ^CALCBPB PROC | ^CALCBPB ENDP
+loaddos_run | src/BIOS.ASM | a run of clusters one after another | ^        JMP     LD_LP
+init_sysinit | src/BIOS.ASM | SYSINIT's variables | ^        JMP     SYSINIT
+
+# Section 4: the kernel
+io_out | src/IO.ASM | entry   OUT | ^BACKPOS:
+vermes | lt:TDATA.ASM | ^VERMES_PRE  DB      "RetrOS | +2
+
+# Section 5: the IBM commands
+ibmfor_bounce | src/IBMFOR.ASM | ^BOUNCE: | ^BN_RET:
+assign_layout | cmd/ASSIGN.ASM | ^start: | ^int21:
+assign_path | cmd/ASSIGN.ASM | ^\.path: | jmp     \.pass
+br_format | cmd/BR.INC | A backup diskette holds | 53h
+mode_int17 | cmd/MODE.ASM | ^sig | ^\.old:
+ansi_keyin | dev/ANSI.ASM | ^keyin: | ^\.one:
+
+# Section 6: Install
+install_fcb | install/INSTALL.ASM | DOS 2 programs take their drives | ^        pop di
+install_dma | install/INSTALL.ASM | ^dma_buf: | ^\.r:     pop cx

@@ -1,0 +1,110 @@
+\mwnewpart
+\renewcommand\runningtitle{Section 2. Building}
+\chapter{Building}
+\sectioncontents
+
+\section{In Brief}\ixs{building}
+
+\begin{plainwords}
+Programs written in 1983 were assembled by programs of 1983. RetrOS/LT is
+built the same way: Microsoft's own assembler and linker, run inside an
+emulated PC on a modern computer, turn the source into the programs on
+the diskettes. The parts that are new are written for NASM, a modern
+assembler, which makes the same kind of program. One script does
+everything, in a few minutes, and the result is the same each time.
+\end{plainwords}
+
+\begin{dialogue}
+git submodule update --init
+sh scripts/build.sh
+python3 scripts/mkinstall.py
+\end{dialogue}
+
+\file{build/OUTPUT} then holds every program, and \file{build/install}
+the two diskette images. The tools needed are DOSBox-X, NASM, mtools,
+Python 3 and \typed{patch}.
+
+\section{The Tools}\ixs{MASM}\ixs{LINK}\ixs{DOSBox-X}
+
+Microsoft's assembler and linker are taken from the same repository: the
+MS-DOS 4.0 source carries in \file{v4.0/src/TOOLS} the Macro Assembler
+5.10 and the linker 3.65 it was built with, released under the same
+license. The 2.0 kit has an older assembler, MASM 1.10, but it could not
+build the kit reliably. MASM 5.10 builds it once two names that it
+reserves are changed (\patch{0001}). \file{scripts/dosrun.sh} runs a batch
+file in DOSBox-X with no window, the work directory as drive D and the
+tools as drive T.
+
+\section{Preparing the Source}\ixs{prep.py}
+
+The published files are not all in the form the tools want.
+\file{scripts/prep.py} copies \file{v2.0/source} to \file{build/work/SRC}
+and cleans each text file:
+
+\srclist{prep_clean}{Cleaning a published file.}
+
+Some files end in an end-of-file mark followed by padding, and the
+patches would not apply over it. A few were edited in WordStar, which
+marks a line it has reflowed with the high bit set on the line feed; MASM
+takes \code{CR 8Ah} as part of the line, and the line that follows as a
+continuation of it. After cleaning, \file{prep.py} applies the series with
+\typed{patch}, adds RetrOS/LT's own files from \file{src/}, and puts back the CR LF line endings and the final
+\keys{Ctrl}{Z} the 1988 tools expect.
+
+\engnote{The patches are made against the cleaned tree with LF line
+endings, so that they are readable and \typed{patch} treats them as text.
+The CR LF endings are added after them.}
+
+\section{The Kernel, COMMAND.COM and RETBIO.COM}
+
+\file{scripts/build.sh} writes one batch file, \file{BUILD.BAT}, that
+assembles every module and links each program, and runs it in DOSBox-X.
+The kernel is linked from twenty-one modules, \file{COMMAND.COM} from
+seventeen, and \file{RETBIO.COM} from three: \file{BIOS.ASM}, then
+Microsoft's \file{SYSINIT.ASM} and \file{SYSIMES.ASM}. \typed{EXE2BIN}
+makes the \file{.COM} files, \file{RETBIO.COM} with a base segment of 70h,
+where the startup record loads it. Link response files are written by a
+few lines of Python, so that no line is longer than LINK 3.65 accepts.
+
+SYSINIT is built as IBM's (\patch{0001}):
+
+\srclist{sysinit_ibm}{SYSINIT as IBM built it.}
+
+In PC DOS 2, the program-loading function, EXEC, is part of
+\file{COMMAND.COM}; the kernel's own returns ``invalid function'' until
+\file{COMMAND.COM} has hooked it. SYSINIT built for MS-DOS asks the kernel
+to EXEC \file{COMMAND.COM}, and fails with \shown{Bad or missing Command
+Interpreter}; built for IBM, it loads \file{COMMAND.COM} itself.
+
+\section{The Parts Written for NASM}\ixs{NASM}
+
+Everything new but \file{RETBIO.COM} and \typed{FORMAT}'s IBM part is
+assembled by NASM, before the DOSBox-X run, so that the master boot record
+and startup record can be built into the programs that write them:
+
+\srclist{build_nasm}{The NASM parts.}
+
+Each file of \file{cmd/} becomes a \file{.COM} program of the same name,
+each of \file{dev/} a \file{.SYS} driver, and \file{install/INSTALL.ASM}
+\file{INSTALL.COM}. \typed{FDISK} includes the first 446 bytes of the
+master boot record as \file{MBRCODE.INC}; Install includes the same. The
+startup record goes into the build tree as \file{BOOTSECT.INC}, which
+\typed{FORMAT} and \typed{SYS} include.
+
+\section{What Comes Out}
+
+\begin{tabularx}{\textwidth}{@{}P{1.6in}Y@{}}
+\toprule
+\file{RETBIO.COM}, \file{RETDOS.COM} & the system\\
+\file{COMMAND.COM} & the command processor\\
+twelve programs & Microsoft's commands, \typed{FORMAT} with IBM's part\\
+\file{LINK.EXE} & copied from the 2.0 release\\
+ten programs, \file{ANSI.SYS} & the commands and driver written new\\
+\file{INSTALL.COM} & Install\\
+\bottomrule
+\end{tabularx}
+
+\file{scripts/mkinstall.py} then makes the two diskettes (Section~6),
+\file{scripts/mkboot.py} a startup diskette of any of the four sizes, and
+\file{scripts/mkhd.py} a fixed disk image with a DOS partition, for the
+tests.
