@@ -55,7 +55,7 @@ class PC:
 
     def screen(self):
         out = self.cmd("xp /2000hx 0xb8000", 0.6)
-        words = [int(x, 16) for x in re.findall(r"0x([0-9a-f]{4})\b(?!:)", out)]
+        words = [int(x, 16) for x in re.findall(r"0x([0-9a-f]{4})\b(?!:)", out)][-2000:]
         text = "".join(chr(w & 255) if 32 <= (w & 255) < 127 else " " for w in words)
         rows = [text[i:i + 80].rstrip() for i in range(0, len(text), 80)]
         while rows and not rows[-1]:

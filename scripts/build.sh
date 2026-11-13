@@ -22,6 +22,11 @@ for f in "$ROOT"/cmd/*.ASM; do
   n=$(basename "$f" .ASM)
   nasm -f bin -i "$ROOT/build/" -i "$ROOT/cmd/" -o "$ROOT/build/OUTPUT/$n.COM" "$f"
 done
+# The device drivers (dev/*.ASM), to .SYS
+for f in "$ROOT"/dev/*.ASM; do
+  n=$(basename "$f" .ASM)
+  nasm -f bin -i "$ROOT/dev/" -o "$ROOT/build/OUTPUT/$n.SYS" "$f"
+done
 # The boot sector, for FORMAT and SYS to write: BOOTSECT.INC
 nasm -f bin -o "$ROOT/build/BOOT.BIN" "$ROOT/boot/BOOT.ASM"
 python3 - "$ROOT/build/BOOT.BIN" > "$S/BOOTSECT.INC" <<'PY'
