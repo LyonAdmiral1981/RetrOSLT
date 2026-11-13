@@ -480,9 +480,10 @@ display:
         jmp     .m
 .mhit:  add     sp,2
         mov     al,[di+1]
-        call    setmode
-        jmp     .shift
-.shift: call    skipsp
+        mov     [newmode],al
+.shift: ; then ,R or ,L and ,T: all read before anything is done, so a
+        ; mistake changes nothing
+        call    skipsp
         cmp     byte [si],','
         jne     .end
         inc     si
@@ -494,20 +495,32 @@ display:
         jne     badparm
 .sh:    mov     [dir],al
         inc     si
-        call    shift
         call    skipsp
         cmp     byte [si],','
         jne     .end
         inc     si
         call    skipsp
         cmp     byte [si],'T'
-        jne     .end
-        call    testpattern
+        jne     badparm
         inc     si
+        mov     byte [wanttest],1
 .end:   call    skipsp
         cmp     byte [si],CR            ; anything left over is wrong
         jne     badparm
-        jmp     finish
+        cmp     byte [newmode],0FDh     ; none named
+        je      .nomode
+        mov     al,[newmode]
+        call    setmode
+.nomode:
+        cmp     byte [dir],0
+        je      .done
+        call    shift
+        cmp     byte [wanttest],0
+        je      .done
+        call    testpattern
+.done:  jmp     finish
+newmode db      0FDh
+wanttest db     0
 
 ; AL = 0-3 or 7: that mode; 0FEh or 0FFh: 40 or 80 columns, color on if it
 ; is on now. The equipment flags (0040:0010) say which adapter is used.
@@ -753,7 +766,7 @@ parity  db      'E'
 databits db     7
 stopbits db     1
 comp    db      0
-dir     db      'R'
+dir     db      0                       ; R or L, if a shift was asked for
 
 m_badver db     "Incorrect DOS version",CR,LF,"$"
 m_badparm db    "Invalid parameters",CR,LF,"$"
