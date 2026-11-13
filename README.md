@@ -10,8 +10,8 @@ from MS-DOS 4.0), not a replacement for them.
 
 ## Status
 
-Work in progress. The kernel (MSDOS.SYS) and COMMAND.COM build from
-Microsoft's source with the 1988 Microsoft tools; IO.SYS, the BIOS
+Work in progress. The kernel (RETDOS.COM) and COMMAND.COM build from
+Microsoft's source with the 1988 Microsoft tools; RETBIO.COM, the BIOS
 interface for the IBM PC, and the boot sector are new. RetrOS/LT starts on
 MAME's IBM PC 5150 with IBM's October 1982 ROM BIOS, and on the XT's fixed
 disk.
@@ -29,7 +29,7 @@ Guide to Engineering.
 
 - `upstream/msdos` Microsoft's MS-DOS repository, pinned (submodule)
 - `patches/` RetrOS/LT's changes to the 2.x source, in `series` order
-- `src/` RetrOS/LT's own sources for the system: `BIOS.ASM` (IO.SYS),
+- `src/` RetrOS/LT's own sources for the system: `BIOS.ASM` (RETBIO.COM),
   `IO.ASM` (the kernel's console functions, missing from the published
   source and reconstructed) and `IBMFOR.ASM` (FORMAT's IBM PC part)
 - `boot/` the boot sector and master boot record (NASM)

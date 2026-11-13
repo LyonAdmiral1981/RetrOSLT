@@ -2,7 +2,7 @@
 
     python3 scripts/mkboot.py OUT.IMG [SIZE] [FILE...]
 
-SIZE is 360 (the default), 320, 180 or 160. IO.SYS and MSDOS.SYS are put
+SIZE is 360 (the default), 320, 180 or 160. RETBIO.COM and RETDOS.COM are put
 first, as DOS 2 requires, then COMMAND.COM and any FILEs.
 """
 import subprocess, sys
@@ -36,10 +36,10 @@ def main():
         o = (1 + f * fat) * 512
         data[o:o + 3] = bytes([media, 0xFF, 0xFF])
     img.write_bytes(data)
-    run("mcopy", "-i", str(img), str(OUT / "IO.SYS"), "::IO.SYS")
-    run("mcopy", "-i", str(img), str(OUT / "MSDOS.SYS"), "::MSDOS.SYS")
+    run("mcopy", "-i", str(img), str(OUT / "RETBIO.COM"), "::RETBIO.COM")
+    run("mcopy", "-i", str(img), str(OUT / "RETDOS.COM"), "::RETDOS.COM")
     run("mcopy", "-i", str(img), str(OUT / "COMMAND.COM"), "::COMMAND.COM")
-    run("mattrib", "-i", str(img), "+h", "+s", "+r", "::IO.SYS", "::MSDOS.SYS")
+    run("mattrib", "-i", str(img), "+h", "+s", "+r", "::RETBIO.COM", "::RETDOS.COM")
     for e in extra:
         run("mcopy", "-i", str(img), e, "::")
     print(f"{img}: {size} KB")

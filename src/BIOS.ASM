@@ -1,6 +1,6 @@
-        TITLE   IO.SYS for the IBM Personal Computer -- RetrOS/LT
+        TITLE   RETBIO.COM, for the IBM Personal Computer -- RetrOS/LT
 
-; RetrOS/LT IO.SYS: the BIOS interface of DOS 2 for the IBM Personal
+; RetrOS/LT RETBIO.COM: the BIOS interface of DOS 2 for the IBM Personal
 ; Computer and Personal Computer XT, and compatibles.
 ;
 ; Microsoft's MS-DOS 2 kit gave computer makers SYSINIT and a skeleton BIOS
@@ -12,10 +12,10 @@
 ; source (MSCON.ASM, MSCLOCK.ASM), Copyright Microsoft Corporation, MIT
 ; License; they are marked where they are used.
 ;
-; IO.SYS is loaded at 0070:0000 by the RetrOS/LT boot sector, which leaves
+; RETBIO.COM is loaded at 0070:0000 by the RetrOS/LT boot sector, which leaves
 ; its own sector, with the BIOS parameter block of the disk started from,
 ; at 0000:7C00 and the BIOS drive number in DL. INIT, at the end, finds
-; and loads MSDOS.SYS, sets up the drivers and jumps to SYSINIT; everything
+; and loads RETDOS.COM, sets up the drivers and jumps to SYSINIT; everything
 ; from INIT on is then given back.
 ;
 ; Copyright The Lyon Mountain Company, Republic Lyon Mountain Corporation 2026
@@ -24,7 +24,7 @@
         INCLUDE DEVSYM.ASM
         .list
 
-BIOSSEG EQU     0070H           ; where the boot sector loads IO.SYS
+BIOSSEG EQU     0070H           ; where the boot sector loads RETBIO.COM
 SECSIZE EQU     512
 MAXUNIT EQU     4               ; A: B: and two fixed disks
 CR      EQU     13
@@ -49,7 +49,7 @@ ST_BUSY EQU     0200H
 ST_ERROR EQU    8000H
 
 ; The segments, in the order LINK must place them: this BIOS, then SYSINIT
-; and its messages, then IMAGEEND, which marks the end of IO.SYS.
+; and its messages, then IMAGEEND, which marks the end of RETBIO.COM.
 CODE    SEGMENT PARA PUBLIC 'CODE'
 CODE    ENDS
 SYSINITSEG      SEGMENT PUBLIC 'SYSTEM_INIT'
@@ -1168,9 +1168,9 @@ BS_HID  DW      0
 ROOTLO  DW      0               ; absolute sector of the root directory
 DATALO  DW      0               ; of the first cluster
 
-MSG_NODOS DB    CR,LF,"Missing MSDOS.SYS",CR,LF,0
-MSG_DOSERR DB   CR,LF,"Error loading MSDOS.SYS",CR,LF,0
-DOSNAME DB      "MSDOS   SYS"
+MSG_NODOS DB    CR,LF,"Missing RETDOS.COM",CR,LF,0
+MSG_DOSERR DB   CR,LF,"Error loading RETDOS.COM",CR,LF,0
+DOSNAME DB      "RETDOS  COM"
 
 INIT:   CLI
         MOV     AX,CS
@@ -1252,7 +1252,7 @@ NOFIXED:
         ; the clock starts at 1-1-80; the boot sector's work is done
         MOV     [DAYCNT],0
 
-        ; load MSDOS.SYS just above the whole of IO.SYS
+        ; load RETDOS.COM just above the whole of RETBIO.COM
         CALL    LOADDOS
 
         ; SYSINIT's variables
@@ -1444,9 +1444,9 @@ FD_LO   DW      0
 FD_HI   DW      0
 DOSPARA  DW      0
 
-; LOADDOS: find MSDOS.SYS, the second entry of the root directory of the
+; LOADDOS: find RETDOS.COM, the second entry of the root directory of the
 ; disk started from, and read it, a cluster at a time along its FAT chain
-; (it need not be contiguous), to the paragraph after IO.SYS.
+; (it need not be contiguous), to the paragraph after RETBIO.COM.
 LOADDOS PROC    NEAR
         MOV     AL,[BOOTDRV]
         MOV     [RW_DRV],AL
@@ -1486,7 +1486,7 @@ LOADDOS PROC    NEAR
         MOV     AX,WORD PTR [SECBUF+32+26]
         MOV     [LD_CLUS],AX
         ; where it goes
-        MOV     AX,SEG ENDIMAGE         ; the paragraph after all of IO.SYS
+        MOV     AX,SEG ENDIMAGE         ; the paragraph after all of RETBIO.COM
         MOV     [DOSPARA],AX
         MOV     ES,AX
         XOR     DI,DI

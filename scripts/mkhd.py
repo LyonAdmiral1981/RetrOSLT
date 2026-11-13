@@ -60,9 +60,9 @@ def main():
         d[p:p + 3] = b"\xF8\xFF\xFF"
     img.write_bytes(d)
     part = f"{img}@@{o}"
-    for f in ("IO.SYS", "MSDOS.SYS", "COMMAND.COM"):
+    for f in ("RETBIO.COM", "RETDOS.COM", "COMMAND.COM"):
         run("mcopy", "-i", part, str(OUT / f), "::" + f)
-    run("mattrib", "-i", part, "+h", "+s", "+r", "::IO.SYS", "::MSDOS.SYS")
+    run("mattrib", "-i", part, "+h", "+s", "+r", "::RETBIO.COM", "::RETDOS.COM")
     for f in args:
         run("mcopy", "-i", part, f, "::")
     print(f"{img}: {cyl}x{hds}x{spt}, {secs} sectors, {spc} a cluster, {clus} clusters, FAT {fat}")

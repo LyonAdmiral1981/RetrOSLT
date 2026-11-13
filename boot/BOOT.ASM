@@ -1,10 +1,10 @@
 ; RetrOS/LT boot sector, for NASM:  nasm -f bin -o BOOT.BIN BOOT.ASM
 ;
 ; The ROM BIOS loads this sector at 0000:7C00 and jumps to it. It finds
-; IO.SYS and MSDOS.SYS as the first two entries of the root directory, as
-; DOS 2 requires, loads IO.SYS (which must be contiguous, as FORMAT /S and
-; SYS lay it down) at 0070:0000, and jumps to it with the drive in DL. IO.SYS
-; loads MSDOS.SYS itself.
+; RETBIO.COM and RETDOS.COM as the first two entries of the root directory, as
+; DOS 2 requires, loads RETBIO.COM (which must be contiguous, as FORMAT /S and
+; SYS lay it down) at 0070:0000, and jumps to it with the drive in DL. RETBIO.COM
+; loads RETDOS.COM itself.
 ;
 ; It works on a diskette and on the DOS partition of a fixed disk, whose
 ; master boot record loads it with DL = 80h. The IBM PC's first ROM BIOS
@@ -90,7 +90,7 @@ boot:   cli
         shr     ax,cl
         add     ax,[rootsec]
         mov     bx,ax
-        ; IO.SYS: cluster and length
+        ; RETBIO.COM: cluster and length
         mov     ax,[DIRBUF+26]
         sub     ax,2
         mov     cl,[spc]
@@ -171,8 +171,8 @@ print:  lodsb
 
 drive:  db      0
 rootsec: dw     0
-ioname: db      "IO      SYS"
-dosname: db     "MSDOS   SYS"
+ioname: db      "RETBIO  COM"
+dosname: db     "RETDOS  COM"
 msgnosys: db    13,10,"Non-System disk or disk error",13,10
         db      "Replace and strike any key when ready",13,10,0
 msgfail: db     13,10,"Disk Boot failure",13,10,0

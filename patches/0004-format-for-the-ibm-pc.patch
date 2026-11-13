@@ -26,7 +26,7 @@ diff -ru d/FORMAT.ASM e/FORMAT.ASM
          DB      "X:\"
          IF IBMVER OR IBMJAPVER
 -        DB      "IBMBIO.COM"
-+        DB      "IO.SYS"                ; RetrOS/LT's name for it
++        DB      "RETBIO.COM"            ; RetrOS/LT's name for it
          ENDIF
          IF MSVER
          DB      "IO.SYS"
@@ -35,7 +35,7 @@ diff -ru d/FORMAT.ASM e/FORMAT.ASM
          DB      "X:\"
          IF IBMVER OR IBMJAPVER
 -        DB      "IBMDOS.COM"
-+        DB      "MSDOS.SYS"             ; RetrOS/LT's name for it
++        DB      "RETDOS.COM"            ; RetrOS/LT's name for it
          ENDIF
          IF MSVER
          DB      "MSDOS.SYS"

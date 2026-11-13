@@ -1,5 +1,5 @@
 #!/bin/sh
-# Builds RetrOS/LT: MSDOS.SYS, IO.SYS and COMMAND.COM into build/OUTPUT,
+# Builds RetrOS/LT: RETDOS.COM, RETBIO.COM and COMMAND.COM into build/OUTPUT,
 # with Microsoft's MASM 5.10 and LINK 3.65 (MIT, from the pinned MS-DOS 4.0
 # tools) in DOSBox-X.      sh scripts/build.sh
 set -eu
@@ -64,9 +64,9 @@ crlf() { sed 's/$/\r/'; }
   echo "T:\\LINK @MSDOS.LNK > LINK.LOG"
   echo "T:\\LINK @COMMAND.LNK >> LINK.LOG"
   echo "T:\\LINK @IO.LNK >> LINK.LOG"
-  echo "T:\\EXE2BIN MSDOS.EXE MSDOS.SYS >> LINK.LOG"
+  echo "T:\\EXE2BIN MSDOS.EXE RETDOS.COM >> LINK.LOG"
   echo "T:\\EXE2BIN COMMAND.EXE COMMAND.COM >> LINK.LOG"
-  echo "T:\\EXE2BIN IO.EXE IO.SYS < BASE.TXT >> LINK.LOG"
+  echo "T:\\EXE2BIN IO.EXE RETBIO.COM < BASE.TXT >> LINK.LOG"
   echo "$CMDS" | while IFS=: read n t mods sw; do
     echo "T:\\LINK @$n.LNK >> LINK.LOG"
     [ "$t" = COM ] && echo "T:\\EXE2BIN $n.EXE $n.COM >> LINK.LOG"
@@ -96,7 +96,7 @@ sh "$ROOT/scripts/dosrun.sh" "$S" BUILD.BAT 15
 for f in ASM.LOG LINK.LOG; do tr -d '\r' < "$S/$f" > "$ROOT/build/$f"; done
 grep -E "^[A-Z0-9_]+\.ASM\([0-9]+\): (error|warning)" "$ROOT/build/ASM.LOG" | grep -v A4016 || true
 grep -iE "error|unresolved|warning L" "$ROOT/build/LINK.LOG" | grep -v L4021 || true
-for f in MSDOS.SYS IO.SYS COMMAND.COM $(echo "$CMDS" | awk -F: '{print $1"."$2}'); do
+for f in RETDOS.COM RETBIO.COM COMMAND.COM $(echo "$CMDS" | awk -F: '{print $1"."$2}'); do
   if [ -f "$S/$f" ]; then cp "$S/$f" "$ROOT/build/OUTPUT/"; else echo "missing $f"; fi
 done
 # LINK, as Microsoft built it for 2.x (PC DOS 2.10 has the same linker)

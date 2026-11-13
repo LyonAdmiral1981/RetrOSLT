@@ -83,7 +83,7 @@ IN_2:   MOV     [FMT],BX
         RET
 
 IN_HARD:
-        ; a fixed disk: its DPB tells the layout IO.SYS gave the partition
+        ; a fixed disk: its DPB tells the layout RETBIO.COM gave the partition
         MOV     [HARDFLAG],1
         MOV     DL,[DRIVE]
         INC     DL

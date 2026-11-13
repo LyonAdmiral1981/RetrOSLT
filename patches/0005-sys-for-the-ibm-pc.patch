@@ -17,9 +17,11 @@ diff -ru e/SYS.ASM f/SYS.ASM
  
  DEFALT  DB      0
 -        IF MSVER
-+; RetrOS/LT: its system files are IO.SYS and MSDOS.SYS in either version
- BIOSName    DB  "A:\IO.SYS",0
- DOSName     DB  "A:\MSDOS.SYS",0
++; RetrOS/LT: its system files are RETBIO.COM and RETDOS.COM in either version
+-BIOSName    DB  "A:\IO.SYS",0
+-DOSName     DB  "A:\MSDOS.SYS",0
++BIOSName    DB  "A:\RETBIO.COM",0
++DOSName     DB  "A:\RETDOS.COM",0
 -        ENDIF
 -        IF IBMVER OR IBMJAPVER
 -BIOSName    DB  "A:\IBMBIO.COM",0
@@ -42,7 +44,7 @@ diff -ru e/SYS.ASM f/SYS.ASM
          ENDIF
  
          IF      IBMVER
-+; RetrOS/LT: always write the RetrOS/LT boot sector, which loads IO.SYS, and
++; RetrOS/LT: always write the RetrOS/LT boot sector, which loads RETBIO.COM, and
 +; keep the disk's own BPB. IBM's SYS wrote one only to a DOS 1 diskette
 +; (FEh or FFh, which may have no BPB) and left a DOS 2 disk's as it was.
  PUTBOOT:
