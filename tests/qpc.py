@@ -22,9 +22,11 @@ KEYS = {"\n": "ret", " ": "spc", ".": "dot", ":": "shift-semicolon", "\\": "back
 
 
 class PC:
-    def __init__(self, a=None, b=None, hd=None, hd2=None, boot="a", mem=4):
+    def __init__(self, a=None, b=None, hd=None, hd2=None, boot="a", mem=4, lpt=None):
         cmd = ["qemu-system-i386", "-machine", "pc", "-cpu", "486", "-m", str(mem),
                "-display", "none", "-monitor", "stdio", "-boot", f"order={boot}"]
+        if lpt:
+            cmd += ["-parallel", f"file:{lpt}"]
         if a:
             cmd += ["-drive", f"file={a},if=floppy,index=0,format=raw"]
         if b:
