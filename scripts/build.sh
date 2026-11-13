@@ -99,4 +99,6 @@ grep -iE "error|unresolved|warning L" "$ROOT/build/LINK.LOG" | grep -v L4021 || 
 for f in MSDOS.SYS IO.SYS COMMAND.COM $(echo "$CMDS" | awk -F: '{print $1"."$2}'); do
   if [ -f "$S/$f" ]; then cp "$S/$f" "$ROOT/build/OUTPUT/"; else echo "missing $f"; fi
 done
+# LINK, as Microsoft built it for 2.x (PC DOS 2.10 has the same linker)
+cp "$ROOT/upstream/msdos/v2.0/bin/LINK.EXE" "$ROOT/build/OUTPUT/"
 ls -l "$ROOT/build/OUTPUT"
