@@ -1,0 +1,38 @@
+diff -ru b/DOSSYM.ASM c/DOSSYM.ASM
+--- b/DOSSYM.ASM	2026-11-13 09:30:19.311833463 -0500
++++ c/DOSSYM.ASM	2026-11-13 09:30:55.232206333 -0500
+@@ -8,7 +8,7 @@
+ ENDIF
+ 
+ DOS_MAJOR_VERSION   EQU      2
+-DOS_MINOR_VERSION   EQU     11
++DOS_MINOR_VERSION   EQU     10      ; RetrOS/LT: as PC DOS 2.10
+ 
+ BREAK <Control character definitions>
+ 
+diff -ru b/TDATA.ASM c/TDATA.ASM
+--- b/TDATA.ASM	2026-11-13 09:30:19.308493883 -0500
++++ c/TDATA.ASM	2026-11-13 09:31:26.348521893 -0500
+@@ -92,7 +92,7 @@
+ 
+ ;"VERMES_PRE<version #>VERMES_POST"
+         IF      IBMVER
+-VERMES_PRE  DB      "TeleVideo Personal Computer DOS Version "
++VERMES_PRE  DB      "RetrOS/LT Version 1.0, DOS"
+         ENDIF
+         IF      MSVER
+ VERMES_PRE  DB      "MS-DOS Version "
+diff -ru b/UINIT.ASM c/UINIT.ASM
+--- b/UINIT.ASM	2026-11-13 09:30:19.308738920 -0500
++++ c/UINIT.ASM	2026-11-13 09:30:55.231795700 -0500
+@@ -17,8 +17,8 @@
+         DB      13,10,"$"
+         ENDIF
+         IF IBM
+-HEADER  DB      13,10,13,10,"TeleVideo Personal Computer DOS Vers. 2.11",13,10
+-        DB      "(C) Copyright TeleVideo Systems, Inc. 1983",13,10
++HEADER  DB      13,10,13,10,"RetrOS/LT Version 1.0",13,10
++        DB      "(C) Copyright Republic Lyon Mountain Corporation 2026",13,10
+ 	DB	"(C) Copyright Microsoft Corp. 1981, 1982, 1983",13,10,"$"
+         ENDIF
+ 
