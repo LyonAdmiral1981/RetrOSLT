@@ -29,6 +29,8 @@ maxcyl  dw      0               ; most cylinders a DOS partition may have
 changed db      0               ; the partition table was written
 
 mbr     times 512 db 0          ; the master boot record, as read
+dmaptr  dw      0               ; the half of DMABUF the ROM is given
+dmabuf  times 1024 db 0
 ; The RetrOS/LT master boot record's code, for a disk that has none
 %include "MBRCODE.INC"
 
@@ -99,9 +101,30 @@ readmbr:
         ret
 
 ; INT 13h function AH, one sector, MBR <-> cylinder 0 head 0 sector 1
-mbrio:  mov     di,3
+mbrio:  push    ax                      ; the ROM's buffer: not across 64K
+        mov     ax,ds
+        mov     cl,4
+        shl     ax,cl
+        add     ax,dmabuf
+        add     ax,511
+        mov     bx,dmabuf
+        jnc     .buf
+        add     bx,512
+.buf:   mov     [dmaptr],bx
+        pop     ax
+        cmp     ah,3                    ; a write: the record in first
+        jne     .go
+        push    ds
+        pop     es
+        mov     si,mbr
+        mov     di,bx
+        mov     cx,256
+        rep     movsw
+.go:    push    ds
+        pop     es
+        mov     di,3
 .try:   push    ax
-        mov     bx,mbr
+        mov     bx,[dmaptr]
         mov     cx,1
         xor     dh,dh
         mov     dl,[drive]
@@ -115,7 +138,15 @@ mbrio:  mov     di,3
         dec     di
         jnz     .try
         stc
-.ok:    ret
+        ret
+.ok:    cmp     ah,2                    ; a read: the record out
+        jne     .r
+        mov     si,[dmaptr]
+        mov     di,mbr
+        mov     cx,256
+        rep     movsw
+.r:     clc
+        ret
 
 ; ------------------------------------------------------------------ menu
 menu:   call    cls

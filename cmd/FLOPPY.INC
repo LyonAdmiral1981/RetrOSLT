@@ -109,7 +109,7 @@ getformat:
         mov     cx,0002h
         xor     dh,dh
         mov     dl,[gfdrv]
-        mov     bx,secbuf
+        mov     bx,[secptr]
         push    ds
         pop     es
         int     13h
@@ -120,7 +120,8 @@ getformat:
         jnz     .try
         stc
         ret
-.read:  mov     al,[secbuf]
+.read:  mov     bx,[secptr]
+        mov     al,[bx]
         mov     bx,fmtid
         mov     cx,4
 .lp:    cmp     al,[bx]
@@ -231,18 +232,24 @@ afbuf   dw      af1
 af1     times 36 db 0
 af2     times 36 db 0
 
-; Pick the address-field buffer that does not cross 64K, and work out how
+; Pick the address-field buffer and sector buffer that do not cross 64K, and work out how
 ; many tracks fit in memory from BUFSEG up: TRKBUF tracks of 512*SPT bytes,
 ; never across a 64K boundary (each track is placed on its own).
 setupmem:
         mov     ax,ds
         mov     cl,4
         shl     ax,cl
+        mov     dx,ax
         add     ax,af1
         add     ax,36
         jnc     .af
         mov     word [afbuf],af2
-.af:    ret
+.af:    mov     ax,dx                   ; and the sector buffer likewise
+        add     ax,secbuf
+        add     ax,511
+        jnc     .sb
+        mov     word [secptr],secbuf+512
+.sb:    ret
 
 ; ES:BX for track buffer number AX (each 512*SPT bytes, from BUFSEG,
 ; skipping a 64K boundary). CF if it is past the end of memory.
@@ -341,4 +348,5 @@ m_crlf  db      13,10,"$"
 m_badver db     "Incorrect DOS version",13,10,"$"
 m_badparm db    "Invalid parameter",13,10,"$"
 m_baddrv db     "Invalid drive specification",13,10,"$"
-secbuf  times 512 db 0
+secptr  dw      secbuf          ; the half of SECBUF not across 64K
+secbuf  times 1024 db 0

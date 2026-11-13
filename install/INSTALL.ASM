@@ -695,16 +695,18 @@ read_mbr:
         xor dh,dh
 ; read_sector: CX/DH = cylinder, sector and head as INT 13h takes them.
 read_sector:
+        call dma_buf                    ; BX: where the ROM may put it
         mov di,3                        ; three tries
 .try:   push cx
         push dx
+        push bx
         mov dl,80h
-        mov bx,buffer
         mov ax,0201h
         int 13h
+        pop bx
         pop dx
         pop cx
-        jnc .ok
+        jnc .copy
         push cx
         push dx
         xor ah,ah
@@ -715,7 +717,32 @@ read_sector:
         dec di
         jnz .try
         stc
-.ok:    ret
+        ret
+.copy:  cmp bx,buffer                   ; read beside BUFFER: move it there
+        je .ok
+        mov si,bx
+        mov di,buffer
+        push ds
+        pop es
+        mov cx,256
+        rep movsw
+.ok:    clc
+        ret
+
+; dma_buf: BX = BUFFER, or BUFFER+512 if a sector at BUFFER would cross a
+; 64K boundary of memory, which the DMA controller cannot.
+dma_buf:
+        push cx
+        mov ax,ds
+        mov cl,4
+        shl ax,cl
+        add ax,buffer
+        add ax,511
+        mov bx,buffer
+        jnc .r
+        add bx,512
+.r:     pop cx
+        ret
 
 ; find_dos_part: looks in the partition table in buffer for a DOS
 ; partition (type 1). Saves where it starts. CF if there is none.
@@ -839,13 +866,21 @@ whole_disk:
         sbb dx,0
         mov [di+12],ax
         mov [di+14],dx
-        mov di,3                        ; write it
+        call dma_buf                    ; write it, from where the ROM can
+        cmp bx,buffer
+        je .write
+        mov si,buffer
+        mov di,bx
+        mov cx,256
+        rep movsw
+.write: mov di,3
 .try:   mov ax,0301h
-        mov bx,buffer
+        push bx
         mov cx,1
         xor dh,dh
         mov dl,80h
         int 13h
+        pop bx
         jnc .ret
         xor ah,ah
         mov dl,80h

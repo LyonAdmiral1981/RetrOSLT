@@ -449,6 +449,7 @@ DIO_LP: JCXZ    DIO_OK
         MOV     DL,[PHYS]
         POP     BX
         PUSH    BX
+        CALL    BOUNCE                  ; BX: a buffer the DMA can use
         MOV     SI,3
 DIO_TRY:
         PUSH    DS
@@ -461,7 +462,7 @@ DIO_TRY:
         INT     13H
         POP     DX
         POP     CX
-        JNC     DIO_NEXT
+        JNC     DIO_DONE
         XOR     AH,AH
         INT     13H
         DEC     SI
@@ -473,7 +474,8 @@ DIO_TRY:
         POP     SI
         STC
         RET
-DIO_NEXT:
+DIO_DONE:
+        CALL    UNBOUNCE                ; a read: to where it was asked for
         POP     BX
         POP     CX
         POP     DX
@@ -489,6 +491,68 @@ DIO_SAME:
 DIO_OK: POP     SI
         CLC
         RET
+
+; The DMA controller cannot cross a 64K boundary of memory, and the ROM
+; refuses a transfer that would. BOUNCE: if the sector at DS:BX would cross
+; one, BX is changed to whichever of BNC1 and BNC2 does not (only one can),
+; after copying the sector there for a write. UNBOUNCE copies it back after
+; a read. ORIGBX holds the caller's buffer, or 0.
+BOUNCE: MOV     [ORIGBX],0
+        PUSH    AX
+        PUSH    CX
+        MOV     AX,DS
+        MOV     CL,4
+        SHL     AX,CL
+        ADD     AX,BX
+        ADD     AX,511
+        POP     CX
+        JNC     BN_RET                  ; it does not cross
+        MOV     [ORIGBX],BX
+        PUSH    SI
+        PUSH    DI
+        PUSH    CX
+        MOV     AX,DS
+        MOV     CL,4
+        SHL     AX,CL
+        ADD     AX,OFFSET BNC1
+        ADD     AX,511
+        MOV     DI,OFFSET BNC1
+        JNC     BN_1
+        MOV     DI,OFFSET BNC2
+BN_1:   MOV     [BNCBUF],DI
+        CMP     BP,3
+        JNZ     BN_2
+        MOV     SI,BX                   ; a write: the data in first
+        PUSH    DS
+        POP     ES
+        MOV     CX,256
+        REP     MOVSW
+BN_2:   MOV     BX,[BNCBUF]
+        POP     CX
+        POP     DI
+        POP     SI
+BN_RET: POP     AX
+        RET
+UNBOUNCE:
+        CMP     [ORIGBX],0
+        JZ      UB_RET
+        CMP     BP,2
+        JNZ     UB_RET
+        PUSH    SI
+        PUSH    DI
+        PUSH    CX
+        PUSH    DS
+        POP     ES
+        MOV     SI,[BNCBUF]
+        MOV     DI,[ORIGBX]
+        MOV     CX,256
+        REP     MOVSW
+        POP     CX
+        POP     DI
+        POP     SI
+UB_RET: RET
+ORIGBX  DW      0
+BNCBUF  DW      0
 
 ; ---------------------------------------------------------------- data
 
@@ -567,6 +631,8 @@ AF2     DB      36 DUP (0)
         INCLUDE BOOTSECT.INC    ; BOOT: the RetrOS/LT boot sector, 512 bytes
 
 SECBUF  DB      512 DUP (0)
+BNC1    DB      512 DUP (0)         ; for BOUNCE
+BNC2    DB      512 DUP (0)
 FATSPACE DW     FATBUF
 FREESPACE DW    ENDFOR
 FATBUF  DB      6*1024 DUP (0)
