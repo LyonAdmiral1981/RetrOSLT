@@ -25,10 +25,18 @@ DISKCOMP, COMP, TREE, ASSIGN, MODE, GRAPHICS, BACKUP, RESTORE and ANSI.SYS.
 RetrOS/LT comes as PC DOS 2.10 did, on two single-sided 180 KB diskettes
 that any IBM PC or PC XT drive reads: the DOS diskette, which starts the
 computer and holds the system, the commands and Install, and the
-Supplemental Programs diskette (DEBUG, LINK, EXE2BIN). Install, adapted
+Supplemental Programs diskette (DEBUG, LINK, EXE2BIN, BASIC and six sample
+BASIC programs). Install, adapted
 from RetrOS/x86's, partitions, formats and fills the fixed disk, asking
 first. FC, from Microsoft's source (PC DOS 2.10 does not have it), comes as an
 extra.
+
+BASIC is Microsoft's GW-BASIC, built from its published source with
+RetrOS/LT's own part for the IBM PC's screen, keyboard, graphics, sound,
+printers and serial ports (Microsoft left that part out). It is
+BASICA.EXE, which BASIC.COM runs. `BASIC /ROM` starts the Cassette BASIC
+in the computer's ROM instead, where there is one; Cassette BASIC has no
+disk, and only the original PC's cassette port to save to.
 
 The *Guide to Operations* (`docs/guide`) and *Guide to Engineering*
 (`docs/engineering`) are in three editions each: one-sided, two-sided,
@@ -37,7 +45,11 @@ and for a print shop.
 ## Layout
 
 - `upstream/msdos` Microsoft's MS-DOS repository, pinned (submodule)
-- `patches/` RetrOS/LT's changes to the 2.x source, in `series` order
+- `upstream/gwbasic` Microsoft's GW-BASIC repository, pinned (submodule)
+- `patches/` RetrOS/LT's changes to the 2.x source, in `series` order;
+  `patches/gwbasic/` its changes to GW-BASIC
+- `basic/` `PCIO.ASM` (GW-BASIC's IBM PC part, MASM), `BASIC.ASM`
+  (BASIC.COM, NASM) and `samples/`
 - `src/` RetrOS/LT's own sources for the system: `BIOS.ASM` (RETBIO.COM),
   `IO.ASM` (the kernel's console functions, missing from the published
   source and reconstructed) and `IBMFOR.ASM` (FORMAT's IBM PC part)
@@ -49,9 +61,11 @@ and for a print shop.
   (Microsoft's), which go on the DOS diskette
 - `scripts/` `build.sh` (DOSBox-X), `prep.py`, `mkboot.py` (a startup
   diskette image), `mkhd.py` (a fixed disk image), `mkinstall.py` (the
-  two distribution diskettes), `dosrun.sh`
+  two distribution diskettes), `dosrun.sh`, `prepbasic.py` and
+  `buildbasic.sh` (BASIC)
 - `tests/` `qpc.py` (QEMU), `hd_test.py` (FDISK, FORMAT and starting from
-  the fixed disk), `install_test.py` (Install onto an empty fixed disk), `mame5150/` (the IBM PC's own BIOS, which you supply)
+  the fixed disk), `install_test.py` (Install onto an empty fixed disk),
+  `basic_test.py` (BASIC from the diskettes), `mame5150/` (the IBM PC's own BIOS, which you supply)
 
 ## Building
 
@@ -59,6 +73,7 @@ and for a print shop.
     sh scripts/build.sh                 # build/OUTPUT: the system and commands
     python3 scripts/mkinstall.py        # build/install: the two diskettes
     python3 tests/install_test.py
+    python3 tests/basic_test.py
     python3 scripts/mkboot.py build/A.IMG
     python3 tests/qpc.py build/A.IMG --type '\n' --type '\n' --type 'DIR\n'
 

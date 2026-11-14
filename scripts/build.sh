@@ -1,5 +1,6 @@
 #!/bin/sh
-# Builds RetrOS/LT: RETDOS.COM, RETBIO.COM and COMMAND.COM into build/OUTPUT,
+# Builds RetrOS/LT: RETDOS.COM, RETBIO.COM, COMMAND.COM, the commands and
+# BASIC into build/OUTPUT,
 # with Microsoft's MASM 5.10 and LINK 3.65 (MIT, from the pinned MS-DOS 4.0
 # tools) in DOSBox-X.      sh scripts/build.sh
 set -eu
@@ -101,6 +102,8 @@ grep -iE "error|unresolved|warning L" "$ROOT/build/LINK.LOG" | grep -v L4021 || 
 for f in RETDOS.COM RETBIO.COM COMMAND.COM $(echo "$CMDS" | awk -F: '{print $1"."$2}'); do
   if [ -f "$S/$f" ]; then cp "$S/$f" "$ROOT/build/OUTPUT/"; else echo "missing $f"; fi
 done
+# BASIC: Microsoft's GW-BASIC (BASICA.EXE) and BASIC.COM
+sh "$ROOT/scripts/buildbasic.sh" "RetrOS/LT BASIC Version 1.0"
 # LINK, as Microsoft built it for 2.x (PC DOS 2.10 has the same linker)
 cp "$ROOT/upstream/msdos/v2.0/bin/LINK.EXE" "$ROOT/build/OUTPUT/"
 ls -l "$ROOT/build/OUTPUT"

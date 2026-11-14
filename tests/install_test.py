@@ -61,7 +61,10 @@ try:
     for c, want in (("VER\n", "DOS 2.10"), ("DEBUG\n", "-"), ("Q\n", "C:\\>"),
                     ("CLS\n", "C:\\>"), ("TYPE CONFIG.SYS\n", "DEVICE=C:\\DOS\\ANSI.SYS"),
                     ("TYPE AUTOEXEC.BAT\n", "PATH C:\\DOS"), ("CLS\n", "C:\\>"),
-                    ("CHKDSK\n", "bytes free")):
+                    ("CHKDSK\n", "bytes free"), ("CLS\n", "C:\\>"),
+                    ("BASIC /ROM\n", "No ROM BASIC in this computer"),
+                    ("BASIC\n", "Bytes free"), ("PRINT 6*7\n", " 42"),
+                    ("SYSTEM\n", "C:\\>")):
         pc.type(c)
         s = pc.wait(want, 30)
     seen = s

@@ -9,7 +9,9 @@ RETROS-LT-DOS.IMG
     commands and Install. Its AUTOEXEC.BAT asks the date and time and runs
     Install, which can be left with Esc.
 RETROS-LT-SUPPLEMENTAL.IMG
-    The Supplemental Programs diskette: DEBUG, LINK and EXE2BIN.
+    The Supplemental Programs diskette: DEBUG, LINK, EXE2BIN, and BASIC
+    (BASICA.EXE, Microsoft's GW-BASIC, and BASIC.COM) with RetrOS's sample
+    programs.
 
 Each holds a hidden RETROS.DSK ("RetrOS/LT 1" or "RetrOS/LT 2") for
 Install to check. Every file carries the release date and time, as IBM's
@@ -29,7 +31,8 @@ DOS = ["RETBIO.COM", "RETDOS.COM", "COMMAND.COM", "ANSI.SYS", "FORMAT.COM",
        "FC.EXE", "EDLIN.COM", "MODE.COM", "FDISK.COM", "BACKUP.COM", "RESTORE.COM",
        "PRINT.COM", "RECOVER.COM", "ASSIGN.COM", "TREE.COM", "GRAPHICS.COM",
        "SORT.EXE", "FIND.EXE", "MORE.COM", "INSTALL.COM"]
-SUPPLEMENTAL = ["EXE2BIN.EXE", "LINK.EXE", "DEBUG.COM"]
+SUPPLEMENTAL = ["EXE2BIN.EXE", "LINK.EXE", "DEBUG.COM", "BASIC.COM", "BASICA.EXE"]
+SAMPLES = ["CLOCK.BAS", "TUNES.BAS", "PALETTE.BAS", "SKETCH.BAS", "LOAN.BAS", "BOUNCE.BAS"]
 
 
 def run(*a):
@@ -71,6 +74,9 @@ def main():
     stage.mkdir()
     for f in DOS + SUPPLEMENTAL:
         shutil.copy(OUT / f, stage / f)
+    for f in SAMPLES:                        # BASIC programs: CR LF, ^Z
+        (stage / f).write_bytes((ROOT / "basic" / "samples" / f).read_bytes()
+                                .replace(b"\r\n", b"\n").replace(b"\n", b"\r\n") + b"\x1a")
     for f in ("LICENSE.TXT", "NOTICE.TXT"):
         (stage / f).write_bytes((DIST / f).read_bytes().replace(b"\r\n", b"\n")
                                 .replace(b"\n", b"\r\n") + b"\x1a")
@@ -86,7 +92,7 @@ def main():
     sup = dest / "RETROS-LT-SUPPLEMENTAL.IMG"
     blank(sup)
     (stage / "RETROS.DSK").write_bytes(b"RetrOS/LT 2\r\n")
-    put(sup, stage, SUPPLEMENTAL)
+    put(sup, stage, SUPPLEMENTAL + SAMPLES)
     put(sup, stage, ["RETROS.DSK"], hidden=["RETROS.DSK"])
 
     for img in (dos, sup):

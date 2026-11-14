@@ -1,0 +1,3 @@
+# RetrOS patches to Microsoft's GW-BASIC source, in order.
+0001-assemble-with-masm-5.patch
+0002-play-octave-commands.patch

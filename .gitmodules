@@ -1,3 +1,6 @@
 [submodule "upstream/msdos"]
 	path = upstream/msdos
 	url = https://github.com/microsoft/MS-DOS.git
+[submodule "upstream/gwbasic"]
+	path = upstream/gwbasic
+	url = https://github.com/microsoft/GW-BASIC.git
