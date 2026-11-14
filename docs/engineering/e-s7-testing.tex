@@ -35,12 +35,20 @@ Ends \shown{HD-TEST OK}.\\
 \file{tests/install\_test.py} & An empty XT disk and the two diskettes:
 Install from beginning to end, as a person would (the partition, the
 restart, the format, the diskette change), then starting from C and
-running \typed{VER}, \typed{DEBUG} and \typed{CHKDSK}, and reading the
-startup files. Ends \shown{INSTALL-TEST OK}.\\
+running \typed{VER}, \typed{DEBUG} and \typed{CHKDSK}, reading the
+startup files, and \typed{BASIC /ROM} and \typed{BASIC} from the path.
+Ends \shown{INSTALL-TEST OK}.\\
+\file{tests/basic\_test.py} & The two diskettes: \typed{BASIC /ROM}, then
+a BASIC program that checks itself, arithmetic, strings, files,
+\typed{PLAY}, the screen, \typed{PAINT}, \typed{GET} and \typed{PUT}, and
+error trapping, and writes what failed. Ends \shown{BASIC-TEST OK}.\\
 On the 5150 & Starting from 360 and 180 KB diskettes at 256 and 640 KB;
 \file{ANSI.SYS}, \typed{MODE}, \typed{GRAPHICS}, \typed{TREE},
 \typed{VER} and \typed{CHKDSK} from \file{AUTOEXEC.BAT}; the time from
-power on to the date prompt.\\
+power on to the date prompt. BASIC at 256 and 640 KB: \typed{BASICA /ROM}
+with the stand-in BASIC sockets, and a program of arithmetic, files,
+\typed{PLAY}, \typed{PAINT}, \typed{GET} and \typed{PUT} and
+\typed{SCREEN}, ending with \typed{SYSTEM}.\\
 \bottomrule
 \end{tabularx}
 
@@ -112,6 +120,15 @@ reconstructed console functions, the startup records, \typed{FDISK},
   machine part.
 \item \textbf{A second fixed disk}, and fixed disks other than the XT's
   10 MB geometry.
+\item \textbf{Cassette BASIC.} \typed{BASIC /ROM} was seen to refuse
+  a computer without it, under QEMU and on the 5150 with empty sockets;
+  no IBM BASIC ROM was used, so starting one has not been seen.
+\item \textbf{BASIC's serial ports, light pen and joysticks}, which the
+  emulators used do not provide in a form the tests could drive.
+\item \textbf{Printing under QEMU.} QEMU's BIOS reports a time-out after
+  each character it sends to a printer file, so \typed{LPRINT}, like DOS's
+  own \code{PRN}, sends the character and reports \shown{Device Timeout}.
+  On the 5150 the printer was not tested.
 \item \textbf{PC DOS 2.10 itself, side by side.} RetrOS/LT's behavior was
   matched to IBM's documentation and to what is known of PC DOS 2.10; no
   copy of PC DOS was used in making it.

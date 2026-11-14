@@ -35,6 +35,17 @@ FILES = [
     ("cmd/TREE.ASM", "TREE (Section~5)"),
     ("dev/ANSI.ASM", "ANSI.SYS (Section~5)"),
     ("install/INSTALL.ASM", "Install (Section~6)"),
+    ("basic/PCIO.ASM", "BASIC's part for the IBM PC (Section~8)"),
+    ("basic/BASIC.ASM", "BASIC.COM (Section~8)"),
+    ("basic/samples/BOUNCE.BAS", "Sample program"),
+    ("basic/samples/CLOCK.BAS", "Sample program"),
+    ("basic/samples/LOAN.BAS", "Sample program"),
+    ("basic/samples/PALETTE.BAS", "Sample program"),
+    ("basic/samples/SKETCH.BAS", "Sample program"),
+    ("basic/samples/TUNES.BAS", "Sample program"),
+    ("patches/gwbasic/series", "GW-BASIC's series (Appendix~B)"),
+    ("scripts/prepbasic.py", "Makes BASIC's build tree (Section~8)"),
+    ("scripts/buildbasic.sh", "Builds BASIC (Section~8)"),
     ("patches/series", "The series (Appendix~B)"),
     ("scripts/prep.py", "Makes the build tree (Section~2)"),
     ("scripts/build.sh", "Builds everything (Section~2)"),
@@ -47,12 +58,14 @@ FILES = [
     ("tests/qpc.py", "A PC under QEMU (Section~7)"),
     ("tests/hd_test.py", "FDISK, FORMAT and starting from the fixed disk (Section~7)"),
     ("tests/install_test.py", "Install onto an empty fixed disk (Section~7)"),
+    ("tests/basic_test.py", "BASIC from the diskettes (Section~7)"),
     ("tests/mame5150/setup.sh", "Prepares MAME's IBM PC 5150 (Section~7)"),
     ("tests/mame5150/screen.lua", "Saves the screen from video memory"),
     ("tests/mame5150/swap.lua", "Changes the diskette in drive A"),
     ("tests/mame5150/WAITSWAP.ASM", "Asks for the diskette change"),
 ]
-CHECKED = ["src", "boot", "cmd", "dev", "install", "scripts", "tests", "tests/mame5150", "dist"]
+CHECKED = ["src", "boot", "cmd", "dev", "install", "scripts", "tests", "tests/mame5150", "dist",
+           "basic", "basic/samples"]
 IGNORE = re.compile(r"(README\.md|\.gitignore|\.COM|\.pyc)$")
 
 
@@ -79,10 +92,17 @@ def files_table():
 
 def patches_table():
     rows = []
-    series = [l.strip() for l in (ROOT / "patches" / "series").read_text().splitlines()
+    for d, mark in (("patches", ""), ("patches/gwbasic", "GW ")):
+        rows += series_rows(ROOT / d, mark)
+    (HERE / "patches.gen.tex").write_text("\n".join(rows) + "\n")
+
+
+def series_rows(d, mark):
+    rows = []
+    series = [l.strip() for l in (d / "series").read_text().splitlines()
               if l.strip() and not l.startswith("#")]
     for name in series:
-        text = (ROOT / "patches" / name).read_text(encoding="latin-1")
+        text = (d / name).read_text(encoding="latin-1")
         files, cur = {}, None
         for l in text.splitlines():
             m = re.match(r"^\+\+\+ \S+?/(\S+)", l)
@@ -95,11 +115,11 @@ def patches_table():
                 files[cur][1] += 1
         first = True
         for f, (a, r) in files.items():
-            label = f"\\patch{{{tex(name[:4])}}}" if first else ""
+            label = f"\\patch{{{mark}{tex(name[:4])}}}" if first else ""
             rows.append(f"{label} & \\file{{{tex(f)}}} & +{a} & $-${r}\\\\")
             first = False
         rows.append("\\addlinespace[2pt]")
-    (HERE / "patches.gen.tex").write_text("\n".join(rows) + "\n")
+    return rows
 
 
 if __name__ == "__main__":

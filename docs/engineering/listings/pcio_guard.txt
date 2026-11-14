@@ -1,0 +1,5 @@
+POLCNT  DB      0
+;The byte before BASIC's program text (LSTVAR, TXTTAB) must stay 0:
+;it is the end of the line before the first.
+        DB      0
+DSEG    ENDS

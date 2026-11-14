@@ -85,7 +85,8 @@ the IBM Personal Computer or XT can read, as PC DOS 2.10 did:
   Install; press \key{Esc} to leave Install and use the commands from
   drive A.
 \item \textbf{The Supplemental Programs diskette} holds the programmer's
-  tools: \typed{DEBUG}, \typed{LINK} and \typed{EXE2BIN}.
+  tools, \typed{DEBUG}, \typed{LINK} and \typed{EXE2BIN}, and
+  \typed{BASIC} with six sample programs (see ``BASIC'' in Section~3).
 \end{itemize}
 
 The DOS diskette also holds \file{LICENSE.TXT}, the RetrOS/LT License,
@@ -113,15 +114,18 @@ differences are few, and you can see them:
   comparison program, beside IBM's \typed{COMP}.
 \item \textbf{Starting up.} RetrOS/LT reads its system files a track at a
   time, so it starts a little faster from a diskette.
+\item \textbf{BASIC.} RetrOS/LT's \typed{BASIC} is Microsoft's GW-BASIC,
+  which needs no BASIC in the computer's read-only memory, where IBM's
+  \typed{BASIC} and \typed{BASICA} build on it. \typed{BASIC /ROM} starts
+  the read-only memory's Cassette BASIC instead. See Section~3.
 \end{itemize}
 
 \section{What RetrOS/LT Does Not Include}
 
 \begin{itemize}
-\item \textbf{BASIC.} IBM's \typed{BASIC} and \typed{BASICA} build on the
-  Cassette BASIC in the Personal Computer's read-only memory and are IBM's
-  own programs; RetrOS/LT does not include them, nor IBM's sample BASIC
-  programs.
+\item \textbf{IBM's BASIC programs.} IBM's \file{BASIC.COM} and
+  \file{BASICA.COM} are IBM's own, and so are its sample BASIC programs;
+  RetrOS/LT has its own BASIC and samples in their place.
 \item \textbf{The features of later versions of DOS}, such as volume
   serial numbers, \typed{ATTRIB}, \typed{LABEL}, \typed{XCOPY} or
   international support. A program that needs DOS 3 or later says so and

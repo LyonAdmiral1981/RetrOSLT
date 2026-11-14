@@ -1,0 +1,56 @@
+TMRISR: CMP     CS:SNDFST,0
+        JNE     TMRI1
+        JMP     DWORD PTR CS:OLD08              ;Slow: only the BIOS's
+TMRI1:  PUSH    AX
+        PUSH    BX
+        PUSH    DX
+        CMP     CS:SNDREM,0
+        JE      TMRI2
+        DEC     CS:SNDREM
+        JNZ     TMRI5                   ;The note goes on
+TMRI2:  CMP     CS:SNDCNT,0             ;Next note
+        JNE     TMRI3
+        CALL    SPKOFF                  ;None: silence, slow down
+        JMP     SHORT TMRI5
+TMRI3:  MOV     BX,CS:SNDHD
+        MOV     DX,WORD PTR CS:SNDQ[BX+2]
+        MOV     CS:SNDREM,DX
+        MOV     BX,WORD PTR CS:SNDQ[BX] ;Frequency, 0 = pause
+        ADD     CS:SNDHD,4
+        AND     CS:SNDHD,NOTEQ*4-1
+        DEC     CS:SNDCNT
+        CALL    SPKOFF
+        OR      BX,BX
+        JZ      TMRI5
+        CMP     BX,19                   ;(below 19 Hz the count overflows)
+        JB      TMRI5
+        MOV     DX,12H                  ;1193180 / frequency
+        MOV     AX,34DCH
+        DIV     BX
+        MOV     BX,AX
+        MOV     AL,0B6H
+        OUT     43H,AL
+        MOV     AL,BL
+        OUT     42H,AL
+        MOV     AL,BH
+        OUT     42H,AL
+        IN      AL,61H
+        OR      AL,3
+        OUT     61H,AL
+TMRI5:  ADD     CS:SNDACC,TIMFRQ        ;Time for the BIOS's tick?
+        JB      TMRI7
+        CMP     CS:SNDREM,0
+        JNE     TMRI6
+        CMP     CS:SNDCNT,0
+        JNE     TMRI6
+        CALL    TMRSLW                  ;All played: slow again
+TMRI6:  MOV     AL,20H
+        OUT     20H,AL
+        POP     DX
+        POP     BX
+        POP     AX
+        IRET
+TMRI7:  POP     DX
+        POP     BX
+        POP     AX
+        JMP     DWORD PTR CS:OLD08

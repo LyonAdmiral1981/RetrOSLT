@@ -1,0 +1,4 @@
+;Editing keys: scan codes, then the function each gives
+EDKSCN  DB      48H,4BH,4DH,50H,47H,4FH,52H,53H,77H,75H,74H,73H
+        EDKN    EQU     $-EDKSCN
+        DB      30,29,28,31,11,14,18,127,12,5,6,2

@@ -1,0 +1,48 @@
+ROMCHK: PUSH    AX
+        PUSH    CX
+        PUSH    SI
+        MOV     SI,81H
+        MOV     CL,BYTE PTR CS:[80H]
+        XOR     CH,CH
+ROMCK1: JCXZ    ROMCKX
+        DEC     CX
+        MOV     AL,BYTE PTR CS:[SI]
+        INC     SI
+        CMP     AL,"/"
+        JNE     ROMCK1
+        CMP     CX,3
+        JB      ROMCKX
+        MOV     AX,WORD PTR CS:[SI]     ;"RO"
+        AND     AX,0DFDFH               ;(upper case)
+        CMP     AX,"O"*256+"R"
+        JNE     ROMCK1
+        MOV     AL,BYTE PTR CS:[SI+2]
+        AND     AL,0DFH
+        CMP     AL,"M"
+        JNE     ROMCK1
+        XOR     AX,AX                   ;/ROM: is there one?
+        MOV     ES,AX
+        CMP     WORD PTR ES:[18H*4],0
+        JNE     NOROM
+        CMP     WORD PTR ES:[18H*4+2],0F600H
+        JNE     NOROM
+        MOV     AX,0F600H
+        MOV     ES,AX
+        MOV     AL,BYTE PTR ES:[0]      ;Empty sockets read FFh, and
+        CMP     AL,0FFH
+        JE      NOROM
+        OR      AL,AL                   ; memory that is not ROM, often 0
+        JZ      NOROM
+        INT     18H                     ;Cassette BASIC
+NOROM:  PUSH    CS
+        POP     DS
+        MOV     DX,OFFSET NOROMM
+        MOV     AH,9
+        INT     21H
+        MOV     AX,4C01H
+        INT     21H
+ROMCKX: POP     SI
+        POP     CX
+        POP     AX
+        RET
+NOROMM  DB      "No ROM BASIC in this computer",13,10,"$"

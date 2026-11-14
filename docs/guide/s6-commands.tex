@@ -14,9 +14,9 @@ In the formats, \var{d:} is a drive, \var{path} a directory path,
 and wildcards in it. Items in square brackets may be left out.
 
 The commands for batch files are \typed{ECHO}, \typed{FOR}, \typed{GOTO},
-\typed{IF}, \typed{PAUSE}, \typed{REM} and \typed{SHIFT}. \typed{DEBUG},
-\typed{LINK} and \typed{EXE2BIN} are on the Supplemental Programs
-diskette.
+\typed{IF}, \typed{PAUSE}, \typed{REM} and \typed{SHIFT}. \typed{BASIC},
+\typed{DEBUG}, \typed{LINK} and \typed{EXE2BIN} are on the Supplemental
+Programs diskette.
 
 \cmd{ASSIGN}{External}{Sends requests for one drive to another.}
 \fmt{ASSIGN [\var{x}=\var{y} [...]]}
@@ -41,6 +41,24 @@ The target diskettes must be formatted. Only \typed{RESTORE} can read what
 the files, 1 if there were none to back up, 3 if it was stopped with
 \keys{Ctrl}{Break}, and 4 after an error; \typed{IF ERRORLEVEL} can test
 it. See Section~4.
+
+\cmd{BASIC, BASICA}{External}{Starts BASIC.}\ixs{BASIC}
+\fmt{BASICA [\var{file}] [/F:\var{files}] [/S:\var{size}] [/C:\var{size}] [/M:\var{memory}]}
+\fmt{BASIC /ROM}
+\begin{opts}
+\opt{\var{file}}{A BASIC program to load and run; \file{.BAS} is assumed.}
+\opt{/F:, /S:}{IBM's number of files and largest random record. They are
+  accepted, and not needed: this BASIC makes room for files and records
+  as they are opened.}
+\opt{/C:}{Bytes for receiving from the serial ports, half for each; 512
+  unless given.}
+\opt{/M:}{The highest memory location BASIC is to use, within its own
+  64 KB, leaving the rest for machine language routines.}
+\opt{/ROM}{Starts Cassette BASIC, in the computer's read-only memory,
+  instead. There is no coming back but restarting the computer.}
+\end{opts}
+\file{BASICA.EXE} and \file{BASIC.COM} are on the Supplemental Programs
+diskette. \typed{SYSTEM} leaves BASIC. See ``BASIC'' in Section~3.
 
 \cmd{BREAK}{Internal}{Sets how often RetrOS/LT checks for
 \keys{Ctrl}{Break}.}

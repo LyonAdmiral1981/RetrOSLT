@@ -17,6 +17,14 @@ D = {
     "NOTICE.TXT": "The notice for Microsoft's code.",
     "ANSI.SYS": "Driver: ANSI screen and keyboard control.",
     "FC.EXE": "The FC command (not in PC DOS 2.10).",
+    "BASIC.COM": "Runs BASICA.EXE: the BASIC command.",
+    "BASICA.EXE": "BASIC: Microsoft's GW-BASIC.",
+    "CLOCK.BAS": "Sample BASIC program: a clock.",
+    "TUNES.BAS": "Sample BASIC program: three tunes.",
+    "PALETTE.BAS": "Sample BASIC program: the colors.",
+    "SKETCH.BAS": "Sample BASIC program: drawing.",
+    "LOAN.BAS": "Sample BASIC program: loan payments.",
+    "BOUNCE.BAS": "Sample BASIC program: a bouncing ball.",
 }
 DISKS = (("RETROS-LT-DOS.IMG", "DOS"), ("RETROS-LT-SUPPLEMENTAL.IMG", "Supplemental"))
 

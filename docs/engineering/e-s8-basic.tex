@@ -1,0 +1,181 @@
+\mwnewpart
+\renewcommand\runningtitle{Section 8. BASIC}
+\chapter{BASIC}
+\sectioncontents
+
+\section{Microsoft's GW-BASIC}\ixs{BASIC}\ixs{GW-BASIC}
+
+\begin{plainwords}
+IBM's BASIC for PC DOS 2.10 was a program on the diskette that used the
+Cassette BASIC in the Personal Computer's read-only memory, and both were
+IBM's. In 2020 Microsoft published the source of GW-BASIC, its BASIC for
+other makers' computers, as it stood in 1983: the language of IBM's
+\typed{BASICA}, with no need of a ROM. As with MS-DOS, Microsoft left out
+the part each maker wrote for its own computer: here the screen,
+keyboard, graphics, speaker, printers and serial ports. RetrOS/LT builds
+Microsoft's part from the source, with the same assembler as the rest of
+the system, and adds that part for the IBM Personal Computer.
+\end{plainwords}
+
+\begin{tabularx}{\textwidth}{@{}P{2.0in}Y@{}}
+\toprule
+\file{upstream/gwbasic} & Microsoft's repository, pinned as a submodule:
+thirty-five modules and five headers\\
+\file{patches/gwbasic} & Two patches (Appendix~B)\\
+\file{basic/PCIO.ASM} & The IBM PC part: sixty-three routines\\
+\file{basic/BASIC.ASM} & \file{BASIC.COM}, which runs \file{BASICA.EXE}\\
+\file{basic/samples} & The six sample programs\\
+\file{scripts/prepbasic.py} & Makes the build tree\\
+\file{scripts/buildbasic.sh} & Assembles and links\\
+\bottomrule
+\end{tabularx}
+
+\section{Building It}\ixs{buildbasic.sh}\ixs{prepbasic.py}
+
+The source was written for MASM 1.x. MASM 1.10, which the MS-DOS 2.0
+release includes, wrote object files for twenty of the modules, six of
+them cut short, and then ran on without end in \file{GWEVAL.ASM}. MASM
+5.10 assembles all of them after four small changes, none to code
+(\patch{GW 0001}). The thirteen modules MASM 1.10 finished were compared
+byte for byte with MASM 5.10's: twelve are the same, and in
+\file{GIOCOM.ASM} one instruction that refers forward to a constant has
+the longer of its two encodings, the same addition.
+
+The one change that mattered most is in \file{BINTRP.H}. Each statement's
+address is declared external the first time the dispatch tables name it,
+and a macro marks it as done. That macro was empty, closed with
+\code{\&endm} so that the macro defining it would not end there; MASM 5
+does not take \code{\&endm} as the end of anything, and the rest of every
+file including \file{BINTRP.H} became part of the macro. Those modules
+assembled with no errors and no code. An equate marks the name instead:
+
+\srclist{gwb_bintrp}{BINTRP.H, as patched.}
+
+\file{scripts/prepbasic.py} cleans the files as \file{prep.py} cleans the
+MS-DOS source, joins \file{MATH1.ASM} and \file{MATH2.ASM} (one module,
+split in two files), applies the patches, adds \file{PCIO.ASM} and
+\file{PCIOID.INC}, which names the edition in the heading, and writes
+everything with CR LF. \file{scripts/buildbasic.sh} assembles each module
+and links them. The order matters three ways:
+
+\srclist{buildbasic_order}{The link order.}
+
+\engnote{\code{LSTVAR}, the last byte of the data segment, is where
+BASIC's program text begins, and the byte before it must stay 0: it is
+the end of the ``line'' before the first, and \typed{RUN} and
+\typed{GOTO} start reading there. The first build put \file{PCIO.ASM}'s
+data last, and its last byte was a counter. Every \typed{RUN} after the
+counter first moved said \shown{Syntax error}, with no line number. A
+byte of 0 now ends \file{PCIO.ASM}'s data:}
+
+\srclist{pcio_guard}{The end of PCIO.ASM's data.}
+
+\section{The IBM PC Part}\ixs{PCIO.ASM}
+
+Microsoft's modules call sixty-three routines they do not define. The
+interface is not documented anywhere but in the comments at the calls,
+which say what each routine is given and must return; \file{PCIO.ASM}
+follows them. Its routines fall into seven groups:
+
+\begin{tabularx}{\textwidth}{@{}P{1.0in}Y@{}}
+\toprule
+Screen & \routine{SCROUT}, \routine{SCRINP}, \routine{SCROLL},
+\routine{CLRSCN}, \routine{CLREOL}, \routine{CSRDSP}, \routine{SCRSTT}
+(\typed{SCREEN}), \routine{SWIDTH} (\typed{WIDTH}), \routine{SETCLR}
+(\typed{COLOR}) and the function key line, through interrupt 10h.\\
+Keyboard & \routine{KEYINP}, which turns the ROM's keys into
+Microsoft's codes, \routine{INKMAP} and \routine{INFMAP}, which turn them
+back into IBM's for \typed{INKEY\$} and \typed{INPUT\$}, and
+\routine{MAPSUP}, for \keys{Alt} and a letter.\\
+Graphics & The current point and its moves, \routine{SETC},
+\routine{READC}, \routine{NSETCX}, PAINT's \routine{SCANR} and
+\routine{SCANL}, GET and PUT, in the Color/Graphics Adapter's memory.\\
+Sound & \routine{DONOTE}: a queue of notes, played by the timer.\\
+Printers, serial & \routine{SNDLPT}, through interrupt 17h; the serial
+ports' own chips, with a receive buffer for each.\\
+Pen, joysticks & Interrupt 10h function 4; port 201h.\\
+Start, end & \routine{GWINI}, \routine{GWTERM}, \routine{SEGINI},
+\routine{SETCBF}, \routine{GETHED}.\\
+\bottomrule
+\end{tabularx}
+
+\subsection{The keyboard} BASIC's editor works in Microsoft's codes: an
+editing key is two bytes, 0FFh and a control character (cursor up is
+0FFh, 30), a function key 80h and 20h plus its number. \routine{KEYINP}
+makes them from the ROM's scan codes:
+
+\srclist{pcio_edkeys}{The editing keys.}
+
+\engnote{\key{Esc} becomes 0FFh, 21, the editor's ``erase the line'': the
+screen editor treats the character 27 as the start of an escape sequence
+before it asks what the key is for. \routine{INKMAP} gives
+\typed{INKEY\$} the 27 back.}
+
+\subsection{PAINT} PAINT is Microsoft's, a scan-line fill with a queue;
+the machine's part scans one line. \routine{SCANR} is given how many
+points of the line above (or below) remain to be covered, skips border
+points among them, then paints to the next border:
+
+\srclist{pcio_scanr}{SCANR.}
+
+\subsection{Sound} \typed{SOUND}, \typed{PLAY} and \typed{BEEP} give
+\routine{DONOTE} a frequency and a duration in units of 2.5 ms.
+\routine{DONOTE} queues the note (32 at most), and, if the timer is at its
+usual 18.2 interrupts a second, sets it to 400: one interrupt a unit. The
+BIOS's own routine still gets its 18.2 a second:
+
+\srclist{pcio_tmrisr}{The timer interrupt, while music plays.}
+
+When the queue is empty and the last note is over, the timer goes back to
+18.2. In the foreground (\typed{MF}), \routine{DONOTE} waits for the note
+to finish, or for \keys{Ctrl}{Break}.
+
+\section{BASIC /ROM}\ixs{Cassette BASIC}\ixs{BASIC /ROM}
+
+\routine{GWINI} looks for \typed{/ROM} in the command line before
+anything else is done, so nothing has to be put back. The IBM Personal
+Computer, XT, AT and PS/2 have Cassette BASIC at F600:0000 and
+interrupt 18h pointing there; a computer without it points interrupt 18h
+at its own routine (a message, or another try at starting):
+
+\srclist{pcio_romchk}{/ROM.}
+
+\engnote{The check of the first byte was added after a run on MAME's
+5150, whose BASIC sockets are filled with zeros for the tests: interrupt
+18h pointed at F600:0000, and the first version jumped into the zeros.
+Empty sockets on a real Personal Computer read FFh. A checksum of the
+ROM would be surer on the 5150, where the power-on test keeps each 8 KB
+summing to 0, but the PS/2's BASIC is part of a larger ROM and need not.}
+
+Cassette BASIC takes the whole computer, and DOS is gone; it has no
+disk, only the cassette port, which only the original Personal Computer
+has. The \textit{Guide to Operations} says so where it describes the
+switch.
+
+\section{BASIC.COM}\ixs{BASIC.COM}
+
+PC DOS 2.10 had \file{BASIC.COM} and \file{BASICA.COM}. RetrOS/LT has one
+BASIC, \file{BASICA.EXE} (an \file{.EXE}: Microsoft's \file{BIBOOT.ASM}
+says it must not be converted to a \file{.COM}), and a 544-byte
+\file{BASIC.COM} that runs it with the same command line. DOS 2 does not
+tell a program where it was loaded from, and its EXEC function does not
+search the path, so \file{BASIC.COM} tries the current directory and
+then each directory of \code{PATH}, as \file{COMMAND.COM} does.
+
+\section{What Was Added, and What Was Not}
+
+\begin{itemize}
+\item \textbf{PLAY's \code{>} and \code{<}}, the octave commands of IBM
+  BASIC 2.0, were not in the 1983 source; \patch{GW 0002} adds them.
+\item \textbf{The statements of later versions}, \typed{TIMER},
+  \typed{CHDIR}, \typed{MKDIR}, \typed{RMDIR}, \typed{SHELL},
+  \typed{ENVIRON}, \typed{IOCTL}, \typed{ERDEV}, \typed{VIEW},
+  \typed{WINDOW} and \typed{PMAP}, are in the source as names only and
+  answer \shown{Advanced Feature}; PC DOS 2.10's \typed{BASICA} did not
+  have them either. The function \typed{PLAY(}\var{n}\typed{)} is not in
+  the source.
+\item \textbf{The cassette device} is left out by the source's own switch
+  (\code{GWCASS=0}).
+\item \textbf{Sequential files} are written in whole 128-byte records,
+  the last ending in \^{}Z, as this BASIC always did.
+\end{itemize}

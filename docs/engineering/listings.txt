@@ -38,3 +38,12 @@ ansi_keyin | dev/ANSI.ASM | ^keyin: | ^\.one:
 # Section 6: Install
 install_fcb | install/INSTALL.ASM | DOS 2 programs take their drives | ^        pop di
 install_dma | install/INSTALL.ASM | ^dma_buf: | ^\.r:     pop cx
+
+# Section 8: BASIC
+gwb_bintrp | patches/gwbasic/0001-assemble-with-masm-5.patch | ^diff -ru a/BINTRP.H | +11
+buildbasic_order | scripts/buildbasic.sh | ^# Link order | ^PCIO ITSA86 BIBOOT"
+pcio_guard | basic/PCIO.ASM | ^POLCNT | ^DSEG	ENDS
+pcio_edkeys | basic/PCIO.ASM | ^;Editing keys: scan codes | ^	DB	30,29
+pcio_scanr | basic/PCIO.ASM | ^SCANR:	PUSH | ^SCNRX:
+pcio_tmrisr | basic/PCIO.ASM | ^TMRISR: | ^	JMP	DWORD PTR CS:OLD08$
+pcio_romchk | basic/PCIO.ASM | ^ROMCHK: | ^NOROMM

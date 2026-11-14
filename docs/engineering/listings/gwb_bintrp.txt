@@ -1,0 +1,11 @@
+diff -ru a/BINTRP.H b/BINTRP.H
+--- a/BINTRP.H  2026-11-13 15:59:31.243598726 -0500
++++ b/BINTRP.H  2026-11-13 15:59:31.244560015 -0500
+@@ -115,8 +115,7 @@
+     purge m
+     n
+ endm
+-?&s macro
+-&endm
++?&s = 0                 ; marks S as seen (MASM 5: was a macro)
+ endm

@@ -2,8 +2,9 @@
 \chapter{The Source Files}
 
 RetrOS/LT's own files, with the number of lines in each when this edition
-was made. Microsoft's files are in \file{upstream/msdos}, unchanged; the
-patches change them as the build prepares them.
+was made. Microsoft's files are in \file{upstream/msdos} and
+\file{upstream/gwbasic}, unchanged; the patches change them as the build
+prepares them.
 
 {\small
 \begin{longtable}{@{}P{1.85in}rP{2.9in}@{}}
@@ -19,8 +20,10 @@ patches change them as the build prepares them.
 \renewcommand\runningtitle{Appendix B. The Patches}
 \chapter{The Patches}
 
-Each patch of the series, the files it changes, and the lines it adds and
-removes in each. Section~1 says what each is for.
+Each patch of the two series, the files it changes, and the lines it
+adds and removes in each: \file{patches/series} for MS-DOS (Section~1
+says what each is for) and \file{patches/gwbasic/series} for GW-BASIC,
+marked GW (Section~8).
 
 {\small
 \begin{longtable}{@{}P{0.7in}P{2.0in}rr@{}}
@@ -54,6 +57,10 @@ that code; \typed{LINK} is Microsoft's program from the same release, and
 the assembler and linker that build RetrOS/LT are Microsoft's, from the
 MS-DOS 4.0 release. A few routines of \file{RETBIO.COM} follow the IBM PC
 BIOS of the MS-DOS 4.0 source, and are marked where they are used.
+
+BASIC is built from the source code of GW-BASIC, which Microsoft released
+in 2020 under the MIT License; its part for the IBM Personal Computer,
+\file{BASIC.COM} and the sample programs are RetrOS/LT's.
 
 RetrOS/LT is not MS-DOS and is not PC DOS, and neither Microsoft nor IBM
 has any part in it.

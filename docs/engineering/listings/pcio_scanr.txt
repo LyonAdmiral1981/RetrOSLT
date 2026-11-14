@@ -1,0 +1,40 @@
+SCANR:  PUSH    AX
+        PUSH    SI
+        PUSH    DI
+        PUSH    ES
+        PUSH    CX
+        MOV     AX,CGASEG
+        MOV     ES,AX
+        MOV     SI,DX                   ;SI = skip count
+        CALL    CXPOS                   ;CX = X, DI and DL the point
+        XOR     BX,BX
+        XOR     AL,AL
+;Skip border points
+SCNR1:  OR      SI,SI
+        JZ      SCNRX                   ;No skip left: nothing painted
+        CALL    ISBRD
+        JNZ     SCNR2
+        DEC     SI
+        CMP     CX,PXMAX
+        JAE     SCNRE                   ;The right edge
+        INC     CX
+        CALL    RTMASK
+        JMP     SHORT SCNR1
+SCNRE:  XOR     SI,SI
+        JMP     SHORT SCNRX
+;Paint to the next border point or the edge
+SCNR2:  MOV     CSAVEA,DI
+        MOV     BYTE PTR CSAVEM,DL
+SCNR3:  CALL    PAINT1
+        INC     BX
+        CMP     CX,PXMAX
+        JAE     SCNR4                   ;Painted the last point of the line
+        INC     CX
+        CALL    RTMASK
+        CALL    ISBRD
+        JNZ     SCNR3
+        JMP     SHORT SCNRX
+SCNR4:  CMP     SI,BX                   ;At the edge: nothing more to the right
+        JBE     SCNRX
+        MOV     SI,BX
+SCNRX:  MOV     CLOC,DI

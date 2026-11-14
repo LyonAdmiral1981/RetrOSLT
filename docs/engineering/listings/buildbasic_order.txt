@@ -1,0 +1,8 @@
+# Link order: GWDATA first (the data segment starts there); PCIO before
+# ITSA86, whose code after CSEND is given back once BASIC is running; and
+# BIBOOT last, since its LSTVAR ends the data segment and BASIC's program
+# text begins there.
+MODS="GWDATA ADVGRP BIMISC BIPRTU BIPTRG BISTRS CALL86 DSKCOM FIVEO GENGRP
+GIO86 GIOCAS GIOCOM GIOCON GIODSK GIOKYB GIOLPT GIOSCN GIOTBL GWEVAL GWINIT
+GWLIST GWMAIN GWRAM GWSTS IBMRES KANJ86 MACLNG MATH NEXT86 SCNDRV SCNEDT
+PCIO ITSA86 BIBOOT"

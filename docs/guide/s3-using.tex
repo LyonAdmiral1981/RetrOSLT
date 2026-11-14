@@ -224,6 +224,83 @@ The batch file \file{AUTOEXEC.BAT} in the root of the startup disk is run
 each time the computer starts, in place of the date and time questions.
 See Section~5.
 
+\section{BASIC}\ixs{BASIC}\ixs{BASICA command}\ixs{GW-BASIC}
+
+RetrOS/LT's BASIC is Microsoft's GW-BASIC, built from the source
+Microsoft published, with RetrOS/LT's own part for the IBM Personal
+Computer's screen, keyboard, graphics, speaker, printers and serial port.
+It understands the BASIC of IBM's \typed{BASICA} for PC DOS 2.10, and
+programs written for that run in it. It is \file{BASICA.EXE}, on the
+Supplemental Programs diskette; \file{BASIC.COM} runs it, so
+\typed{BASIC} and \typed{BASICA} both start it:
+
+\begin{dialogue}
+C:\bs>\textbf{BASICA}
+RetrOS/LT BASIC Version 1.0
+(C) Copyright Microsoft 1982
+62746 Bytes free
+Ok
+\end{dialogue}
+
+Type \typed{SYSTEM} to leave BASIC. \typed{BASICA CLOCK} starts BASIC and
+runs the program \file{CLOCK.BAS}. IBM's switches are accepted; see
+\typed{BASIC} in Section~6.
+
+\file{BASIC.COM} looks for \file{BASICA.EXE} in the current directory and
+then in the \typed{PATH}, as RetrOS/LT looks for a program. Once Install
+has set the path, \typed{BASIC} works from anywhere; from the diskettes,
+make the Supplemental Programs diskette's drive the current one first, or
+type \typed{BASICA}.
+
+BASIC takes about 53 KB for itself and up to 64 KB more for programs and
+their data, all it can address; with less memory, it uses what is left.
+
+\subsection{The sample programs} The Supplemental Programs diskette has
+six, written for RetrOS/LT. Run one with \typed{BASICA} and its name, or
+\typed{RUN "}\var{name}\typed{"} in BASIC; \typed{LIST} shows how it is
+done.
+
+\begin{tabularx}{\textwidth}{@{}P{1.1in}X@{}}
+\toprule
+\file{CLOCK.BAS} & A clock with hands, set by \typed{TIME\$}.\\
+\file{TUNES.BAS} & Three old tunes, played with \typed{PLAY}.\\
+\file{PALETTE.BAS} & The text colors, and the two graphics palettes.\\
+\file{SKETCH.BAS} & Drawing with the arrow keys.\\
+\file{LOAN.BAS} & A loan's monthly payment, and its first year.\\
+\file{BOUNCE.BAS} & A ball, with \typed{GET}, \typed{PUT} and \typed{SOUND}.\\
+\bottomrule
+\end{tabularx}
+
+The graphics programs need the Color/Graphics Adapter.
+
+\subsection{What it does not have} It has no cassette device,
+\file{CAS1:}, since it runs from disk. \typed{TIMER}, \typed{CHDIR},
+\typed{MKDIR}, \typed{RMDIR}, \typed{SHELL}, \typed{ENVIRON},
+\typed{IOCTL}, \typed{ERDEV}, \typed{VIEW}, \typed{WINDOW} and
+\typed{PMAP}, which later versions of BASIC added, answer
+\shown{Advanced Feature}.
+
+\subsection{Cassette BASIC}\ixs{Cassette BASIC}\ixs{ROM BASIC} The IBM
+Personal Computer, the XT and some later IBM computers have BASIC in
+read-only memory: Cassette BASIC, the BASIC the computer starts when it
+finds no disk to start from. \typed{BASIC /ROM} (or \typed{BASICA /ROM})
+leaves RetrOS/LT and starts it:
+
+\begin{dialogue}
+C:\bs>\textbf{BASIC /ROM}
+\end{dialogue}
+
+On a computer without it, BASIC says \shown{No ROM BASIC in this computer}
+and you are back at the prompt.
+
+\caution{Cassette BASIC cannot use diskettes or the fixed disk. The only
+place it can keep a program is a cassette recorder, plugged into the
+cassette connector of the original IBM Personal Computer; the XT, the AT
+and the PS/2 have no such connector, and on them what you type in
+Cassette BASIC cannot be saved at all. There is no way back to RetrOS/LT
+but restarting the computer, which loses whatever was in Cassette BASIC's
+memory. Save your work before you leave.}
+
 \section{Restarting}
 
 To restart the computer without turning it off, press

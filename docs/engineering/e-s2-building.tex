@@ -101,8 +101,13 @@ twelve programs & Microsoft's commands, \typed{FORMAT} with IBM's part\\
 \file{LINK.EXE} & copied from the 2.0 release\\
 ten programs, \file{ANSI.SYS} & the commands and driver written new\\
 \file{INSTALL.COM} & Install\\
+\file{BASICA.EXE}, \file{BASIC.COM} & BASIC (Section~8)\\
 \bottomrule
 \end{tabularx}
+
+\file{scripts/build.sh} builds BASIC last, by running
+\file{scripts/buildbasic.sh}, which makes its own tree and runs MASM and
+LINK in DOSBox-X again (Section~8).
 
 \file{scripts/mkinstall.py} then makes the two diskettes (Section~6),
 \file{scripts/mkboot.py} a startup diskette of any of the four sizes, and
